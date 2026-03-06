@@ -1,18 +1,19 @@
-# TO Fine Tracker
+# DriveSafe TO
 
 ## Overview
-A mobile-friendly Flask web app for managing Toronto traffic fines. Features a dark mode UI with glassmorphism effects and neon accent colors.
+A mobile-friendly Flask web app for managing Toronto traffic fines. Features an Apple/iOS-native dark mode UI with true black background and clean card design.
 
 ## Stack
 - Python 3.11
 - Flask 3.x
+- Gunicorn (production server)
 - In-memory data storage
 
 ## Structure
 - `main.py` - Single-file Flask application with embedded HTML template
 
 ## Running
-The app runs on port 5000 via `python main.py`.
+The app runs on port 5000 via `python main.py` (dev) or `gunicorn --bind=0.0.0.0:5000 main:app` (production).
 
 ## Features
 - Dashboard with AI ticket scanner, profile, deadline ROI calculator, and fine reminders with due dates
@@ -26,24 +27,30 @@ The app runs on port 5000 via `python main.py`.
 - Street Parking Checker: dropdown for 4 Toronto areas (Queen St W, Bloor/Yorkville, Kensington, Front St) showing rates, enforcement hours, free parking times, rush hour warnings, plus Green P app link
 - Dispute Script Builder: 4 pre-written legal dispute templates (hidden sign, wrong data, broken meter, valid permit) with copy-to-clipboard
 - Vehicle Towed link: direct link to Toronto Police towing services
-- Hotspots tab with GPS Guardian Proximity Scanner (live geolocation tracking detects $200 bike lane and $100 fire hydrant fine zones, red pulsing alert banner on proximity), 311 Community Hazard Reporter (4 report types: Broken Meter, Hidden Sign, Pothole, Bike Lane Blocked — GPS-located, stored server-side, shown as purple markers on map), and Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap) plus bike lane polyline and hydrant markers
+- Hotspots tab with GPS Guardian Proximity Scanner (live geolocation tracking detects $200 bike lane and $100 fire hydrant fine zones, red alert banner on proximity), 311 Community Hazard Reporter (4 report types: Broken Meter, Hidden Sign, Pothole, Bike Lane Blocked — GPS-located, stored server-side, shown as blue markers on map), and Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap) plus bike lane polyline and hydrant markers
 - All external links open in new tabs to official Toronto portals
 - Guide tab: step-by-step walkthrough of all app features, shown as the default landing page with a "Get Started" button
-- 4-tab floating pill-shaped bottom navigation bar (Guide, Dashboard, Services, Hotspots) with Font Awesome icons
+- 4-tab iOS-style full-width bottom tab bar (Guide, Dashboard, Services, Hotspots) with Font Awesome icons
 - Toast notifications on save/delete actions
-- Dark mode glassmorphism design: backdrop-filter blur on cards, gradient header, box-shadows, staggered entrance animations, cubic-bezier button transitions
-- Font Awesome 6.5.1 icons throughout (nav bar, card labels, buttons)
-- Pulsing red "Find Towed Car" danger button with urgency animation
-- Solid-color action buttons (green for Green P, red for towed car, gradient for scan/save)
+
+## Design System (Apple/iOS Native)
+- True black background (#000000)
+- iOS dark gray cards (#1C1C1E) — solid, no glassmorphism, no borders
+- Apple Electric Blue accent (#0A84FF)
+- Apple system font stack: -apple-system, BlinkMacSystemFont, SF Pro Text
+- JetBrains Mono for ticket numbers and plates
+- Solid-color buttons (no gradients) with opacity 0.8 active state
+- Full-width bottom nav bar (flush to bottom, blur backdrop, 0.5px top border)
+- 12px/16px border-radius, no card borders, 4px-24px box-shadows
 - prefers-reduced-motion accessibility support
-- DM Sans + JetBrains Mono typography, gradient top borders on cards
+- Color palette: Blue #0A84FF, Purple #BF5AF2, Teal #64D2FF, Rose #FF453A, Amber #FFD60A, Green #30D158, Orange #FF9F0A
 
 ## External Dependencies (CDN)
 - Leaflet.js 1.9.4 (map rendering)
 - leaflet.heat (heatmap layer plugin)
 - Tesseract.js 4.0.1 (client-side OCR for ticket scanning)
 - Font Awesome 6.5.1 (icon library)
-- Google Fonts (DM Sans, JetBrains Mono)
+- Google Fonts (JetBrains Mono)
 
 ## Routes
 - `GET /` - Main page

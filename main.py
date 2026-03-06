@@ -26,54 +26,54 @@ HTML_TEMPLATE = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#101014">
-    <title>TO Fine Tracker</title>
+    <meta name="theme-color" content="#000000">
+    <title>DriveSafe TO | Professional</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
     <script src="https://unpkg.com/tesseract.js@v4.0.1/dist/tesseract.min.js"></script>
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --bg-root: #0c0c10;
-            --bg-surface: #16161b;
-            --bg-elevated: #1e1e25;
-            --bg-input: #121216;
-            --border: rgba(255,255,255,0.07);
+            --bg-root: #000000;
+            --bg-surface: #1C1C1E;
+            --bg-elevated: #2C2C2E;
+            --bg-input: #1C1C1E;
+            --border: rgba(255,255,255,0.08);
             --border-focus: rgba(255,255,255,0.18);
-            --text-primary: #f0f0f5;
-            --text-secondary: #9898a8;
-            --text-tertiary: #5c5c6e;
-            --blue: #5b9aff;
-            --blue-vivid: #3d85ff;
-            --blue-subtle: rgba(91,154,255,0.10);
-            --blue-glow: rgba(91,154,255,0.20);
-            --purple: #a78bfa;
-            --purple-subtle: rgba(167,139,250,0.10);
-            --purple-glow: rgba(167,139,250,0.18);
-            --teal: #2dd4bf;
-            --teal-subtle: rgba(45,212,191,0.10);
-            --teal-glow: rgba(45,212,191,0.18);
-            --rose: #f43f5e;
-            --rose-subtle: rgba(244,63,94,0.10);
-            --rose-glow: rgba(244,63,94,0.18);
-            --amber: #fbbf24;
-            --amber-subtle: rgba(251,191,36,0.10);
-            --amber-glow: rgba(251,191,36,0.18);
-            --green: #34d399;
-            --green-subtle: rgba(52,211,153,0.10);
-            --green-glow: rgba(52,211,153,0.18);
-            --orange: #fb923c;
-            --orange-subtle: rgba(251,146,60,0.10);
-            --radius: 10px;
-            --radius-lg: 14px;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8E8E93;
+            --text-tertiary: #636366;
+            --blue: #0A84FF;
+            --blue-vivid: #0A84FF;
+            --blue-subtle: rgba(10,132,255,0.12);
+            --blue-glow: rgba(10,132,255,0.20);
+            --purple: #BF5AF2;
+            --purple-subtle: rgba(191,90,242,0.12);
+            --purple-glow: rgba(191,90,242,0.18);
+            --teal: #64D2FF;
+            --teal-subtle: rgba(100,210,255,0.12);
+            --teal-glow: rgba(100,210,255,0.18);
+            --rose: #FF453A;
+            --rose-subtle: rgba(255,69,58,0.12);
+            --rose-glow: rgba(255,69,58,0.18);
+            --amber: #FFD60A;
+            --amber-subtle: rgba(255,214,10,0.12);
+            --amber-glow: rgba(255,214,10,0.18);
+            --green: #30D158;
+            --green-subtle: rgba(48,209,88,0.12);
+            --green-glow: rgba(48,209,88,0.18);
+            --orange: #FF9F0A;
+            --orange-subtle: rgba(255,159,10,0.12);
+            --radius: 12px;
+            --radius-lg: 16px;
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
-            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
+            --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
         }
 
         html { background: var(--bg-root); }
@@ -97,71 +97,42 @@ HTML_TEMPLATE = """
         }
 
         .header {
-            padding: 40px 0 24px;
+            padding: 20px 0 24px;
             animation: fadeIn 0.6s ease-out both;
-            background: linear-gradient(180deg, rgba(91,154,255,0.08) 0%, transparent 100%);
-            margin: 0 -20px;
-            padding-left: 20px;
-            padding-right: 20px;
         }
         .header-top {
             display: flex;
             align-items: center;
             gap: 14px;
         }
-        .header-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 13px;
-            background: linear-gradient(135deg, var(--blue-vivid), var(--purple));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
-            box-shadow: 0 4px 16px var(--blue-glow);
-        }
         .header-text h1 {
-            font-size: 20px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--text-primary);
-            letter-spacing: -0.3px;
+            letter-spacing: -0.5px;
             line-height: 1.2;
         }
+        .header-text h1 span {
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
         .header-text p {
-            font-size: 13px;
+            font-size: 15px;
             color: var(--text-secondary);
             font-weight: 400;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .card {
-            background: rgba(22, 27, 34, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
+            background: var(--bg-surface);
+            border-radius: 16px;
             padding: 20px;
             margin-bottom: 16px;
             animation: slideUp 0.5s ease-out both;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
         }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-        }
-        .card-blue::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
-        .card-teal::before { background: linear-gradient(90deg, var(--teal), var(--green)); }
-        .card-amber::before { background: linear-gradient(90deg, var(--amber), var(--orange)); }
-        .card-rose::before { background: linear-gradient(90deg, var(--rose), var(--orange)); }
-        .card-purple::before { background: linear-gradient(90deg, var(--purple), var(--rose)); }
-        .card-green::before { background: linear-gradient(90deg, var(--green), var(--teal)); }
         .card-1 { animation-delay: 0.05s; }
         .card-2 { animation-delay: 0.1s; }
         .card-3 { animation-delay: 0.15s; }
@@ -170,21 +141,33 @@ HTML_TEMPLATE = """
         .card-6 { animation-delay: 0.3s; }
 
         .card-label {
-            font-size: 11px;
+            font-size: 18px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .card-label.label-blue { color: var(--blue); }
-        .card-label.label-teal { color: var(--teal); }
-        .card-label.label-amber { color: var(--amber); }
-        .card-label.label-rose { color: var(--rose); }
-        .card-label.label-purple { color: var(--purple); }
-        .card-label.label-green { color: var(--green); }
+        .card-label i { color: var(--blue); }
+        .card-label.label-blue { color: var(--text-primary); }
+        .card-label.label-blue i { color: var(--blue); }
+        .card-label.label-teal { color: var(--text-primary); }
+        .card-label.label-teal i { color: var(--teal); }
+        .card-label.label-amber { color: var(--text-primary); }
+        .card-label.label-amber i { color: var(--amber); }
+        .card-label.label-rose { color: var(--text-primary); }
+        .card-label.label-rose i { color: var(--rose); }
+        .card-label.label-purple { color: var(--text-primary); }
+        .card-label.label-purple i { color: var(--purple); }
+        .card-label.label-green { color: var(--text-primary); }
+        .card-label.label-green i { color: var(--green); }
+        .card-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0 0 16px 0;
+            line-height: 1.4;
+        }
 
         .field { margin-bottom: 12px; }
         .field label {
@@ -197,20 +180,19 @@ HTML_TEMPLATE = """
         .field input {
             width: 100%;
             padding: 12px 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+            border: none;
             border-radius: var(--radius);
             color: var(--text-primary);
             font-size: 14px;
             font-family: var(--font);
             font-weight: 500;
             outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: box-shadow 0.2s ease;
         }
         .field input::placeholder { color: var(--text-tertiary); }
         .field input:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px var(--blue-subtle);
+            box-shadow: 0 0 0 2px var(--blue);
         }
         .field input[type="date"] { color-scheme: dark; }
         .field input[type="date"]::-webkit-calendar-picker-indicator {
@@ -227,27 +209,22 @@ HTML_TEMPLATE = """
             width: 100%;
             padding: 16px;
             border: none;
-            border-radius: 14px;
+            border-radius: 12px;
             font-family: var(--font);
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            letter-spacing: 0.3px;
+            transition: opacity 0.2s, transform 0.2s;
         }
-        .btn:active { transform: scale(0.95); }
+        .btn:active { opacity: 0.8; transform: scale(0.98); }
         .btn-blue {
-            background: linear-gradient(135deg, var(--blue-vivid), var(--blue));
+            background: var(--blue);
             color: #fff;
-            box-shadow: 0 2px 12px var(--blue-glow);
         }
-        .btn-blue:hover { box-shadow: 0 4px 20px rgba(91,154,255,0.30); }
         .btn-teal {
-            background: linear-gradient(135deg, var(--teal), var(--green));
-            color: #0c0c10;
-            box-shadow: 0 2px 12px var(--teal-glow);
+            background: var(--teal);
+            color: #000;
         }
-        .btn-teal:hover { box-shadow: 0 4px 20px rgba(45,212,191,0.30); }
 
         .saved-banner {
             display: none;
@@ -255,7 +232,7 @@ HTML_TEMPLATE = """
             gap: 8px;
             padding: 10px 14px;
             background: var(--green-subtle);
-            border: 1px solid rgba(52,211,153,0.15);
+            border: none;
             border-radius: var(--radius);
             margin-bottom: 12px;
             font-size: 13px;
@@ -267,7 +244,7 @@ HTML_TEMPLATE = """
         .reminder {
             padding: 14px;
             background: var(--bg-elevated);
-            border: 1px solid var(--border);
+            border: none;
             border-radius: var(--radius);
             margin-bottom: 8px;
             animation: slideUp 0.35s ease both;
@@ -303,17 +280,14 @@ HTML_TEMPLATE = """
         .badge-upcoming {
             background: var(--green-subtle);
             color: var(--green);
-            border: 1px solid rgba(52,211,153,0.12);
         }
         .badge-overdue {
             background: var(--rose-subtle);
             color: var(--rose);
-            border: 1px solid rgba(244,63,94,0.12);
         }
         .badge-today {
             background: var(--amber-subtle);
             color: var(--amber);
-            border: 1px solid rgba(251,191,36,0.12);
         }
         .reminder-del {
             background: none;
@@ -356,24 +330,14 @@ HTML_TEMPLATE = """
             flex-shrink: 0;
         }
         .cal-btn-gcal {
-            border: 1px solid rgba(91,154,255,0.15);
+            border: none;
             background: var(--blue-subtle);
             color: var(--blue);
         }
-        .cal-btn-gcal:hover {
-            border-color: rgba(91,154,255,0.30);
-            background: rgba(91,154,255,0.14);
-            box-shadow: 0 2px 10px var(--blue-subtle);
-        }
         .cal-btn-ics {
-            border: 1px solid rgba(167,139,250,0.15);
+            border: none;
             background: var(--purple-subtle);
             color: var(--purple);
-        }
-        .cal-btn-ics:hover {
-            border-color: rgba(167,139,250,0.30);
-            background: rgba(167,139,250,0.14);
-            box-shadow: 0 2px 10px var(--purple-subtle);
         }
 
         .empty {
@@ -390,13 +354,13 @@ HTML_TEMPLATE = """
             gap: 12px;
             padding: 13px 14px;
             background: var(--bg-elevated);
-            border: 1px solid var(--border);
+            border: none;
             border-radius: var(--radius);
             color: var(--text-primary);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+            transition: background 0.15s ease;
         }
         .service-link .svc-icon {
             width: 34px;
@@ -416,23 +380,11 @@ HTML_TEMPLATE = """
         }
         .service-link:hover .svc-arrow { transform: translateX(2px); }
         .svc-blue .svc-icon { background: var(--blue-subtle); color: var(--blue); }
-        .svc-blue:hover { border-color: rgba(91,154,255,0.20); background: rgba(91,154,255,0.04); }
-        .svc-blue:hover .svc-arrow { color: var(--blue); }
         .svc-rose .svc-icon { background: var(--rose-subtle); color: var(--rose); }
-        .svc-rose:hover { border-color: rgba(244,63,94,0.20); background: rgba(244,63,94,0.04); }
-        .svc-rose:hover .svc-arrow { color: var(--rose); }
         .svc-purple .svc-icon { background: var(--purple-subtle); color: var(--purple); }
-        .svc-purple:hover { border-color: rgba(167,139,250,0.20); background: rgba(167,139,250,0.04); }
-        .svc-purple:hover .svc-arrow { color: var(--purple); }
         .svc-amber .svc-icon { background: var(--amber-subtle); color: var(--amber); }
-        .svc-amber:hover { border-color: rgba(251,191,36,0.20); background: rgba(251,191,36,0.04); }
-        .svc-amber:hover .svc-arrow { color: var(--amber); }
         .svc-teal .svc-icon { background: var(--teal-subtle); color: var(--teal); }
-        .svc-teal:hover { border-color: rgba(45,212,191,0.20); background: rgba(45,212,191,0.04); }
-        .svc-teal:hover .svc-arrow { color: var(--teal); }
         .svc-green .svc-icon { background: var(--green-subtle); color: var(--green); }
-        .svc-green:hover { border-color: rgba(52,211,153,0.20); background: rgba(52,211,153,0.04); }
-        .svc-green:hover .svc-arrow { color: var(--green); }
 
         .section-divider {
             height: 1px;
@@ -442,56 +394,51 @@ HTML_TEMPLATE = """
 
         .nav {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
+            bottom: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
-            height: 70px;
-            background: rgba(22, 27, 34, 0.6);
-            backdrop-filter: blur(20px) saturate(1.2);
-            -webkit-backdrop-filter: blur(20px) saturate(1.2);
-            border-radius: 25px;
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            height: 90px;
+            background: rgba(28, 28, 30, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(255,255,255,0.1);
             padding-bottom: var(--safe-bottom);
         }
         .nav-inner {
             display: flex;
             justify-content: space-around;
-            align-items: center;
+            align-items: flex-start;
+            padding-top: 12px;
             height: 100%;
             max-width: 460px;
             margin: 0 auto;
-            padding: 0 8px;
         }
         .nav-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            padding: 8px 12px;
-            border-radius: 14px;
+            gap: 6px;
             cursor: pointer;
             border: none;
             background: none;
-            color: #8b949e;
+            color: var(--text-secondary);
             font-family: var(--font);
             font-size: 10px;
             font-weight: 500;
-            transition: color 0.2s, background 0.2s;
+            width: 60px;
+            transition: color 0.2s;
         }
-        .nav-btn:hover { color: var(--text-secondary); }
         .nav-btn.active {
             color: var(--blue);
         }
         .nav-btn i {
-            font-size: 20px;
+            font-size: 22px;
             display: block;
-            margin-bottom: 2px;
         }
         .nav-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
         }
 
         .tab { display: none; }
@@ -519,10 +466,10 @@ HTML_TEMPLATE = """
             pointer-events: none;
             transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
             opacity: 0;
-            background: rgba(52,211,153,0.12);
-            border: 1px solid rgba(52,211,153,0.20);
+            background: var(--bg-elevated);
+            border: none;
             color: var(--green);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
         .toast.show {
             transform: translateX(-50%) translateY(0);
@@ -530,9 +477,9 @@ HTML_TEMPLATE = """
         }
 
         #map {
-            height: 380px;
+            height: 250px;
             border-radius: var(--radius);
-            border: 1px solid var(--border);
+            border: none;
             z-index: 1;
         }
         .map-caption {
@@ -572,8 +519,8 @@ HTML_TEMPLATE = """
             width: 100%;
             padding: 12px 14px;
             border-radius: var(--radius);
-            border: 1px solid var(--border);
-            background: var(--bg-root);
+            border: none;
+            background: var(--bg-elevated);
             color: var(--text-primary);
             font-size: 14px;
             font-family: var(--font);
@@ -586,7 +533,7 @@ HTML_TEMPLATE = """
         }
         .street-select:focus {
             outline: none;
-            border-color: var(--green);
+            box-shadow: 0 0 0 2px var(--green);
         }
         .rate-box {
             background: rgba(52,211,153,0.05);
@@ -637,17 +584,18 @@ HTML_TEMPLATE = """
             gap: 10px;
             margin-top: 14px;
             padding: 16px;
-            border-radius: 14px;
+            border-radius: 12px;
             background: var(--green);
-            color: #0c0c10;
+            color: #000;
             text-decoration: none;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 16px;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: opacity 0.2s, transform 0.2s;
             border: none;
         }
         .green-p-link:active {
-            transform: scale(0.95);
+            opacity: 0.8;
+            transform: scale(0.98);
         }
         .towed-link {
             display: flex;
@@ -655,25 +603,26 @@ HTML_TEMPLATE = """
             justify-content: center;
             gap: 10px;
             padding: 16px;
-            border-radius: 14px;
+            border-radius: 12px;
             background: var(--rose);
             color: #fff;
             text-decoration: none;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 16px;
             animation: pulseDanger 2s infinite;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: opacity 0.2s, transform 0.2s;
             border: none;
         }
         .towed-link:active {
-            transform: scale(0.95);
+            opacity: 0.8;
+            transform: scale(0.98);
         }
         .dispute-select {
             width: 100%;
             padding: 12px 14px;
             border-radius: var(--radius);
-            border: 1px solid var(--border);
-            background: var(--bg-root);
+            border: none;
+            background: var(--bg-elevated);
             color: var(--text-primary);
             font-size: 14px;
             font-family: var(--font);
@@ -686,14 +635,14 @@ HTML_TEMPLATE = """
         }
         .dispute-select:focus {
             outline: none;
-            border-color: var(--purple);
+            box-shadow: 0 0 0 2px var(--purple);
         }
         .dispute-textarea {
             width: 100%;
             padding: 12px 14px;
             border-radius: var(--radius);
-            border: 1px solid var(--border);
-            background: var(--bg-root);
+            border: none;
+            background: var(--bg-elevated);
             color: var(--text-primary);
             font-family: var(--font-mono);
             font-size: 13px;
@@ -705,7 +654,7 @@ HTML_TEMPLATE = """
         }
         .dispute-textarea:focus {
             outline: none;
-            border-color: var(--purple);
+            box-shadow: 0 0 0 2px var(--purple);
         }
         .copy-btn {
             display: inline-flex;
@@ -715,17 +664,13 @@ HTML_TEMPLATE = """
             padding: 8px 16px;
             border-radius: var(--radius);
             border: none;
-            background: rgba(167,139,250,0.12);
-            border: 1px solid rgba(167,139,250,0.2);
+            background: var(--purple-subtle);
             color: var(--purple);
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             font-family: var(--font);
             transition: background 0.15s ease;
-        }
-        .copy-btn:hover {
-            background: rgba(167,139,250,0.2);
         }
 
         .guide-step {
@@ -784,21 +729,19 @@ HTML_TEMPLATE = """
         .guide-tab-hot { background: rgba(244,63,94,0.12); color: var(--rose); }
         .guide-start-btn {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             border-radius: var(--radius);
             border: none;
-            background: linear-gradient(135deg, var(--blue), var(--purple));
+            background: var(--blue);
             color: #fff;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             font-family: var(--font);
-            transition: transform 0.15s ease, box-shadow 0.2s ease;
-            box-shadow: 0 4px 16px rgba(91,154,255,0.25);
+            transition: opacity 0.2s, transform 0.2s;
             margin-top: 8px;
         }
-        .guide-start-btn:hover { transform: scale(1.02); }
-        .guide-start-btn:active { transform: scale(0.98); }
+        .guide-start-btn:active { opacity: 0.8; transform: scale(0.98); }
 
         .notif-banner {
             display: flex;
@@ -807,13 +750,12 @@ HTML_TEMPLATE = """
             gap: 12px;
             padding: 14px 16px;
             border-radius: var(--radius);
-            background: linear-gradient(135deg, rgba(91,154,255,0.12), rgba(91,154,255,0.04));
-            border: 1px solid rgba(91,154,255,0.20);
+            background: var(--bg-surface);
+            border: none;
             margin-bottom: 16px;
         }
         .notif-banner.granted {
-            background: linear-gradient(135deg, rgba(52,211,153,0.10), rgba(52,211,153,0.03));
-            border-color: rgba(52,211,153,0.20);
+            background: var(--green-subtle);
         }
         .notif-banner-left {
             display: flex;
@@ -864,9 +806,9 @@ HTML_TEMPLATE = """
         }
 
         .scan-btn {
-            background: linear-gradient(135deg, var(--purple), var(--rose));
+            background: var(--purple);
             color: #fff;
-            padding: 14px 20px;
+            padding: 16px 20px;
             border-radius: var(--radius);
             text-align: center;
             font-weight: 600;
@@ -878,15 +820,11 @@ HTML_TEMPLATE = """
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: transform 0.15s ease, box-shadow 0.2s ease;
-            box-shadow: 0 4px 16px rgba(167,139,250,0.25);
+            transition: opacity 0.2s, transform 0.2s;
             font-family: var(--font);
         }
-        .scan-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 24px rgba(167,139,250,0.35);
-        }
         .scan-btn:active {
+            opacity: 0.8;
             transform: scale(0.98);
         }
         .scan-btn svg {
@@ -924,8 +862,8 @@ HTML_TEMPLATE = """
             100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
         }
         .scan-result {
-            background: rgba(167,139,250,0.06);
-            border: 1px solid rgba(167,139,250,0.15);
+            background: var(--bg-elevated);
+            border: none;
             border-radius: var(--radius);
             padding: 12px 14px;
             margin-top: 12px;
@@ -950,8 +888,8 @@ HTML_TEMPLATE = """
             display: inline-block;
             margin-top: 8px;
             padding: 8px 16px;
-            background: rgba(167,139,250,0.12);
-            border: 1px solid rgba(167,139,250,0.2);
+            background: var(--purple-subtle);
+            border: none;
             color: var(--purple);
             border-radius: var(--radius);
             font-size: 13px;
@@ -959,9 +897,6 @@ HTML_TEMPLATE = """
             cursor: pointer;
             transition: background 0.15s ease;
             font-family: var(--font);
-        }
-        .scan-autofill:hover {
-            background: rgba(167,139,250,0.2);
         }
         .scan-help {
             font-size: 11px;
@@ -1037,30 +972,29 @@ HTML_TEMPLATE = """
             margin-top: 14px;
         }
         .report-btn {
-            background: var(--bg-input);
-            padding: 16px 10px;
-            border-radius: 14px;
+            background: var(--bg-elevated);
+            padding: 18px 10px;
+            border-radius: 12px;
             text-align: center;
             font-size: 13px;
             cursor: pointer;
-            border: 1px solid var(--border);
+            border: none;
             color: var(--text-primary);
-            font-weight: 600;
+            font-weight: 500;
             font-family: var(--font);
-            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
         .report-btn:active {
-            background: var(--purple);
-            color: #0c0c10;
-            border-color: var(--purple);
-            transform: scale(0.95);
+            background: #3A3A3C;
+            transform: scale(0.97);
         }
-        .report-btn:active i { color: #0c0c10; }
         .report-btn i {
             font-size: 22px;
-            display: block;
-            margin-bottom: 8px;
-            color: var(--purple);
+            color: var(--blue);
         }
 
         .loading-overlay {
@@ -1069,17 +1003,19 @@ HTML_TEMPLATE = """
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             z-index: 2000;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            color: var(--purple);
-            font-weight: 700;
+            color: var(--blue);
+            font-weight: 500;
             font-size: 16px;
             font-family: var(--font);
         }
         .loading-overlay.show { display: flex; }
-        .loading-overlay i { font-size: 40px; margin-bottom: 16px; }
+        .loading-overlay i { font-size: 36px; margin-bottom: 16px; }
 
         .report-count {
             display: inline-flex;
@@ -1088,25 +1024,24 @@ HTML_TEMPLATE = """
             margin-top: 12px;
             padding: 6px 12px;
             border-radius: 20px;
-            background: var(--purple-subtle);
-            border: 1px solid rgba(167,139,250,0.2);
-            color: var(--purple);
+            background: var(--blue-subtle);
+            border: none;
+            color: var(--blue);
             font-size: 12px;
             font-weight: 600;
         }
 
         .gps-alert {
-            background: linear-gradient(90deg, #8b0000, var(--rose));
+            background: var(--rose);
             color: white;
             padding: 16px;
-            border-radius: 14px;
+            border-radius: 12px;
             text-align: center;
-            font-weight: 700;
+            font-weight: 600;
             margin-bottom: 16px;
             display: none;
             animation: pulseDanger 1.5s infinite;
-            box-shadow: 0 4px 20px rgba(244,63,94,0.5);
-            border: 2px solid rgba(255,123,114,0.6);
+            border: none;
             font-size: 15px;
             line-height: 1.5;
         }
@@ -1120,21 +1055,19 @@ HTML_TEMPLATE = """
             gap: 10px;
             width: 100%;
             padding: 16px;
-            border-radius: 14px;
-            background: linear-gradient(45deg, #1f6feb, var(--blue));
+            border-radius: 12px;
+            background: var(--blue);
             color: #fff;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 16px;
             border: none;
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: opacity 0.2s, transform 0.2s;
             font-family: var(--font);
-            box-shadow: 0 4px 16px var(--blue-glow);
         }
-        .btn-gps:active { transform: scale(0.95); }
+        .btn-gps:active { opacity: 0.8; transform: scale(0.98); }
         .btn-gps.active-gps {
-            background: linear-gradient(45deg, #238636, var(--green));
-            box-shadow: 0 4px 16px var(--green-glow);
+            background: var(--green);
         }
         .gps-status {
             text-align: center;
@@ -1170,10 +1103,9 @@ HTML_TEMPLATE = """
     <div class="app">
         <div class="header">
             <div class="header-top">
-                <div class="header-icon">&#x1F698;</div>
                 <div class="header-text">
-                    <h1>TO Fine Tracker</h1>
-                    <p>Toronto Traffic Fine Management</p>
+                    <h1>DriveSafe <span>TO</span></h1>
+                    <p>Community Infrastructure Tracker</p>
                 </div>
             </div>
         </div>
@@ -1181,7 +1113,7 @@ HTML_TEMPLATE = """
         <div id="tab-guide" class="tab active">
             <div class="card card-blue card-1">
                 <div class="card-label label-blue"><i class="fa-solid fa-book-open"></i> How to Use This App</div>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">Welcome to TO Fine Tracker — your all-in-one Toronto parking and traffic fine manager. Here is a quick walkthrough of everything you can do.</p>
+                <p class="card-desc">Welcome to DriveSafe TO — your all-in-one Toronto parking and traffic fine manager. Here is a quick walkthrough of everything you can do.</p>
 
                 <div class="guide-step">
                     <div class="guide-num guide-num-1">1</div>
@@ -1286,7 +1218,7 @@ HTML_TEMPLATE = """
 
             <div class="card card-purple card-1">
                 <div class="card-label label-purple"><i class="fa-solid fa-receipt"></i> AI Ticket Scanner</div>
-                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Photograph a physical parking ticket to auto-extract the plate number and date.</p>
+                <p class="card-desc">Photograph a physical parking ticket to auto-extract the plate number and date.</p>
                 <button class="scan-btn" onclick="document.getElementById('imageUpload').click()">
                     <i class="fa-solid fa-camera"></i>
                     Scan Ticket Photo
@@ -1324,7 +1256,7 @@ HTML_TEMPLATE = """
 
             <div class="card card-rose card-3">
                 <div class="card-label label-rose"><i class="fa-solid fa-calculator"></i> Deadline ROI Calculator</div>
-                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">See how much extra you'll pay by missing parking ticket deadlines.</p>
+                <p class="card-desc">See how much extra you'll pay by missing parking ticket deadlines.</p>
                 <div class="field">
                     <label>Base Ticket Amount</label>
                     <div class="roi-input-wrap">
@@ -1447,7 +1379,7 @@ HTML_TEMPLATE = """
 
             <div class="card card-green card-4">
                 <div class="card-label label-green"><i class="fa-solid fa-square-parking"></i> Street Parking Checker</div>
-                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Select a street to see rates, enforcement hours, and free parking times.</p>
+                <p class="card-desc">Select a street to see rates, enforcement hours, and free parking times.</p>
                 <select id="streetSelect" class="street-select" onchange="checkStreet()">
                     <option value="">Choose a Street / Area</option>
                     <option value="queen_west">Queen St W (Spadina to Bathurst)</option>
@@ -1472,12 +1404,12 @@ HTML_TEMPLATE = """
                 <a href="https://www.tps.ca/services/towing/" target="_blank" rel="noopener" class="towed-link">
                     <i class="fa-solid fa-truck-ramp-box"></i> FIND TOWED CAR
                 </a>
-                <p style="text-align:center; font-size:12px; margin-top:10px; color:#8b949e;">Storage fees start at $75/day. Act fast.</p>
+                <p style="text-align:center; font-size:12px; margin-top:10px; color:var(--text-secondary);">Storage fees start at $75/day. Act fast.</p>
             </div>
 
             <div class="card card-purple card-6">
                 <div class="card-label label-purple"><i class="fa-solid fa-scroll"></i> Dispute Script Builder</div>
-                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Select a reason to generate a pre-written dispute script for your ticket.</p>
+                <p class="card-desc">Select a reason to generate a pre-written dispute script for your ticket.</p>
                 <select id="disputeReason" class="dispute-select" onchange="generateScript()">
                     <option value="">Select a Reason</option>
                     <option value="hidden_sign">Sign was hidden or missing</option>
@@ -1501,7 +1433,7 @@ HTML_TEMPLATE = """
 
             <div class="card card-blue card-1">
                 <div class="card-label label-blue"><i class="fa-solid fa-location-crosshairs"></i> Proximity Scanner</div>
-                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Detects $200 Bike Lane and $100 Fire Hydrant fine zones near your live GPS position.</p>
+                <p class="card-desc">Detects $200 Bike Lane and $100 Fire Hydrant fine zones near your live GPS position.</p>
                 <button class="btn-gps" onclick="startGPSGuardian()" id="gpsBtn">
                     <i class="fa-solid fa-satellite-dish"></i> Start Live GPS Guardian
                 </button>
@@ -1521,7 +1453,7 @@ HTML_TEMPLATE = """
 
             <div class="card card-purple card-3">
                 <div class="card-label label-purple"><i class="fa-solid fa-bullhorn"></i> Report an Issue</div>
-                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; line-height: 1.5;">Tap to instantly map a hazard using your live GPS. Reports appear on the map for other drivers.</p>
+                <p class="card-desc" style="margin-bottom: 4px;">Tap to instantly map a hazard using your live GPS. Reports appear on the map for other drivers.</p>
                 <div class="report-count"><i class="fa-solid fa-map-pin"></i> {{ reports|length }} community reports on the map</div>
                 <div class="report-grid">
                     <button class="report-btn" onclick="submitReport('Broken Meter')">
@@ -1625,15 +1557,15 @@ HTML_TEMPLATE = """
 
             var hazardIcon = L.divIcon({
                 className: 'custom-icon',
-                html: '<i class="fa-solid fa-triangle-exclamation" style="color: #a78bfa; font-size: 20px; text-shadow: 0 0 10px rgba(167,139,250,0.8);"></i>',
-                iconSize: [20, 20],
-                iconAnchor: [10, 20]
+                html: '<i class="fa-solid fa-location-dot" style="color: #0A84FF; font-size: 32px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));"></i>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
             });
 
             var liveReports = {{ reports_json|safe }};
             liveReports.forEach(function(report) {
                 var marker = L.marker([report.lat, report.lng], {icon: hazardIcon}).addTo(mapInstance);
-                marker.bindPopup('<b>' + report.type + '</b><br><span style="color:#d29922;">' + report.status + '</span>');
+                marker.bindPopup('<b style="font-family:-apple-system,sans-serif;">' + report.type + '</b><br><span style="color:#8E8E93; font-size:12px;">' + report.status + '</span>');
             });
         }
 
@@ -1812,7 +1744,7 @@ HTML_TEMPLATE = """
                     btn.classList.add('active');
                     title.textContent = 'Alerts Active';
                     desc.textContent = 'You will be notified 24h before fees increase.';
-                    new Notification('TO Fine Tracker', {
+                    new Notification('DriveSafe TO', {
                         body: 'Deadline alerts enabled. We will notify you 24h before fees increase.',
                         icon: 'https://www.toronto.ca/wp-content/themes/toronto/assets/images/toronto-logo.png'
                     });
@@ -2012,7 +1944,7 @@ def build_ics_content(ticket_num, due_date_str, plate=''):
     lines = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//TO Fine Tracker//EN',
+        'PRODID:-//DriveSafe TO//EN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
         'BEGIN:VEVENT',
