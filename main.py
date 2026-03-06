@@ -24,6 +24,7 @@ HTML_TEMPLATE = """
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -497,9 +498,49 @@ HTML_TEMPLATE = """
             opacity: 1;
         }
 
+        #map {
+            height: 380px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            z-index: 1;
+        }
+        .map-caption {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-high { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+        .dot-med { background: #84cc16; box-shadow: 0 0 6px rgba(132,204,22,0.4); }
+        .dot-low { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
+        .leaflet-container { background: var(--bg-root) !important; }
+
         @media (max-width: 380px) {
             .app { padding: 0 14px; padding-bottom: calc(var(--safe-bottom) + 80px); }
             .card { padding: 16px; }
+            #map { height: 300px; }
         }
     </style>
 </head>
@@ -640,6 +681,19 @@ HTML_TEMPLATE = """
                 </div>
             </div>
         </div>
+
+        <div id="tab-hotspots" class="tab">
+            <div class="card card-rose card-1">
+                <div class="card-label label-rose">Live Ticket Hotspots</div>
+                <div id="map"></div>
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot dot-high"></span> High enforcement</div>
+                    <div class="legend-item"><span class="legend-dot dot-med"></span> Moderate</div>
+                    <div class="legend-item"><span class="legend-dot dot-low"></span> Low activity</div>
+                </div>
+                <p class="map-caption">Simulated enforcement hotspots across Toronto.<br>Check the map before you park.</p>
+            </div>
+        </div>
     </div>
 
     <nav class="nav">
@@ -652,26 +706,74 @@ HTML_TEMPLATE = """
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                 Services
             </button>
+            <button class="nav-btn" onclick="switchTab('hotspots', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                Hotspots
+            </button>
         </div>
     </nav>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
     <script>
+        var mapInstance = null;
+
+        function initMap() {
+            if (mapInstance) {
+                mapInstance.invalidateSize();
+                return;
+            }
+            mapInstance = L.map('map').setView([43.6532, -79.3832], 13);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap',
+                maxZoom: 18
+            }).addTo(mapInstance);
+
+            var hotspots = [
+                [43.6545, -79.3807, 1.0],
+                [43.6489, -79.3850, 0.9],
+                [43.6592, -79.3627, 0.95],
+                [43.6426, -79.3871, 0.85],
+                [43.6488, -79.3802, 0.7],
+                [43.6677, -79.3948, 0.6],
+                [43.6510, -79.3470, 0.5],
+                [43.6613, -79.3955, 0.75],
+                [43.6380, -79.3812, 0.65],
+                [43.6710, -79.3865, 0.55],
+                [43.6560, -79.3740, 0.80],
+                [43.6455, -79.3920, 0.70],
+                [43.6630, -79.3780, 0.60],
+                [43.6350, -79.3750, 0.50],
+                [43.6520, -79.4010, 0.45]
+            ];
+
+            L.heatLayer(hotspots, {
+                radius: 28,
+                blur: 18,
+                maxZoom: 15,
+                gradient: { 0.3: '#3b82f6', 0.5: '#06b6d4', 0.7: '#84cc16', 0.85: '#f59e0b', 1.0: '#ef4444' }
+            }).addTo(mapInstance);
+        }
+
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
             btn.classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (tab === 'hotspots') {
+                setTimeout(initMap, 100);
+            }
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
+            var toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+            setTimeout(function() { toast.classList.remove('show'); }, 2500);
         }
 
-        const params = new URLSearchParams(window.location.search);
+        var params = new URLSearchParams(window.location.search);
         if (params.get('saved') === 'profile') showToast('Profile saved successfully');
         if (params.get('saved') === 'reminder') showToast('Reminder added');
         if (params.get('deleted') === '1') showToast('Reminder deleted');

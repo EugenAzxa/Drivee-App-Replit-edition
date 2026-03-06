@@ -20,10 +20,16 @@ The app runs on port 5000 via `python main.py`.
 - Calendar integration: Google Calendar link (opens pre-filled event) and .ics file download (works with Apple Calendar, Outlook, etc.)
 - .ics files include VALARM reminders (1 day before and day-of)
 - Services tab with 3 sections: Parking Violations, Speed & Red Light Cameras, Court Services
+- Hotspots tab with Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap)
 - All external links open in new tabs to official Toronto portals
-- Bottom navigation bar for tab switching
+- 3-tab bottom navigation bar (Dashboard, Services, Hotspots)
 - Toast notifications on save/delete actions
-- Refined dark mode with muted color system (DM Sans + JetBrains Mono typography), layered surface cards, subtle borders, SVG icons
+- Refined dark mode with vibrant color palette (DM Sans + JetBrains Mono typography), layered surface cards, gradient top borders, SVG icons
+
+## External Dependencies (CDN)
+- Leaflet.js 1.9.4 (map rendering)
+- leaflet.heat (heatmap layer plugin)
+- Google Fonts (DM Sans, JetBrains Mono)
 
 ## Routes
 - `GET /` - Main page

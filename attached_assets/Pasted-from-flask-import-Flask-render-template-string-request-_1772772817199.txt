@@ -1,0 +1,164 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+
+app = Flask(__name__)
+
+# Temporary storage for saved tickets
+users_data = []
+
+# The HTML template now includes Leaflet.js for the map and custom CSS for the "Viral" design
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto Fine Tracker</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; padding: 20px; 
+            background-color: #0d1117; color: #c9d1d9; 
+        }
+        .container { 
+            max-width: 500px; margin: auto; 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 25px; border-radius: 16px; 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        h1, h2 { color: #58a6ff; text-align: center; }
+        
+        /* Map Container */
+        #map { 
+            height: 300px; 
+            border-radius: 12px; 
+            margin-bottom: 25px; 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="date"] { 
+            width: 100%; padding: 12px; 
+            box-sizing: border-box; 
+            border-radius: 8px; border: none; 
+            background: #161b22; color: white;
+        }
+        
+        button { 
+            width: 100%; padding: 14px; 
+            background-color: #238636; color: white; 
+            border: none; border-radius: 8px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; 
+            transition: transform 0.1s ease;
+        }
+        button:hover { transform: scale(1.02); }
+
+        .ticket-card { 
+            background: rgba(0,0,0,0.4); 
+            padding: 20px; margin-top: 20px; 
+            border-radius: 12px; border: 1px solid #30363d; 
+        }
+        
+        /* Official Links Buttons */
+        .btn-link { 
+            display: block; text-align: center; 
+            padding: 12px; margin-top: 10px; 
+            border-radius: 8px; text-decoration: none; 
+            font-weight: bold; color: white;
+        }
+        .btn-parking { background-color: #1f6feb; }
+        .btn-speed { background-color: #da3633; }
+        .btn-court { background-color: #bf8700; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Toronto Fine Tracker</h1>
+        
+        <h2>Live Ticket Hotspots</h2>
+        <p style="text-align:center; font-size:12px; color:#8b949e;">Check the map before you park. High enforcement areas glow red.</p>
+        <div id="map"></div>
+
+        <h2>Add Reminder</h2>
+        <form action="/add" method="POST">
+            <div class="form-group">
+                <label>License Plate:</label>
+                <input type="text" name="plate" placeholder="e.g. ABCD 123" required>
+            </div>
+            <div class="form-group">
+                <label>Due Date:</label>
+                <input type="date" name="due_date" required>
+            </div>
+            <button type="submit">Save Ticket</button>
+        </form>
+
+        <h2>Your Tickets</h2>
+        {% if users_data %}
+            {% for ticket in users_data %}
+                <div class="ticket-card">
+                    <p><strong>Plate:</strong> {{ ticket.plate }}</p>
+                    <p><strong>Due Date:</strong> {{ ticket.due_date }}</p>
+                    <hr style="border-color:#30363d; margin: 15px 0;">
+                    
+                    <a class="btn-link btn-parking" href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/pay-your-parking-violation/" target="_blank">Pay Parking Ticket</a>
+                    <a class="btn-link btn-speed" href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/" target="_blank">Pay Camera Fine</a>
+                    <a class="btn-link btn-court" href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/" target="_blank">Court Services</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center; color:#8b949e;">No tickets saved currently.</p>
+        {% endif %}
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    
+    <script>
+        // 1. Initialize the map and center it on Toronto coordinates (43.6532, -79.3832)
+        var map = L.map('map').setView([43.6532, -79.3832], 13);
+        
+        // 2. Load a dark-themed basemap to match our viral design
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        // 3. Simulated Open Data Coordinates [Lat, Lng, Intensity] for hotspots
+        var parkingHotspots = [
+            [43.659153, -79.362650, 1.0], // Sample point 1
+            [43.653200, -79.383200, 0.8], // Sample point 2 (City Center)
+            [43.642600, -79.387100, 0.9], // Sample point 3
+            [43.648800, -79.380200, 0.7], // Sample point 4
+            [43.667700, -79.394800, 0.6], // Sample point 5
+            [43.651000, -79.347000, 0.5]  // Sample point 6
+        ];
+
+        // 4. Render the Heatmap layer
+        var heat = L.heatLayer(parkingHotspots, {
+            radius: 25, 
+            blur: 15, 
+            maxZoom: 15,
+            gradient: {0.4: 'blue', 0.6: 'lime', 1: 'red'}
+        }).addTo(map);
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_TEMPLATE, users_data=users_data)
+
+@app.route('/add', methods=['POST'])
+def add_ticket():
+    plate = request.form.get('plate')
+    due_date = request.form.get('due_date')
+    users_data.append({'plate': plate.upper(), 'due_date': due_date})
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
