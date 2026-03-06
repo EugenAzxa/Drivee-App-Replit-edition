@@ -538,6 +538,165 @@ HTML_TEMPLATE = """
         .dot-low { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
         .leaflet-container { background: var(--bg-root) !important; }
 
+        .street-select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-root);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: var(--font);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            cursor: pointer;
+        }
+        .street-select:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+        .rate-box {
+            background: rgba(52,211,153,0.05);
+            border-left: 3px solid var(--green);
+            padding: 14px 16px;
+            margin-top: 14px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .rate-box.show { display: block; }
+        .rate-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 5px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .rate-row-icon {
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+        .rate-row-label {
+            color: var(--text-tertiary);
+            min-width: 55px;
+            font-weight: 500;
+        }
+        .rate-row-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .rate-row-value.rate-warn {
+            color: var(--rose);
+            font-size: 12px;
+        }
+        .rate-row-value.rate-free {
+            color: var(--green);
+        }
+        .rate-row-value.rate-cost {
+            color: var(--amber);
+            font-family: var(--font-mono);
+        }
+        .green-p-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.06));
+            border: 1px solid rgba(52,211,153,0.20);
+            color: var(--green);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.15s ease;
+        }
+        .green-p-link:hover {
+            background: linear-gradient(135deg, rgba(52,211,153,0.22), rgba(52,211,153,0.10));
+        }
+        .towed-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(244,63,94,0.12), rgba(244,63,94,0.04));
+            border: 1px solid rgba(244,63,94,0.20);
+            color: var(--rose);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.15s ease;
+        }
+        .towed-link:hover {
+            background: linear-gradient(135deg, rgba(244,63,94,0.20), rgba(244,63,94,0.08));
+        }
+        .dispute-select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-root);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: var(--font);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            cursor: pointer;
+        }
+        .dispute-select:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+        .dispute-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-root);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            height: 140px;
+            resize: none;
+            margin-top: 12px;
+            line-height: 1.6;
+            box-sizing: border-box;
+        }
+        .dispute-textarea:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            border: none;
+            background: rgba(167,139,250,0.12);
+            border: 1px solid rgba(167,139,250,0.2);
+            color: var(--purple);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: background 0.15s ease;
+        }
+        .copy-btn:hover {
+            background: rgba(167,139,250,0.2);
+        }
+
         .notif-banner {
             display: flex;
             align-items: center;
@@ -956,6 +1115,52 @@ HTML_TEMPLATE = """
                     </a>
                 </div>
             </div>
+
+            <div class="card card-green card-4">
+                <div class="card-label label-green">Street Parking Checker</div>
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Select a street to see rates, enforcement hours, and free parking times.</p>
+                <select id="streetSelect" class="street-select" onchange="checkStreet()">
+                    <option value="">Choose a Street / Area</option>
+                    <option value="queen_west">Queen St W (Spadina to Bathurst)</option>
+                    <option value="bloor_yorkville">Bloor St W (Yorkville Area)</option>
+                    <option value="kensington">Kensington Market</option>
+                    <option value="front_st">Front St (Near Scotiabank Arena)</option>
+                </select>
+                <div id="rateInfo" class="rate-box">
+                    <div class="rate-row"><span class="rate-row-icon">&#x1F4CD;</span> <span class="rate-row-label">Area</span> <span class="rate-row-value" id="streetName"></span></div>
+                    <div class="rate-row"><span class="rate-row-icon">&#x1F4B0;</span> <span class="rate-row-label">Rate</span> <span class="rate-row-value rate-cost" id="streetRate"></span></div>
+                    <div class="rate-row"><span class="rate-row-icon">&#x23F0;</span> <span class="rate-row-label">Hours</span> <span class="rate-row-value" id="streetHours"></span></div>
+                    <div class="rate-row"><span class="rate-row-icon">&#x1F7E2;</span> <span class="rate-row-label">Free</span> <span class="rate-row-value rate-free" id="streetFree"></span></div>
+                    <div class="rate-row"><span class="rate-row-icon">&#x26A0;</span> <span class="rate-row-label">Rush</span> <span class="rate-row-value rate-warn" id="streetRush"></span></div>
+                </div>
+                <a href="https://apps.apple.com/ca/app/green-p-parking/id983111045" target="_blank" rel="noopener" class="green-p-link">
+                    &#x1F17F; Pay with Green P App
+                </a>
+            </div>
+
+            <div class="card card-rose card-5">
+                <div class="card-label label-rose">Vehicle Towed?</div>
+                <a href="https://www.tps.ca/services/towing/" target="_blank" rel="noopener" class="towed-link">
+                    &#x1F6A8; Find which pound has your car
+                </a>
+            </div>
+
+            <div class="card card-purple card-6">
+                <div class="card-label label-purple">Dispute Script Builder</div>
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Select a reason to generate a pre-written dispute script for your ticket.</p>
+                <select id="disputeReason" class="dispute-select" onchange="generateScript()">
+                    <option value="">Select a Reason</option>
+                    <option value="hidden_sign">Sign was hidden or missing</option>
+                    <option value="wrong_data">Officer wrote wrong plate/date</option>
+                    <option value="broken_meter">Parking meter was broken</option>
+                    <option value="valid_permit">I had a valid residential permit</option>
+                </select>
+                <textarea id="scriptOutput" class="dispute-textarea" placeholder="Your dispute script will appear here…" readonly></textarea>
+                <button class="copy-btn" onclick="copyScript()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+                    Copy Script
+                </button>
+            </div>
         </div>
 
         <div id="tab-hotspots" class="tab">
@@ -1029,6 +1234,55 @@ HTML_TEMPLATE = """
                 maxZoom: 15,
                 gradient: { 0.3: '#3b82f6', 0.5: '#06b6d4', 0.7: '#84cc16', 0.85: '#f59e0b', 1.0: '#ef4444' }
             }).addTo(mapInstance);
+        }
+
+        function checkStreet() {
+            var street = document.getElementById('streetSelect').value;
+            var rateBox = document.getElementById('rateInfo');
+            if (!street) { rateBox.classList.remove('show'); return; }
+            rateBox.classList.add('show');
+            var db = {
+                'queen_west': { name: 'Queen St W', rate: '$3.00 / hour', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', free: 'Every day after 9:00 PM', rush: '3:30–6:30 PM (Mon–Fri) — WILL TOW' },
+                'bloor_yorkville': { name: 'Bloor St W (Yorkville)', rate: '$4.00 / hour', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', free: 'Every day after 9:00 PM', rush: '3:30–6:30 PM (Mon–Fri) — WILL TOW' },
+                'kensington': { name: 'Kensington Market', rate: '$2.25 / hour', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', free: 'Every day after 9:00 PM', rush: 'None' },
+                'front_st': { name: 'Front St (Arena Area)', rate: '$5.00 / hour (Event Rates)', hours: 'Mon–Sun 8am–Midnight', free: 'After Midnight', rush: '3:30–6:30 PM (Mon–Fri)' }
+            };
+            var d = db[street];
+            document.getElementById('streetName').textContent = d.name;
+            document.getElementById('streetRate').textContent = d.rate;
+            document.getElementById('streetHours').textContent = d.hours;
+            document.getElementById('streetFree').textContent = d.free;
+            document.getElementById('streetRush').textContent = d.rush;
+        }
+
+        function generateScript() {
+            var reason = document.getElementById('disputeReason').value;
+            var output = document.getElementById('scriptOutput');
+            var scripts = {
+                'hidden_sign': 'To the Screening Officer,\n\nI respectfully request cancellation of this parking infraction notice. The regulatory signage at the location was completely obscured by overgrown foliage/construction materials, rendering the parking restrictions illegible to a reasonable person.\n\nI have attached photographic evidence of the sign obstruction taken at the time of the infraction.\n\nThank you for your consideration.',
+                'wrong_data': 'To the Screening Officer,\n\nI respectfully request cancellation under Section 1.0 (Incorrect Data). Upon reviewing the parking infraction notice, I have identified that the officer recorded incorrect information (licence plate number/date/time/location), rendering this notice legally invalid.\n\nPlease review the attached documentation.\n\nThank you for your consideration.',
+                'broken_meter': 'To the Screening Officer,\n\nI respectfully request cancellation of this infraction. I attempted to pay for parking at the location, however the Green P pay station was malfunctioning and would not accept payment. I have attached a photograph of the error screen on the machine.\n\nThank you for your consideration.',
+                'valid_permit': 'To the Screening Officer,\n\nI respectfully request cancellation under Section 3.1 (Valid Permit). At the time of the infraction, I held a valid City of Toronto On-Street Residential Parking Permit for this area, which was properly displayed.\n\nPlease see the attached copy of my valid permit.\n\nThank you for your consideration.'
+            };
+            output.value = scripts[reason] || '';
+        }
+
+        function copyScript() {
+            var textarea = document.getElementById('scriptOutput');
+            if (!textarea.value) { showToast('Generate a script first'); return; }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textarea.value).then(function() {
+                    showToast('Script copied to clipboard');
+                }).catch(function() {
+                    textarea.select();
+                    document.execCommand('copy');
+                    showToast('Script copied to clipboard');
+                });
+            } else {
+                textarea.select();
+                document.execCommand('copy');
+                showToast('Script copied to clipboard');
+            }
         }
 
         function enableNotifications() {

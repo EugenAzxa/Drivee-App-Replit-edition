@@ -22,7 +22,10 @@ The app runs on port 5000 via `python main.py`.
 - Reminders show status badges (Upcoming, Today, Overdue)
 - Calendar integration: Google Calendar link (opens pre-filled event) and .ics file download (works with Apple Calendar, Outlook, etc.)
 - .ics files include VALARM reminders (1 day before and day-of)
-- Services tab with 3 sections: Parking Violations, Speed & Red Light Cameras, Court Services
+- Services tab with 6 sections: Parking Violations, Speed & Red Light Cameras, Court Services, Street Parking Checker, Vehicle Towed finder, Dispute Script Builder
+- Street Parking Checker: dropdown for 4 Toronto areas (Queen St W, Bloor/Yorkville, Kensington, Front St) showing rates, enforcement hours, free parking times, rush hour warnings, plus Green P app link
+- Dispute Script Builder: 4 pre-written legal dispute templates (hidden sign, wrong data, broken meter, valid permit) with copy-to-clipboard
+- Vehicle Towed link: direct link to Toronto Police towing services
 - Hotspots tab with Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap)
 - All external links open in new tabs to official Toronto portals
 - 3-tab bottom navigation bar (Dashboard, Services, Hotspots)

@@ -1,0 +1,227 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+
+app = Flask(__name__)
+
+users_data = []
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto Fine Tracker PRO</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/tesseract.js@v4.0.1/dist/tesseract.min.js"></script>
+    
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; padding: 20px; 
+            background-color: #0d1117; color: #c9d1d9; 
+        }
+        .container { 
+            max-width: 500px; margin: auto; 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 25px; border-radius: 20px; 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        h1, h2, h3 { color: #58a6ff; text-align: center; }
+
+        /* GREEN P STREET CHECKER */
+        .street-checker {
+            background: #161b22; border-left: 4px solid #2ea043; 
+            padding: 20px; border-radius: 12px; margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(46, 160, 67, 0.2);
+        }
+        select {
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #30363d;
+            background: #0d1117; color: white; font-size: 16px; margin-bottom: 10px;
+        }
+        .rate-box {
+            background: #0d1117; padding: 15px; border-radius: 8px; border: 1px solid #30363d;
+            margin-bottom: 15px; display: none;
+        }
+        .green-p-btn {
+            background: linear-gradient(90deg, #2ea043, #238636);
+            color: white; padding: 15px; border-radius: 12px;
+            text-align: center; font-weight: bold; display: block;
+            text-decoration: none; font-size: 18px;
+            box-shadow: 0 4px 15px rgba(46, 160, 67, 0.4);
+        }
+
+        /* TOWED BUTTON */
+        .towed-btn {
+            background: linear-gradient(90deg, #da3633, #8b0000);
+            color: white; padding: 15px; border-radius: 12px;
+            text-align: center; font-weight: bold; margin-bottom: 25px;
+            display: block; text-decoration: none; border: 1px solid #ff7b72;
+        }
+
+        /* DISPUTE BUILDER */
+        .dispute-box {
+            background: #161b22; border-left: 4px solid #d2a8ff; 
+            padding: 15px; border-radius: 8px; margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #30363d;
+            background: #0d1117; color: #58a6ff; font-family: monospace; height: 120px;
+            box-sizing: border-box; resize: none; margin-bottom: 10px;
+        }
+
+        /* STANDARD APP STYLES */
+        .scan-btn {
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            color: white; padding: 15px; border-radius: 12px;
+            text-align: center; font-weight: bold; margin-bottom: 20px;
+            cursor: pointer; border: none; width: 100%;
+        }
+        input { 
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #30363d;
+            background: #161b22; color: white; font-size: 16px; margin-bottom: 10px; box-sizing: border-box;
+        }
+        button.save-btn { width: 100%; padding: 14px; background-color: #1f6feb; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;}
+        .ticket-card { background: rgba(255,255,255,0.03); padding: 15px; margin-top: 15px; border-radius: 12px; border: 1px solid #30363d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Toronto Auto-Mate</h1>
+        <p style="text-align:center; color:#8b949e; margin-top:-10px;">Park smart. Fight fines.</p>
+
+        <div class="street-checker">
+            <h2 style="margin-top:0; color:#2ea043;">🅿️ Street Parking Checker</h2>
+            <p style="font-size: 12px; color: #c9d1d9;">Select a street to see live rates and free parking hours.</p>
+            
+            <select id="streetSelect" onchange="checkStreet()">
+                <option value="">-- Choose a Street / Area --</option>
+                <option value="queen_west">Queen St W (Spadina to Bathurst)</option>
+                <option value="bloor_yorkville">Bloor St W (Yorkville Area)</option>
+                <option value="kensington">Kensington Market</option>
+                <option value="front_st">Front St (Near Scotiabank Arena)</option>
+            </select>
+
+            <div id="rateInfo" class="rate-box">
+                <h3 id="streetName" style="margin-top:0; color:white; font-size:16px;"></h3>
+                <p style="color:#ff7b72; font-weight:bold; margin:5px 0;">💰 Rate: <span id="streetRate"></span></p>
+                <p style="color:#58a6ff; font-weight:bold; margin:5px 0;">⏰ Enforced: <span id="streetHours"></span></p>
+                <p style="color:#2ea043; font-weight:bold; margin:5px 0;">🟢 FREE: <span id="streetFree"></span></p>
+                <p style="color:#da3633; font-weight:bold; margin:5px 0; font-size:12px;">⚠️ NO STOPPING: <span id="streetRush"></span></p>
+            </div>
+
+            <a href="https://apps.apple.com/ca/app/green-p-parking/id983111045" target="_blank" class="green-p-btn">
+                Pay with Green P App 📱
+            </a>
+        </div>
+
+        <a href="https://www.tps.ca/services/towing/" target="_blank" class="towed-btn">
+            🚨 Car missing? Find which pound towed it.
+        </a>
+
+        <hr style="border-color:#30363d; margin: 25px 0;">
+
+        <h2>Got a ticket?</h2>
+        
+        <div class="dispute-box">
+            <h3 style="margin-top:0; color:#d2a8ff;">⚖️ Dispute Script Builder</h3>
+            <select id="disputeReason" onchange="generateScript()">
+                <option value="">-- Select a Reason to fight it --</option>
+                <option value="hidden_sign">Sign was hidden/missing</option>
+                <option value="wrong_data">Officer wrote wrong plate/date</option>
+                <option value="broken_meter">Parking meter was broken</option>
+                <option value="valid_permit">I had a valid residential permit</option>
+            </select>
+            <textarea id="scriptOutput" placeholder="Your legal script will appear here..." readonly></textarea>
+            <button onclick="copyScript()" style="background:#30363d; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">📋 Copy Script</button>
+        </div>
+
+        <button class="scan-btn" onclick="document.getElementById('imageUpload').click()">📸 Scan Ticket to set Alert</button>
+        <input type="file" id="imageUpload" accept="image/*" capture="environment" style="display:none" onchange="performOCR(event)">
+
+        <form action="/add" method="POST">
+            <input type="text" name="plate" id="plateInput" placeholder="Plate Number" required>
+            <input type="date" name="due_date" id="dateInput" required>
+            <button type="submit" class="save-btn">Save Ticket & Set 24h Alert</button>
+        </form>
+
+        <h2>Active Reminders</h2>
+        {% for ticket in users_data %}
+            <div class="ticket-card">
+                <p>🚗 <strong>{{ ticket.plate }}</strong></p>
+                <p>🕒 Due: {{ ticket.due_date }}</p>
+                <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/" target="_blank" style="display:block; text-align:center; background:#da3633; color:white; padding:10px; text-decoration:none; border-radius:6px; margin-top:10px;">Pay City Fine</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // --- STREET CHECKER LOGIC (Simulating Toronto Open Data) ---
+        function checkStreet() {
+            const street = document.getElementById('streetSelect').value;
+            const rateBox = document.getElementById('rateInfo');
+            
+            if (street === "") {
+                rateBox.style.display = "none";
+                return;
+            }
+            
+            rateBox.style.display = "block";
+            
+            const db = {
+                "queen_west": { name: "Queen St W", rate: "$3.00 / hour", hours: "Mon-Sat 8am-9pm, Sun 1pm-9pm", free: "Every day after 9:00 PM", rush: "3:30 PM - 6:30 PM (Mon-Fri) - WILL TOW" },
+                "bloor_yorkville": { name: "Bloor St W", rate: "$4.00 / hour", hours: "Mon-Sat 8am-9pm, Sun 1pm-9pm", free: "Every day after 9:00 PM", rush: "3:30 PM - 6:30 PM (Mon-Fri) - WILL TOW" },
+                "kensington": { name: "Kensington Market", rate: "$2.25 / hour", hours: "Mon-Sat 8am-9pm, Sun 1pm-9pm", free: "Every day after 9:00 PM", rush: "None" },
+                "front_st": { name: "Front St", rate: "$5.00 / hour (Event Rates Apply)", hours: "Mon-Sun 8am-Midnight", free: "After Midnight", rush: "3:30 PM - 6:30 PM (Mon-Fri)" }
+            };
+
+            const data = db[street];
+            document.getElementById('streetName').innerText = data.name;
+            document.getElementById('streetRate').innerText = data.rate;
+            document.getElementById('streetHours').innerText = data.hours;
+            document.getElementById('streetFree').innerText = data.free;
+            document.getElementById('streetRush').innerText = data.rush;
+        }
+
+        // --- SCRIPT GENERATOR LOGIC ---
+        function generateScript() {
+            const reason = document.getElementById('disputeReason').value;
+            const output = document.getElementById('scriptOutput');
+            let script = "";
+            if (reason === "hidden_sign") script = "To the Screening Officer:\\n\\nI request cancellation. The regulatory signage was completely obscured by a tree/construction, rendering restrictions illegible. See attached photo.\\n\\nThank you.";
+            else if (reason === "wrong_data") script = "To the Screening Officer:\\n\\nI request cancellation under Section 1.0 (Incorrect Data). The officer recorded the incorrect details on the notice, making it legally invalid.\\n\\nThank you.";
+            else if (reason === "broken_meter") script = "To the Screening Officer:\\n\\nI attempted to pay, but the Green P pay station was malfunctioning. I have attached a photo of the error screen.\\n\\nThank you.";
+            else if (reason === "valid_permit") script = "To the Screening Officer:\\n\\nI request cancellation under Section 3.1. I hold a valid On-Street Residential Parking Permit for this area. See attached permit.\\n\\nThank you.";
+            output.value = script;
+        }
+
+        function copyScript() {
+            document.getElementById('scriptOutput').select();
+            document.execCommand("copy");
+            alert("Script copied! Paste it into the Toronto Dispute portal.");
+        }
+
+        // --- AI SCAN LOGIC ---
+        async function performOCR(event) {
+            const file = event.target.files[0];
+            const result = await Tesseract.recognize(file, 'eng');
+            const plateMatch = result.data.text.match(/[A-Z]{4}\s?\d{3}/);
+            if(plateMatch) document.getElementById('plateInput').value = plateMatch[0];
+            alert("AI Scan Done! Please verify the plate.");
+        }
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index(): return render_template_string(HTML_TEMPLATE, users_data=users_data)
+
+@app.route('/add', methods=['POST'])
+def add_ticket():
+    users_data.append({'plate': request.form.get('plate').upper(), 'due_date': request.form.get('due_date')})
+    return redirect(url_for('index'))
+
+if __name__ == '__main__': app.run(host='0.0.0.0', port=8080)
