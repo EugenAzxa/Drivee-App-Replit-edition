@@ -25,6 +25,7 @@ HTML_TEMPLATE = """
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/tesseract.js@v4.0.1/dist/tesseract.min.js"></script>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -537,6 +538,108 @@ HTML_TEMPLATE = """
         .dot-low { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
         .leaflet-container { background: var(--bg-root) !important; }
 
+        .scan-btn {
+            background: linear-gradient(135deg, var(--purple), var(--rose));
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 16px rgba(167,139,250,0.25);
+            font-family: var(--font);
+        }
+        .scan-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 24px rgba(167,139,250,0.35);
+        }
+        .scan-btn:active {
+            transform: scale(0.98);
+        }
+        .scan-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .scan-status {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 10px 0;
+            display: none;
+        }
+        .scan-status.loading {
+            display: block;
+            color: var(--purple);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .scan-status.done {
+            display: block;
+            color: var(--green);
+        }
+        .scan-status.error {
+            display: block;
+            color: var(--rose);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .scan-result {
+            background: rgba(167,139,250,0.06);
+            border: 1px solid rgba(167,139,250,0.15);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            margin-top: 12px;
+            display: none;
+        }
+        .scan-result.show { display: block; animation: fadeIn 0.25s ease; }
+        .scan-result-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            margin-bottom: 4px;
+        }
+        .scan-result-value {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        .scan-result-value:last-child { margin-bottom: 0; }
+        .scan-autofill {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 16px;
+            background: rgba(167,139,250,0.12);
+            border: 1px solid rgba(167,139,250,0.2);
+            color: var(--purple);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            font-family: var(--font);
+        }
+        .scan-autofill:hover {
+            background: rgba(167,139,250,0.2);
+        }
+        .scan-help {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
         .roi-input-wrap {
             position: relative;
         }
@@ -619,7 +722,26 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="tab-dashboard" class="tab active">
-            <div class="card card-blue card-1">
+            <div class="card card-purple card-1">
+                <div class="card-label label-purple">AI Ticket Scanner</div>
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Photograph a physical parking ticket to auto-extract the plate number and date.</p>
+                <button class="scan-btn" onclick="document.getElementById('imageUpload').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    Scan Ticket Photo
+                </button>
+                <input type="file" id="imageUpload" accept="image/*" capture="environment" style="display:none" onchange="performOCR(event)">
+                <div id="scanStatus" class="scan-status"></div>
+                <div id="scanResult" class="scan-result">
+                    <div class="scan-result-label">Detected Plate</div>
+                    <div class="scan-result-value" id="scanPlate">—</div>
+                    <div class="scan-result-label">Detected Date</div>
+                    <div class="scan-result-value" id="scanDate">—</div>
+                    <button class="scan-autofill" onclick="autofillFromScan()">Auto-fill Reminder Form</button>
+                </div>
+                <p class="scan-help">Works best with clear, well-lit photos. Looks for Ontario plate patterns (e.g. ABCD 123) and dates.</p>
+            </div>
+
+            <div class="card card-blue card-2">
                 <div class="card-label label-blue">Profile</div>
                 <form action="/save-profile" method="POST">
                     <div class="saved-banner {% if profile_saved %}show{% endif %}">
@@ -638,7 +760,7 @@ HTML_TEMPLATE = """
                 </form>
             </div>
 
-            <div class="card card-rose card-2">
+            <div class="card card-rose card-3">
                 <div class="card-label label-rose">Deadline ROI Calculator</div>
                 <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">See how much extra you'll pay by missing parking ticket deadlines.</p>
                 <div class="field">
@@ -658,7 +780,7 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
-            <div class="card card-teal card-3">
+            <div class="card card-teal card-4">
                 <div class="card-label label-teal">Add Fine Reminder</div>
                 <form action="/add-reminder" method="POST">
                     <div class="field">
@@ -673,7 +795,7 @@ HTML_TEMPLATE = """
                 </form>
             </div>
 
-            <div class="card card-amber card-4">
+            <div class="card card-amber card-5">
                 <div class="card-label label-amber">Reminders</div>
                 {% if reminders %}
                     {% for r in reminders %}
@@ -833,6 +955,69 @@ HTML_TEMPLATE = """
                 maxZoom: 15,
                 gradient: { 0.3: '#3b82f6', 0.5: '#06b6d4', 0.7: '#84cc16', 0.85: '#f59e0b', 1.0: '#ef4444' }
             }).addTo(mapInstance);
+        }
+
+        var scannedPlate = '';
+        var scannedDate = '';
+
+        async function performOCR(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            var statusEl = document.getElementById('scanStatus');
+            var resultEl = document.getElementById('scanResult');
+            statusEl.className = 'scan-status loading';
+            statusEl.textContent = 'AI is reading your ticket…';
+            resultEl.classList.remove('show');
+            try {
+                var result = await Tesseract.recognize(file, 'eng');
+                var text = result.data.text.toUpperCase();
+                var plateMatch = text.match(/[A-Z]{4}\s?\d{3}/);
+                var dateMatch = text.match(/\d{4}[\/\-]\d{2}[\/\-]\d{2}/) || text.match(/\d{2}[\/\-]\d{2}[\/\-]\d{4}/);
+                scannedPlate = plateMatch ? plateMatch[0].trim() : '';
+                scannedDate = '';
+                if (dateMatch) {
+                    var raw = dateMatch[0].replace(/\//g, '-');
+                    if (raw.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                        scannedDate = raw;
+                    } else if (raw.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                        var parts = raw.split('-');
+                        var y = parseInt(parts[2]), m = parseInt(parts[0]), d = parseInt(parts[1]);
+                        if (m > 12) { var tmp = m; m = d; d = tmp; }
+                        scannedDate = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+                    }
+                }
+                document.getElementById('scanPlate').textContent = scannedPlate || 'Not detected';
+                document.getElementById('scanDate').textContent = scannedDate || 'Not detected';
+                resultEl.classList.add('show');
+                if (scannedPlate || scannedDate) {
+                    statusEl.className = 'scan-status done';
+                    statusEl.textContent = 'Scan complete!';
+                } else {
+                    statusEl.className = 'scan-status error';
+                    statusEl.textContent = 'No plate or date found. Try a clearer photo.';
+                }
+            } catch (err) {
+                statusEl.className = 'scan-status error';
+                statusEl.textContent = 'Scan failed. Try a clearer photo.';
+            }
+            event.target.value = '';
+        }
+
+        function autofillFromScan() {
+            var filled = 0;
+            if (scannedPlate) {
+                var ticketField = document.querySelector('#tab-dashboard input[name="ticket_num"]');
+                if (ticketField) { ticketField.value = scannedPlate; filled++; }
+            }
+            if (scannedDate) {
+                var dateField = document.querySelector('#tab-dashboard input[name="due_date"]');
+                if (dateField) { dateField.value = scannedDate; filled++; }
+            }
+            if (filled > 0) {
+                showToast('Reminder form auto-filled from scan');
+            } else {
+                showToast('Nothing to auto-fill');
+            }
         }
 
         function calculateROI() {

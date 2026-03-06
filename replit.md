@@ -15,7 +15,8 @@ A mobile-friendly Flask web app for managing Toronto traffic fines. Features a d
 The app runs on port 5000 via `python main.py`.
 
 ## Features
-- Dashboard with profile (name + license plate), deadline ROI calculator, and fine reminders with due dates
+- Dashboard with AI ticket scanner, profile, deadline ROI calculator, and fine reminders with due dates
+- AI Ticket Scanner: uses Tesseract.js OCR (v4.0.1 from CDN) to photograph physical parking tickets and extract Ontario plate numbers (ABCD 123 format) and dates; auto-fills the Add Fine Reminder form
 - Deadline ROI Calculator: enter a base fine amount and see how Toronto late fees escalate ($15.39 address search + $32.10 late payment + $32.10 plate denial = $79.59 total penalties)
 - Reminders show status badges (Upcoming, Today, Overdue)
 - Calendar integration: Google Calendar link (opens pre-filled event) and .ics file download (works with Apple Calendar, Outlook, etc.)
@@ -30,6 +31,7 @@ The app runs on port 5000 via `python main.py`.
 ## External Dependencies (CDN)
 - Leaflet.js 1.9.4 (map rendering)
 - leaflet.heat (heatmap layer plugin)
+- Tesseract.js 4.0.1 (client-side OCR for ticket scanning)
 - Google Fonts (DM Sans, JetBrains Mono)
 
 ## Routes
