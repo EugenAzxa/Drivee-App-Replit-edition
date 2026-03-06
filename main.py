@@ -1088,6 +1088,15 @@ HTML_TEMPLATE = """
         var scannedPlate = '';
         var scannedDate = '';
 
+        function fileToDataURL(file) {
+            return new Promise(function(resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function() { resolve(reader.result); };
+                reader.onerror = function() { reject(new Error('Failed to read file')); };
+                reader.readAsDataURL(file);
+            });
+        }
+
         async function performOCR(event) {
             var file = event.target.files[0];
             if (!file) return;
@@ -1097,7 +1106,8 @@ HTML_TEMPLATE = """
             statusEl.textContent = 'AI is reading your ticket…';
             resultEl.classList.remove('show');
             try {
-                var result = await Tesseract.recognize(file, 'eng');
+                var dataUrl = await fileToDataURL(file);
+                var result = await Tesseract.recognize(dataUrl, 'eng');
                 var text = result.data.text.toUpperCase();
                 var plateMatch = text.match(/[A-Z]{4}\s?\d{3}/);
                 var dateMatch = text.match(/\d{4}[\/\-]\d{2}[\/\-]\d{2}/) || text.match(/\d{2}[\/\-]\d{2}[\/\-]\d{4}/);
