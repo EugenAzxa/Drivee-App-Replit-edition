@@ -1,5 +1,6 @@
-from flask import Flask, render_template_string, request, redirect, url_for, jsonify
-from datetime import datetime
+from flask import Flask, render_template_string, request, redirect, url_for, jsonify, Response
+from datetime import datetime, timedelta
+from urllib.parse import quote
 import os
 
 app = Flask(__name__)
@@ -253,9 +254,6 @@ HTML_TEMPLATE = """
         .profile-saved.show { display: flex; }
 
         .reminder-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             padding: 14px 16px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-glass);
@@ -265,6 +263,11 @@ HTML_TEMPLATE = """
             animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
         .reminder-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .reminder-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
         .reminder-info { flex: 1; }
         .reminder-info .reminder-ticket {
             font-size: 14px;
@@ -314,6 +317,48 @@ HTML_TEMPLATE = """
         .reminder-delete:hover {
             color: var(--neon-pink);
             background: var(--neon-pink-subtle);
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .cal-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid var(--border-glass);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .cal-btn:active { transform: scale(0.95); }
+        .cal-btn .cal-icon { font-size: 13px; }
+        .cal-btn-google {
+            background: rgba(66, 133, 244, 0.1);
+            color: #4285f4;
+            border-color: rgba(66, 133, 244, 0.2);
+        }
+        .cal-btn-google:hover {
+            background: rgba(66, 133, 244, 0.18);
+            border-color: rgba(66, 133, 244, 0.35);
+            box-shadow: 0 2px 12px rgba(66, 133, 244, 0.15);
+        }
+        .cal-btn-ics {
+            background: var(--neon-blue-subtle);
+            color: var(--neon-blue);
+            border-color: rgba(0, 212, 255, 0.15);
+        }
+        .cal-btn-ics:hover {
+            background: rgba(0, 212, 255, 0.14);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 2px 12px var(--neon-blue-subtle);
         }
 
         .empty-state {
@@ -550,15 +595,25 @@ HTML_TEMPLATE = """
                 {% if reminders %}
                     {% for r in reminders %}
                         <div class="reminder-item" style="animation-delay: {{ loop.index * 0.05 }}s;">
-                            <div class="reminder-info">
-                                <div class="reminder-ticket">{{ r.ticket_num }}</div>
-                                <div class="reminder-meta">Due {{ r.due_date_display }}</div>
+                            <div class="reminder-top">
+                                <div class="reminder-info">
+                                    <div class="reminder-ticket">{{ r.ticket_num }}</div>
+                                    <div class="reminder-meta">Due {{ r.due_date_display }}</div>
+                                </div>
+                                <span class="reminder-badge {{ r.badge_class }}">{{ r.badge_text }}</span>
+                                <form action="/delete-reminder" method="POST" style="display:inline;">
+                                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+                                    <button type="submit" class="reminder-delete" title="Delete">&times;</button>
+                                </form>
                             </div>
-                            <span class="reminder-badge {{ r.badge_class }}">{{ r.badge_text }}</span>
-                            <form action="/delete-reminder" method="POST" style="display:inline;">
-                                <input type="hidden" name="index" value="{{ loop.index0 }}">
-                                <button type="submit" class="reminder-delete" title="Delete">&times;</button>
-                            </form>
+                            <div class="reminder-actions">
+                                <a href="{{ r.gcal_url }}" target="_blank" rel="noopener" class="cal-btn cal-btn-google">
+                                    <span class="cal-icon">&#x1F4C5;</span> Google Calendar
+                                </a>
+                                <a href="/calendar/ics/{{ loop.index0 }}" class="cal-btn cal-btn-ics" download>
+                                    <span class="cal-icon">&#x2B07;</span> Download .ics
+                                </a>
+                            </div>
                         </div>
                     {% endfor %}
                 {% else %}
@@ -677,6 +732,60 @@ HTML_TEMPLATE = """
 </html>
 """
 
+def build_gcal_url(ticket_num, due_date_str, plate=''):
+    try:
+        due = datetime.strptime(due_date_str, '%Y-%m-%d')
+    except ValueError:
+        due = datetime.now()
+    date_str = due.strftime('%Y%m%d')
+    title = quote(f'Toronto Fine Due: {ticket_num}')
+    details = quote(f'Ticket: {ticket_num}' + (f'\\nPlate: {plate}' if plate else '') + '\\n\\nPay at: https://www.toronto.ca/services-payments/tickets-fines-penalties/')
+    location = quote('Toronto, ON')
+    return f'https://calendar.google.com/calendar/render?action=TEMPLATE&text={title}&dates={date_str}/{date_str}&details={details}&location={location}'
+
+def build_ics_content(ticket_num, due_date_str, plate=''):
+    try:
+        due = datetime.strptime(due_date_str, '%Y-%m-%d')
+    except ValueError:
+        due = datetime.now()
+    date_str = due.strftime('%Y%m%d')
+    now_str = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+    desc = f'Ticket: {ticket_num}'
+    if plate:
+        desc += f'\\nPlate: {plate}'
+    desc += '\\nPay at: https://www.toronto.ca/services-payments/tickets-fines-penalties/'
+    uid = f'{ticket_num}-{date_str}@tofinetracker'
+    alarm_date = due - timedelta(days=1)
+    lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//TO Fine Tracker//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        f'DTSTART;VALUE=DATE:{date_str}',
+        f'DTEND;VALUE=DATE:{date_str}',
+        f'DTSTAMP:{now_str}',
+        f'UID:{uid}',
+        f'SUMMARY:Toronto Fine Due: {ticket_num}',
+        f'DESCRIPTION:{desc}',
+        'LOCATION:Toronto\\, ON',
+        'STATUS:CONFIRMED',
+        'BEGIN:VALARM',
+        'TRIGGER:-P1D',
+        'ACTION:DISPLAY',
+        f'DESCRIPTION:Fine payment due tomorrow: {ticket_num}',
+        'END:VALARM',
+        'BEGIN:VALARM',
+        'TRIGGER:-PT0M',
+        'ACTION:DISPLAY',
+        f'DESCRIPTION:Fine payment due today: {ticket_num}',
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR',
+    ]
+    return '\r\n'.join(lines)
+
 def get_badge_info(due_date_str):
     try:
         due = datetime.strptime(due_date_str, '%Y-%m-%d').date()
@@ -703,6 +812,7 @@ def format_date_display(due_date_str):
 @app.route('/')
 def index():
     reminders = []
+    plate = users_data['profile'].get('plate', '')
     for r in users_data['reminders']:
         badge_class, badge_text = get_badge_info(r['due_date'])
         reminders.append({
@@ -711,6 +821,7 @@ def index():
             'due_date_display': format_date_display(r['due_date']),
             'badge_class': badge_class,
             'badge_text': badge_text,
+            'gcal_url': build_gcal_url(r['ticket_num'], r['due_date'], plate),
         })
     profile_saved = request.args.get('saved') == 'profile'
     return render_template_string(HTML_TEMPLATE,
@@ -745,6 +856,20 @@ def delete_reminder():
     except (ValueError, IndexError):
         pass
     return redirect('/?deleted=1')
+
+@app.route('/calendar/ics/<int:index>')
+def download_ics(index):
+    if 0 <= index < len(users_data['reminders']):
+        r = users_data['reminders'][index]
+        plate = users_data['profile'].get('plate', '')
+        ics_content = build_ics_content(r['ticket_num'], r['due_date'], plate)
+        filename = f"fine-reminder-{r['ticket_num']}.ics"
+        return Response(
+            ics_content,
+            mimetype='text/calendar',
+            headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+        )
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
