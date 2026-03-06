@@ -19,695 +19,596 @@ HTML_TEMPLATE = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0a0a1a">
+    <meta name="theme-color" content="#101014">
     <title>TO Fine Tracker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-primary: #0a0a1a;
-            --bg-secondary: #111128;
-            --bg-card: rgba(255, 255, 255, 0.04);
-            --bg-card-hover: rgba(255, 255, 255, 0.07);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --border-glass-hover: rgba(255, 255, 255, 0.15);
-            --text-primary: #f0f0f8;
-            --text-secondary: rgba(240, 240, 248, 0.6);
-            --text-muted: rgba(240, 240, 248, 0.35);
-            --neon-blue: #00d4ff;
-            --neon-pink: #ff2d78;
-            --neon-green: #00ff88;
-            --neon-blue-glow: rgba(0, 212, 255, 0.25);
-            --neon-pink-glow: rgba(255, 45, 120, 0.25);
-            --neon-green-glow: rgba(0, 255, 136, 0.25);
-            --neon-blue-subtle: rgba(0, 212, 255, 0.08);
-            --neon-pink-subtle: rgba(255, 45, 120, 0.08);
-            --neon-green-subtle: rgba(0, 255, 136, 0.08);
-            --radius-sm: 12px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
+            --bg-root: #101014;
+            --bg-surface: #18181c;
+            --bg-elevated: #1f1f24;
+            --bg-input: #141418;
+            --border: rgba(255,255,255,0.06);
+            --border-focus: rgba(255,255,255,0.18);
+            --text-primary: #ececf0;
+            --text-secondary: #8e8e99;
+            --text-tertiary: #5a5a66;
+            --accent: #4f8cff;
+            --accent-hover: #6aa0ff;
+            --accent-subtle: rgba(79,140,255,0.08);
+            --accent-muted: rgba(79,140,255,0.15);
+            --danger: #ef4444;
+            --danger-subtle: rgba(239,68,68,0.08);
+            --warning: #f59e0b;
+            --warning-subtle: rgba(245,158,11,0.08);
+            --success: #22c55e;
+            --success-subtle: rgba(34,197,94,0.08);
+            --radius: 10px;
+            --radius-lg: 14px;
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
 
-        html { background: var(--bg-primary); }
+        html { background: var(--bg-root); }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
+            font-family: var(--font);
+            background: var(--bg-root);
             color: var(--text-primary);
             min-height: 100vh;
             min-height: 100dvh;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        .bg-mesh {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        .bg-mesh .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.3;
-            animation: orbFloat 20s ease-in-out infinite alternate;
-        }
-        .bg-mesh .orb-1 { width: 300px; height: 300px; background: var(--neon-blue); top: -80px; left: -60px; animation-delay: 0s; }
-        .bg-mesh .orb-2 { width: 250px; height: 250px; background: var(--neon-pink); bottom: 20%; right: -80px; animation-delay: -7s; }
-        .bg-mesh .orb-3 { width: 200px; height: 200px; background: var(--neon-green); bottom: -60px; left: 30%; animation-delay: -14s; }
-
-        @keyframes orbFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -20px) scale(1.05); }
-            66% { transform: translate(-20px, 30px) scale(0.95); }
-            100% { transform: translate(10px, -10px) scale(1.02); }
-        }
-
-        .app-container {
-            position: relative;
-            z-index: 1;
-            max-width: 480px;
+        .app {
+            max-width: 460px;
             margin: 0 auto;
-            padding: 0 16px;
-            padding-top: calc(var(--safe-top) + 16px);
-            padding-bottom: calc(var(--safe-bottom) + 100px);
+            padding: 0 20px;
+            padding-top: calc(var(--safe-top) + 12px);
+            padding-bottom: calc(var(--safe-bottom) + 88px);
         }
 
-        .app-header {
-            text-align: center;
-            padding: 24px 0 8px;
-            animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        .header {
+            padding: 20px 0 24px;
+            animation: fadeIn 0.5s ease both;
         }
-        .app-header .logo-icon {
-            display: inline-flex;
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 56px;
-            height: 56px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-pink));
-            margin-bottom: 12px;
-            font-size: 28px;
-            box-shadow: 0 8px 32px var(--neon-blue-glow);
+            font-size: 22px;
+            flex-shrink: 0;
         }
-        .app-header h1 {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--text-primary), var(--neon-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .header-text h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            line-height: 1.2;
         }
-        .app-header .subtitle {
+        .header-text p {
             font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 4px;
+            color: var(--text-tertiary);
             font-weight: 400;
+            margin-top: 1px;
         }
 
-        .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(40px) saturate(1.4);
-            -webkit-backdrop-filter: blur(40px) saturate(1.4);
-            border: 1px solid var(--border-glass);
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             padding: 20px;
-            margin-bottom: 16px;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 12px;
+            animation: slideUp 0.4s ease both;
         }
-        .glass-card:hover {
-            border-color: var(--border-glass-hover);
-        }
+        .card-1 { animation-delay: 0.05s; }
+        .card-2 { animation-delay: 0.1s; }
+        .card-3 { animation-delay: 0.15s; }
 
-        .section-label {
+        .card-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-tertiary);
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-glass);
         }
-        .section-label .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+        .card-label::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            border-radius: 2px;
             flex-shrink: 0;
         }
-        .section-label.blue { color: var(--neon-blue); }
-        .section-label.blue .dot { background: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue-glow); }
-        .section-label.pink { color: var(--neon-pink); }
-        .section-label.pink .dot { background: var(--neon-pink); box-shadow: 0 0 8px var(--neon-pink-glow); }
-        .section-label.green { color: var(--neon-green); }
-        .section-label.green .dot { background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green-glow); }
+        .card-label.label-blue::before { background: var(--accent); }
+        .card-label.label-green::before { background: var(--success); }
+        .card-label.label-amber::before { background: var(--warning); }
 
-        .form-group { margin-bottom: 14px; }
-        .form-group label {
+        .field { margin-bottom: 12px; }
+        .field label {
             display: block;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--text-secondary);
             margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        .form-group input {
+        .field input {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             color: var(--text-primary);
-            font-size: 15px;
-            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-family: var(--font);
             font-weight: 500;
             outline: none;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .form-group input::placeholder { color: var(--text-muted); }
-        .form-group input:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 0 3px var(--neon-blue-subtle), 0 0 20px var(--neon-blue-subtle);
-            background: rgba(0, 212, 255, 0.03);
+        .field input::placeholder { color: var(--text-tertiary); }
+        .field input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-subtle);
         }
-        .form-group input[type="date"] {
-            color-scheme: dark;
-        }
-        .form-group input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            opacity: 0.5;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
+        .field input[type="date"] { color-scheme: dark; }
+        .field input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.7);
+            opacity: 0.6;
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
-        .btn-primary:active { transform: scale(0.97); }
-        .btn-save-profile {
-            background: linear-gradient(135deg, var(--neon-blue), #0090ff);
-            color: #fff;
-            box-shadow: 0 4px 20px var(--neon-blue-glow);
-        }
-        .btn-save-profile:hover { box-shadow: 0 6px 30px rgba(0, 212, 255, 0.4); }
-        .btn-add-reminder {
-            background: linear-gradient(135deg, var(--neon-green), #00cc6a);
-            color: #0a0a1a;
-            box-shadow: 0 4px 20px var(--neon-green-glow);
-        }
-        .btn-add-reminder:hover { box-shadow: 0 6px 30px rgba(0, 255, 136, 0.4); }
 
-        .profile-saved {
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: var(--radius);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.15s ease;
+            letter-spacing: 0.3px;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-accent {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-accent:hover { background: var(--accent-hover); }
+        .btn-surface {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-surface:hover { border-color: var(--border-focus); }
+
+        .saved-banner {
             display: none;
             align-items: center;
             gap: 8px;
-            padding: 12px 16px;
-            background: var(--neon-blue-subtle);
-            border: 1px solid rgba(0, 212, 255, 0.15);
-            border-radius: var(--radius-sm);
-            margin-bottom: 14px;
+            padding: 10px 14px;
+            background: var(--success-subtle);
+            border: 1px solid rgba(34,197,94,0.12);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
             font-size: 13px;
-            color: var(--neon-blue);
+            color: var(--success);
             font-weight: 500;
-            animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .profile-saved.show { display: flex; }
+        .saved-banner.show { display: flex; }
 
-        .reminder-item {
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-sm);
+        .reminder {
+            padding: 14px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             margin-bottom: 8px;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
-            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            animation: slideUp 0.35s ease both;
         }
-        .reminder-item:hover { background: rgba(255, 255, 255, 0.05); }
-        .reminder-top {
+        .reminder-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 10px;
         }
-        .reminder-info { flex: 1; }
-        .reminder-info .reminder-ticket {
+        .reminder-info { flex: 1; min-width: 0; }
+        .reminder-ticket {
             font-size: 14px;
             font-weight: 600;
+            font-family: var(--font-mono);
             color: var(--text-primary);
+            letter-spacing: 0.3px;
         }
-        .reminder-info .reminder-meta {
+        .reminder-date {
             font-size: 12px;
             color: var(--text-secondary);
             margin-top: 2px;
         }
-        .reminder-badge {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 20px;
+        .badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             flex-shrink: 0;
+            line-height: 1.4;
         }
         .badge-upcoming {
-            background: var(--neon-green-subtle);
-            color: var(--neon-green);
-            border: 1px solid rgba(0, 255, 136, 0.15);
+            background: var(--success-subtle);
+            color: var(--success);
         }
         .badge-overdue {
-            background: var(--neon-pink-subtle);
-            color: var(--neon-pink);
-            border: 1px solid rgba(255, 45, 120, 0.15);
+            background: var(--danger-subtle);
+            color: var(--danger);
         }
         .badge-today {
-            background: rgba(255, 200, 0, 0.08);
-            color: #ffc800;
-            border: 1px solid rgba(255, 200, 0, 0.15);
+            background: var(--warning-subtle);
+            color: var(--warning);
         }
-        .reminder-delete {
+        .reminder-del {
             background: none;
             border: none;
-            color: var(--text-muted);
+            color: var(--text-tertiary);
             cursor: pointer;
-            font-size: 18px;
-            padding: 4px 8px;
-            margin-left: 8px;
-            border-radius: 8px;
-            transition: color 0.2s, background 0.2s;
+            font-size: 16px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+            line-height: 1;
         }
-        .reminder-delete:hover {
-            color: var(--neon-pink);
-            background: var(--neon-pink-subtle);
+        .reminder-del:hover {
+            color: var(--danger);
+            background: var(--danger-subtle);
         }
-
-        .reminder-actions {
+        .reminder-cal {
             display: flex;
             gap: 6px;
-            margin-top: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
         }
         .cal-btn {
             display: inline-flex;
             align-items: center;
             gap: 5px;
             padding: 6px 10px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font);
             text-decoration: none;
             cursor: pointer;
-            border: 1px solid var(--border-glass);
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            transition: border-color 0.15s, color 0.15s, background 0.15s;
         }
-        .cal-btn:active { transform: scale(0.95); }
-        .cal-btn .cal-icon { font-size: 13px; }
-        .cal-btn-google {
-            background: rgba(66, 133, 244, 0.1);
-            color: #4285f4;
-            border-color: rgba(66, 133, 244, 0.2);
+        .cal-btn:hover {
+            border-color: var(--border-focus);
+            color: var(--text-primary);
+            background: var(--bg-elevated);
         }
-        .cal-btn-google:hover {
-            background: rgba(66, 133, 244, 0.18);
-            border-color: rgba(66, 133, 244, 0.35);
-            box-shadow: 0 2px 12px rgba(66, 133, 244, 0.15);
-        }
-        .cal-btn-ics {
-            background: var(--neon-blue-subtle);
-            color: var(--neon-blue);
-            border-color: rgba(0, 212, 255, 0.15);
-        }
-        .cal-btn-ics:hover {
-            background: rgba(0, 212, 255, 0.14);
-            border-color: rgba(0, 212, 255, 0.3);
-            box-shadow: 0 2px 12px var(--neon-blue-subtle);
+        .cal-btn svg {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
         }
 
-        .empty-state {
+        .empty {
             text-align: center;
-            padding: 24px 16px;
-            color: var(--text-muted);
+            padding: 28px 16px;
+            color: var(--text-tertiary);
             font-size: 13px;
         }
-        .empty-state .empty-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-            opacity: 0.5;
-        }
 
-        .link-grid { display: flex; flex-direction: column; gap: 8px; }
-        .link-btn {
+        .service-list { display: flex; flex-direction: column; gap: 6px; }
+        .service-link {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-sm);
+            padding: 13px 14px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             color: var(--text-primary);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.3s ease;
+            transition: border-color 0.15s ease, background 0.15s ease;
         }
-        .link-btn:active { transform: scale(0.98); }
-        .link-btn .link-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
+        .service-link:hover {
+            border-color: var(--border-focus);
+            background: rgba(255,255,255,0.03);
+        }
+        .service-link .svc-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             flex-shrink: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
         }
-        .link-btn .link-text { flex: 1; }
-        .link-btn .link-arrow {
-            color: var(--text-muted);
-            font-size: 18px;
-            transition: transform 0.2s ease;
+        .service-link .svc-text { flex: 1; }
+        .service-link .svc-arrow {
+            color: var(--text-tertiary);
+            font-size: 14px;
+            transition: transform 0.15s ease;
         }
-        .link-btn:hover .link-arrow { transform: translateX(3px); }
+        .service-link:hover .svc-arrow { transform: translateX(2px); }
 
-        .link-btn.blue-link:hover {
-            border-color: rgba(0, 212, 255, 0.2);
-            background: var(--neon-blue-subtle);
-            box-shadow: 0 4px 20px var(--neon-blue-subtle);
-        }
-        .link-btn.blue-link .link-icon {
-            background: var(--neon-blue-subtle);
-            color: var(--neon-blue);
-        }
-        .link-btn.pink-link:hover {
-            border-color: rgba(255, 45, 120, 0.2);
-            background: var(--neon-pink-subtle);
-            box-shadow: 0 4px 20px var(--neon-pink-subtle);
-        }
-        .link-btn.pink-link .link-icon {
-            background: var(--neon-pink-subtle);
-            color: var(--neon-pink);
-        }
-        .link-btn.green-link:hover {
-            border-color: rgba(0, 255, 136, 0.2);
-            background: var(--neon-green-subtle);
-            box-shadow: 0 4px 20px var(--neon-green-subtle);
-        }
-        .link-btn.green-link .link-icon {
-            background: var(--neon-green-subtle);
-            color: var(--neon-green);
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0;
         }
 
-        .nav-bar {
+        .nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             z-index: 100;
-            background: rgba(10, 10, 26, 0.85);
-            backdrop-filter: blur(30px) saturate(1.5);
-            -webkit-backdrop-filter: blur(30px) saturate(1.5);
-            border-top: 1px solid var(--border-glass);
-            padding: 8px 0;
-            padding-bottom: calc(8px + var(--safe-bottom));
+            background: rgba(16,16,20,0.92);
+            backdrop-filter: blur(24px) saturate(1.2);
+            -webkit-backdrop-filter: blur(24px) saturate(1.2);
+            border-top: 1px solid var(--border);
+            padding: 6px 0;
+            padding-bottom: calc(6px + var(--safe-bottom));
         }
         .nav-inner {
             display: flex;
-            justify-content: space-around;
-            max-width: 480px;
+            justify-content: center;
+            gap: 8px;
+            max-width: 460px;
             margin: 0 auto;
         }
-        .nav-item {
+        .nav-btn {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 4px;
-            padding: 6px 16px;
-            border-radius: 12px;
+            gap: 6px;
+            padding: 8px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s ease;
-            border: none;
+            border: 1px solid transparent;
             background: none;
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
+            color: var(--text-tertiary);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.15s, background 0.15s, border-color 0.15s;
         }
-        .nav-item.active { color: var(--neon-blue); }
-        .nav-item .nav-icon { font-size: 22px; }
-        .nav-item .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-
-        .stagger-1 { animation-delay: 0.05s; }
-        .stagger-2 { animation-delay: 0.1s; }
-        .stagger-3 { animation-delay: 0.15s; }
-        .stagger-4 { animation-delay: 0.2s; }
-        .stagger-5 { animation-delay: 0.25s; }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .nav-btn:hover { color: var(--text-secondary); }
+        .nav-btn.active {
+            color: var(--text-primary);
+            background: var(--bg-elevated);
+            border-color: var(--border);
         }
+        .nav-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .tab { display: none; }
+        .tab.active { display: block; animation: fadeIn 0.25s ease; }
+
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        @keyframes bounceIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
 
         .toast {
             position: fixed;
-            top: calc(var(--safe-top) + 16px);
+            top: calc(var(--safe-top) + 12px);
             left: 50%;
-            transform: translateX(-50%) translateY(-100px);
+            transform: translateX(-50%) translateY(-60px);
             z-index: 200;
-            padding: 12px 24px;
-            border-radius: var(--radius-sm);
+            padding: 10px 20px;
+            border-radius: var(--radius);
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             pointer-events: none;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
             opacity: 0;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
         .toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
-        .toast-success {
-            background: rgba(0, 255, 136, 0.15);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: var(--neon-green);
-        }
 
         @media (max-width: 380px) {
-            .app-container { padding: 0 12px; }
-            .glass-card { padding: 16px; }
+            .app { padding: 0 14px; padding-bottom: calc(var(--safe-bottom) + 80px); }
+            .card { padding: 16px; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-mesh">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
+    <div id="toast" class="toast"></div>
 
-    <div id="toast" class="toast toast-success"></div>
-
-    <div class="app-container">
-        <div class="app-header">
-            <div class="logo-icon">&#x1F698;</div>
-            <h1>TO Fine Tracker</h1>
-            <p class="subtitle">Toronto Traffic Fine Management</p>
+    <div class="app">
+        <div class="header">
+            <div class="header-top">
+                <div class="header-icon">&#x1F698;</div>
+                <div class="header-text">
+                    <h1>TO Fine Tracker</h1>
+                    <p>Toronto Traffic Fine Management</p>
+                </div>
+            </div>
         </div>
 
-        <!-- TAB: Dashboard -->
-        <div id="tab-dashboard" class="tab-content active">
-            <div class="glass-card stagger-1" style="animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.05s both;">
-                <div class="section-label blue">
-                    <span class="dot"></span>
-                    My Profile
-                </div>
-                <form id="profile-form" action="/save-profile" method="POST">
-                    <div id="profile-saved" class="profile-saved {% if profile_saved %}show{% endif %}">
-                        &#x2713; Profile saved
+        <div id="tab-dashboard" class="tab active">
+            <div class="card card-1">
+                <div class="card-label label-blue">Profile</div>
+                <form action="/save-profile" method="POST">
+                    <div class="saved-banner {% if profile_saved %}show{% endif %}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Profile saved
                     </div>
-                    <div class="form-group">
+                    <div class="field">
                         <label>Full Name</label>
-                        <input type="text" name="name" placeholder="Enter your name" value="{{ profile.name }}" required>
+                        <input type="text" name="name" placeholder="Your name" value="{{ profile.name }}" required>
                     </div>
-                    <div class="form-group">
+                    <div class="field">
                         <label>License Plate</label>
-                        <input type="text" name="plate" placeholder="e.g. ABCD 123" value="{{ profile.plate }}" required style="text-transform: uppercase;">
+                        <input type="text" name="plate" placeholder="e.g. ABCD 123" value="{{ profile.plate }}" required style="text-transform: uppercase; font-family: var(--font-mono);">
                     </div>
-                    <button type="submit" class="btn-primary btn-save-profile">Save Profile</button>
+                    <button type="submit" class="btn btn-accent">Save Profile</button>
                 </form>
             </div>
 
-            <div class="glass-card stagger-2" style="animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;">
-                <div class="section-label green">
-                    <span class="dot"></span>
-                    Add Fine Reminder
-                </div>
-                <form id="reminder-form" action="/add-reminder" method="POST">
-                    <div class="form-group">
+            <div class="card card-2">
+                <div class="card-label label-green">Add Fine Reminder</div>
+                <form action="/add-reminder" method="POST">
+                    <div class="field">
                         <label>Ticket / Reference Number</label>
-                        <input type="text" name="ticket_num" placeholder="e.g. TK-12345" required>
+                        <input type="text" name="ticket_num" placeholder="e.g. TK-12345" required style="font-family: var(--font-mono);">
                     </div>
-                    <div class="form-group">
+                    <div class="field">
                         <label>Due Date</label>
                         <input type="date" name="due_date" required>
                     </div>
-                    <button type="submit" class="btn-primary btn-add-reminder">Add Reminder</button>
+                    <button type="submit" class="btn btn-surface">Add Reminder</button>
                 </form>
             </div>
 
-            <div class="glass-card stagger-3" style="animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;">
-                <div class="section-label pink">
-                    <span class="dot"></span>
-                    My Reminders
-                </div>
+            <div class="card card-3">
+                <div class="card-label label-amber">Reminders</div>
                 {% if reminders %}
                     {% for r in reminders %}
-                        <div class="reminder-item" style="animation-delay: {{ loop.index * 0.05 }}s;">
-                            <div class="reminder-top">
+                        <div class="reminder" style="animation-delay: {{ 0.15 + loop.index * 0.04 }}s;">
+                            <div class="reminder-row">
                                 <div class="reminder-info">
                                     <div class="reminder-ticket">{{ r.ticket_num }}</div>
-                                    <div class="reminder-meta">Due {{ r.due_date_display }}</div>
+                                    <div class="reminder-date">Due {{ r.due_date_display }}</div>
                                 </div>
-                                <span class="reminder-badge {{ r.badge_class }}">{{ r.badge_text }}</span>
+                                <span class="badge {{ r.badge_class }}">{{ r.badge_text }}</span>
                                 <form action="/delete-reminder" method="POST" style="display:inline;">
                                     <input type="hidden" name="index" value="{{ loop.index0 }}">
-                                    <button type="submit" class="reminder-delete" title="Delete">&times;</button>
+                                    <button type="submit" class="reminder-del" title="Delete">&times;</button>
                                 </form>
                             </div>
-                            <div class="reminder-actions">
-                                <a href="{{ r.gcal_url }}" target="_blank" rel="noopener" class="cal-btn cal-btn-google">
-                                    <span class="cal-icon">&#x1F4C5;</span> Google Calendar
+                            <div class="reminder-cal">
+                                <a href="{{ r.gcal_url }}" target="_blank" rel="noopener" class="cal-btn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    Google Calendar
                                 </a>
-                                <a href="/calendar/ics/{{ loop.index0 }}" class="cal-btn cal-btn-ics" download>
-                                    <span class="cal-icon">&#x2B07;</span> Download .ics
+                                <a href="/calendar/ics/{{ loop.index0 }}" class="cal-btn" download>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    Download .ics
                                 </a>
                             </div>
                         </div>
                     {% endfor %}
                 {% else %}
-                    <div class="empty-state">
-                        <div class="empty-icon">&#x1F4CB;</div>
-                        <p>No reminders yet. Add one above!</p>
-                    </div>
+                    <div class="empty">No reminders yet</div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- TAB: Services -->
-        <div id="tab-services" class="tab-content">
-            <div class="glass-card" style="animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.05s both;">
-                <div class="section-label blue">
-                    <span class="dot"></span>
-                    Parking Violations
-                </div>
-                <div class="link-grid">
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/pay-your-parking-violation/" target="_blank" rel="noopener" class="link-btn blue-link">
-                        <div class="link-icon">&#x1F4B3;</div>
-                        <span class="link-text">Pay Parking Ticket</span>
-                        <span class="link-arrow">&#x203A;</span>
+        <div id="tab-services" class="tab">
+            <div class="card card-1">
+                <div class="card-label label-blue">Parking Violations</div>
+                <div class="service-list">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/pay-your-parking-violation/" target="_blank" rel="noopener" class="service-link">
+                        <div class="svc-icon">&#x1F4B3;</div>
+                        <span class="svc-text">Pay Parking Ticket</span>
+                        <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/dispute-your-parking-violation/" target="_blank" rel="noopener" class="link-btn blue-link">
-                        <div class="link-icon">&#x2696;</div>
-                        <span class="link-text">Dispute Ticket</span>
-                        <span class="link-arrow">&#x203A;</span>
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/dispute-your-parking-violation/" target="_blank" rel="noopener" class="service-link">
+                        <div class="svc-icon">&#x2696;</div>
+                        <span class="svc-text">Dispute Ticket</span>
+                        <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/about-parking-violations/" target="_blank" rel="noopener" class="link-btn blue-link">
-                        <div class="link-icon">&#x2139;</div>
-                        <span class="link-text">About Parking Violations</span>
-                        <span class="link-arrow">&#x203A;</span>
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/about-parking-violations/" target="_blank" rel="noopener" class="service-link">
+                        <div class="svc-icon">&#x2139;</div>
+                        <span class="svc-text">About Parking Violations</span>
+                        <span class="svc-arrow">&#x203A;</span>
                     </a>
                 </div>
             </div>
 
-            <div class="glass-card" style="animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;">
-                <div class="section-label pink">
-                    <span class="dot"></span>
-                    Speed & Red Light Cameras
-                </div>
-                <div class="link-grid">
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/" target="_blank" rel="noopener" class="link-btn pink-link">
-                        <div class="link-icon">&#x1F4F7;</div>
-                        <span class="link-text">Pay Camera Fine</span>
-                        <span class="link-arrow">&#x203A;</span>
+            <div class="card card-2">
+                <div class="card-label label-amber">Speed & Red Light Cameras</div>
+                <div class="service-list">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/" target="_blank" rel="noopener" class="service-link">
+                        <div class="svc-icon">&#x1F4F7;</div>
+                        <span class="svc-text">Pay Camera Fine</span>
+                        <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/dispute-your-red-light-camera-penalty/" target="_blank" rel="noopener" class="link-btn pink-link">
-                        <div class="link-icon">&#x2696;</div>
-                        <span class="link-text">Dispute Camera Fine</span>
-                        <span class="link-arrow">&#x203A;</span>
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/dispute-your-red-light-camera-penalty/" target="_blank" rel="noopener" class="service-link">
+                        <div class="svc-icon">&#x2696;</div>
+                        <span class="svc-text">Dispute Camera Fine</span>
+                        <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/dispute-your-red-light-camera-penalty/" target="_blank" rel="noopener" class="link-btn pink-link">
-                        <div class="link-icon">&#x2139;</div>
-                        <span class="link-text">About Camera Penalties</span>
-                        <span class="link-arrow">&#x203A;</span>
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/dispute-your-red-light-camera-penalty/" target="_blank" rel="noopener" class="service-link">
+                        <div class="svc-icon">&#x2139;</div>
+                        <span class="svc-text">About Camera Penalties</span>
+                        <span class="svc-arrow">&#x203A;</span>
                     </a>
                 </div>
             </div>
 
-            <div class="glass-card" style="animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;">
-                <div class="section-label green">
-                    <span class="dot"></span>
-                    Court Services
-                </div>
-                <div class="link-grid">
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/" target="_blank" rel="noopener" class="link-btn green-link">
-                        <div class="link-icon">&#x1F3DB;</div>
-                        <span class="link-text">Court Services & Provincial Offences</span>
-                        <span class="link-arrow">&#x203A;</span>
+            <div class="card card-3">
+                <div class="card-label label-green">Court Services</div>
+                <div class="service-list">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/" target="_blank" rel="noopener" class="service-link">
+                        <div class="svc-icon">&#x1F3DB;</div>
+                        <span class="svc-text">Court Services & Provincial Offences</span>
+                        <span class="svc-arrow">&#x203A;</span>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <nav class="nav-bar">
+    <nav class="nav">
         <div class="nav-inner">
-            <button class="nav-item active" onclick="switchTab('dashboard', this)">
-                <span class="nav-icon">&#x1F3E0;</span>
-                <span class="nav-label">Dashboard</span>
+            <button class="nav-btn active" onclick="switchTab('dashboard', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Dashboard
             </button>
-            <button class="nav-item" onclick="switchTab('services', this)">
-                <span class="nav-icon">&#x1F517;</span>
-                <span class="nav-label">Services</span>
+            <button class="nav-btn" onclick="switchTab('services', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                Services
             </button>
         </div>
     </nav>
 
     <script>
         function switchTab(tab, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
             btn.classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });

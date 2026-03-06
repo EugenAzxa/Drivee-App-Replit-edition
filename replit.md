@@ -23,7 +23,7 @@ The app runs on port 5000 via `python main.py`.
 - All external links open in new tabs to official Toronto portals
 - Bottom navigation bar for tab switching
 - Toast notifications on save/delete actions
-- Dark mode with glassmorphism, neon accents (blue, pink, green), animated background orbs
+- Refined dark mode with muted color system (DM Sans + JetBrains Mono typography), layered surface cards, subtle borders, SVG icons
 
 ## Routes
 - `GET /` - Main page
