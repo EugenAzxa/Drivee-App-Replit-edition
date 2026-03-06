@@ -1,0 +1,191 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+import json
+
+app = Flask(__name__)
+
+# Databases
+users_data = []
+# New Database for 311 Community Reports
+reports_data = [
+    # Adding a fake default report so you can see what it looks like on the map
+    {"type": "Pothole", "lat": 43.650, "lng": -79.390, "status": "Pending 311"}
+]
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DriveSafe TO | 311 Hotspots</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #58a6ff; --danger: #da3633; --warning: #d29922; --report: #d2a8ff;
+            --bg: #010409; --glass: rgba(22, 27, 34, 0.9);
+        }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px 20px 100px; }
+        
+        .card { background: var(--glass); border: 1px solid #30363d; border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        
+        /* 311 REPORTING GRID */
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .report-btn { 
+            background: #161b22; padding: 15px 10px; border-radius: 12px; 
+            text-align: center; font-size: 14px; cursor: pointer; 
+            border: 1px solid #30363d; color: white; font-weight: bold;
+            transition: background 0.2s;
+        }
+        .report-btn:active { background: var(--report); color: black; }
+        .report-btn i { font-size: 24px; margin-bottom: 8px; color: var(--report); }
+        .report-btn:active i { color: black; }
+
+        /* LOADING OVERLAY */
+        #loadingOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+            flex-direction: column; color: var(--report); font-weight: bold;
+        }
+
+        #map { height: 300px; border-radius: 12px; border: 1px solid #30363d; margin-top: 15px; }
+
+        .nav-bar { position: fixed; bottom: 15px; left: 15px; right: 15px; height: 70px; background: rgba(22, 27, 34, 0.98); border-radius: 25px; border: 1px solid #30363d; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-item { color: #8b949e; text-decoration: none; font-size: 10px; text-align: center; }
+        .nav-item.active { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 40px; margin-bottom: 15px;"></i>
+        <span>Grabbing GPS Coordinates...</span>
+    </div>
+
+    <div class="header" style="text-align: center; margin-bottom: 20px;">
+        <h1 style="margin:0;">DriveSafe <span style="color:var(--report)">311</span></h1>
+        <p style="color:#8b949e; margin-top:5px; font-size: 14px;">Community Hazard Tracker</p>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;"><i class="fa-solid fa-map-location-dot"></i> Live Hazard Hotspots</h3>
+        <p style="font-size: 12px; color: #8b949e;">Hazards reported by the DriveSafe community.</p>
+        <div id="map"></div>
+    </div>
+
+    <div class="card" style="border-color: var(--report);">
+        <h3 style="margin-top:0; color: var(--report);"><i class="fa-solid fa-bullhorn"></i> Report an Issue</h3>
+        <p style="font-size: 12px; color: #c9d1d9;">Tap to instantly map a hazard using your live GPS.</p>
+        
+        <div class="report-grid">
+            <button class="report-btn" onclick="submitReport('Broken Meter')">
+                <i class="fa-solid fa-plug-circle-xmark"></i><br>Broken Meter
+            </button>
+            <button class="report-btn" onclick="submitReport('Hidden Sign')">
+                <i class="fa-solid fa-eye-slash"></i><br>Hidden Sign
+            </button>
+            <button class="report-btn" onclick="submitReport('Pothole')">
+                <i class="fa-solid fa-road"></i><br>Pothole
+            </button>
+            <button class="report-btn" onclick="submitReport('Bike Lane Blocked')">
+                <i class="fa-solid fa-bicycle"></i><br>Bike Lane Block
+            </button>
+        </div>
+        
+        <form id="reportForm" action="/report_311" method="POST" style="display:none;">
+            <input type="hidden" name="issue_type" id="issueTypeInput">
+            <input type="hidden" name="lat" id="latInput">
+            <input type="hidden" name="lng" id="lngInput">
+        </form>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="#" class="nav-item"><i class="fa-solid fa-shield-halved"></i><br>Guardian</a>
+        <a href="#" class="nav-item active" style="color: var(--report)"><i class="fa-solid fa-bullhorn"></i><br>Report 311</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-receipt"></i><br>Tickets</a>
+    </nav>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inject reports data from Python directly into JavaScript
+        const liveReports = {{ reports_json|safe }};
+
+        // 1. Initialize Map
+        var map = L.map('map').setView([43.6532, -79.3832], 14);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+        // 2. Custom Icon for Hazards
+        var hazardIcon = L.divIcon({
+            className: 'custom-icon',
+            html: '<i class="fa-solid fa-triangle-exclamation" style="color: #d2a8ff; font-size: 24px; text-shadow: 0 0 10px rgba(210,168,255,0.8);"></i>',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24]
+        });
+
+        // 3. Loop through Python data and drop pins on the map
+        liveReports.forEach(report => {
+            var marker = L.marker([report.lat, report.lng], {icon: hazardIcon}).addTo(map);
+            marker.bindPopup(`<b>${report.type}</b><br><span style="color:#d29922;">${report.status}</span>`);
+        });
+
+        // 4. GPS Reporting Logic
+        function submitReport(issueType) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        // Success! We got the GPS coordinates
+                        document.getElementById('issueTypeInput').value = issueType;
+                        document.getElementById('latInput').value = position.coords.latitude;
+                        document.getElementById('lngInput').value = position.coords.longitude;
+                        
+                        // Submit the hidden form
+                        document.getElementById('reportForm').submit();
+                    },
+                    function(error) {
+                        // Error handling (e.g. user denied location)
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        alert("Could not get your location. Please enable GPS permissions to report issues.");
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index():
+    # Convert the Python list to a JSON string so JavaScript can read it to draw the map pins
+    reports_json = json.dumps(reports_data)
+    return render_template_string(HTML_TEMPLATE, reports_json=reports_json)
+
+@app.route('/report_311', methods=['POST'])
+def handle_311_report():
+    # Grab the data sent from the JavaScript GPS tracker
+    issue_type = request.form.get('issue_type')
+    lat = request.form.get('lat')
+    lng = request.form.get('lng')
+    
+    # Save it to our database
+    if issue_type and lat and lng:
+        reports_data.append({
+            "type": issue_type,
+            "lat": float(lat),
+            "lng": float(lng),
+            "status": "Logged in Community App"
+        })
+        
+    # Refresh the page to show the new pin
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)

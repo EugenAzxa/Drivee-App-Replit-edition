@@ -2,6 +2,7 @@ from flask import Flask, render_template_string, request, redirect, url_for, jso
 from datetime import datetime, timedelta
 from urllib.parse import quote
 import os
+import json
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SESSION_SECRET', 'dev-secret-key')
@@ -10,6 +11,12 @@ users_data = {
     'profile': {'name': '', 'plate': ''},
     'reminders': []
 }
+
+reports_data = [
+    {"type": "Pothole", "lat": 43.650, "lng": -79.390, "status": "Pending 311"},
+    {"type": "Broken Meter", "lat": 43.652, "lng": -79.383, "status": "Pending 311"},
+    {"type": "Hidden Sign", "lat": 43.648, "lng": -79.396, "status": "Pending 311"}
+]
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -1023,6 +1030,71 @@ HTML_TEMPLATE = """
             font-weight: 500;
         }
 
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .report-btn {
+            background: var(--bg-input);
+            padding: 16px 10px;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: var(--font);
+            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+        }
+        .report-btn:active {
+            background: var(--purple);
+            color: #0c0c10;
+            border-color: var(--purple);
+            transform: scale(0.95);
+        }
+        .report-btn:active i { color: #0c0c10; }
+        .report-btn i {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--purple);
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--purple);
+            font-weight: 700;
+            font-size: 16px;
+            font-family: var(--font);
+        }
+        .loading-overlay.show { display: flex; }
+        .loading-overlay i { font-size: 40px; margin-bottom: 16px; }
+
+        .report-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: var(--purple-subtle);
+            border: 1px solid rgba(167,139,250,0.2);
+            color: var(--purple);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         .gps-alert {
             background: linear-gradient(90deg, #8b0000, var(--rose));
             color: white;
@@ -1088,6 +1160,11 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <i class="fa-solid fa-satellite-dish fa-spin"></i>
+        <span>Grabbing GPS Coordinates...</span>
+    </div>
+
     <div id="toast" class="toast"></div>
 
     <div class="app">
@@ -1441,6 +1518,35 @@ HTML_TEMPLATE = """
                 </div>
                 <p class="map-caption">Simulated enforcement hotspots across Toronto.<br>Bike lanes and hydrants shown when GPS is active.</p>
             </div>
+
+            <div class="card card-purple card-3">
+                <div class="card-label label-purple"><i class="fa-solid fa-bullhorn"></i> Report an Issue</div>
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; line-height: 1.5;">Tap to instantly map a hazard using your live GPS. Reports appear on the map for other drivers.</p>
+                <div class="report-count"><i class="fa-solid fa-map-pin"></i> {{ reports|length }} community reports on the map</div>
+                <div class="report-grid">
+                    <button class="report-btn" onclick="submitReport('Broken Meter')">
+                        <i class="fa-solid fa-plug-circle-xmark"></i>
+                        Broken Meter
+                    </button>
+                    <button class="report-btn" onclick="submitReport('Hidden Sign')">
+                        <i class="fa-solid fa-eye-slash"></i>
+                        Hidden Sign
+                    </button>
+                    <button class="report-btn" onclick="submitReport('Pothole')">
+                        <i class="fa-solid fa-road"></i>
+                        Pothole
+                    </button>
+                    <button class="report-btn" onclick="submitReport('Bike Lane Blocked')">
+                        <i class="fa-solid fa-bicycle"></i>
+                        Bike Lane Block
+                    </button>
+                </div>
+                <form id="reportForm" action="/report_311" method="POST" style="display:none;">
+                    <input type="hidden" name="issue_type" id="issueTypeInput">
+                    <input type="hidden" name="lat" id="latInput">
+                    <input type="hidden" name="lng" id="lngInput">
+                </form>
+            </div>
         </div>
     </div>
 
@@ -1516,6 +1622,19 @@ HTML_TEMPLATE = """
             var hydrantPos = [43.6485, -79.3950];
             var hydrant = L.circleMarker(hydrantPos, {color: '#d29922', radius: 8, fillOpacity: 1}).addTo(mapInstance);
             hydrant.bindPopup('<b>Fire Hydrant</b><br>Must be 3m away ($100 Fine)');
+
+            var hazardIcon = L.divIcon({
+                className: 'custom-icon',
+                html: '<i class="fa-solid fa-triangle-exclamation" style="color: #a78bfa; font-size: 20px; text-shadow: 0 0 10px rgba(167,139,250,0.8);"></i>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 20]
+            });
+
+            var liveReports = {{ reports_json|safe }};
+            liveReports.forEach(function(report) {
+                var marker = L.marker([report.lat, report.lng], {icon: hazardIcon}).addTo(mapInstance);
+                marker.bindPopup('<b>' + report.type + '</b><br><span style="color:#d29922;">' + report.status + '</span>');
+            });
         }
 
         var userMarker = null;
@@ -1807,6 +1926,31 @@ HTML_TEMPLATE = """
             }
         }
 
+        function submitReport(issueType) {
+            var overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('show');
+
+            if (!('geolocation' in navigator)) {
+                overlay.classList.remove('show');
+                showToast('Geolocation is not supported by your browser');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    document.getElementById('issueTypeInput').value = issueType;
+                    document.getElementById('latInput').value = position.coords.latitude;
+                    document.getElementById('lngInput').value = position.coords.longitude;
+                    document.getElementById('reportForm').submit();
+                },
+                function(error) {
+                    overlay.classList.remove('show');
+                    showToast('Could not get your location. Please enable GPS.');
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
@@ -1829,7 +1973,11 @@ HTML_TEMPLATE = """
         if (params.get('saved') === 'profile') showToast('Profile saved successfully');
         if (params.get('saved') === 'reminder') showToast('Reminder added');
         if (params.get('deleted') === '1') showToast('Reminder deleted');
-        if (params.has('saved') || params.has('deleted')) {
+        if (params.get('reported') === '1') {
+            showToast('Hazard reported! Pin added to map.');
+            switchTab('hotspots', document.querySelectorAll('.nav-btn')[3]);
+        }
+        if (params.has('saved') || params.has('deleted') || params.has('reported')) {
             history.replaceState(null, '', '/');
         }
     </script>
@@ -1929,10 +2077,13 @@ def index():
             'gcal_url': build_gcal_url(r['ticket_num'], r['due_date'], plate),
         })
     profile_saved = request.args.get('saved') == 'profile'
+    reports_json = json.dumps(reports_data)
     return render_template_string(HTML_TEMPLATE,
         profile=users_data['profile'],
         reminders=reminders,
-        profile_saved=profile_saved
+        profile_saved=profile_saved,
+        reports=reports_data,
+        reports_json=reports_json
     )
 
 @app.route('/save-profile', methods=['POST'])
@@ -1975,6 +2126,23 @@ def download_ics(index):
             headers={'Content-Disposition': f'attachment; filename="{filename}"'}
         )
     return redirect('/')
+
+@app.route('/report_311', methods=['POST'])
+def handle_311_report():
+    issue_type = request.form.get('issue_type', '').strip()
+    lat = request.form.get('lat')
+    lng = request.form.get('lng')
+    if issue_type and lat and lng:
+        try:
+            reports_data.append({
+                "type": issue_type,
+                "lat": float(lat),
+                "lng": float(lng),
+                "status": "Logged in Community App"
+            })
+        except (ValueError, TypeError):
+            pass
+    return redirect('/?reported=1')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
