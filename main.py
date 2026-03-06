@@ -28,25 +28,36 @@ HTML_TEMPLATE = """
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-root: #101014;
-            --bg-surface: #18181c;
-            --bg-elevated: #1f1f24;
-            --bg-input: #141418;
-            --border: rgba(255,255,255,0.06);
+            --bg-root: #0c0c10;
+            --bg-surface: #16161b;
+            --bg-elevated: #1e1e25;
+            --bg-input: #121216;
+            --border: rgba(255,255,255,0.07);
             --border-focus: rgba(255,255,255,0.18);
-            --text-primary: #ececf0;
-            --text-secondary: #8e8e99;
-            --text-tertiary: #5a5a66;
-            --accent: #4f8cff;
-            --accent-hover: #6aa0ff;
-            --accent-subtle: rgba(79,140,255,0.08);
-            --accent-muted: rgba(79,140,255,0.15);
-            --danger: #ef4444;
-            --danger-subtle: rgba(239,68,68,0.08);
-            --warning: #f59e0b;
-            --warning-subtle: rgba(245,158,11,0.08);
-            --success: #22c55e;
-            --success-subtle: rgba(34,197,94,0.08);
+            --text-primary: #f0f0f5;
+            --text-secondary: #9898a8;
+            --text-tertiary: #5c5c6e;
+            --blue: #5b9aff;
+            --blue-vivid: #3d85ff;
+            --blue-subtle: rgba(91,154,255,0.10);
+            --blue-glow: rgba(91,154,255,0.20);
+            --purple: #a78bfa;
+            --purple-subtle: rgba(167,139,250,0.10);
+            --purple-glow: rgba(167,139,250,0.18);
+            --teal: #2dd4bf;
+            --teal-subtle: rgba(45,212,191,0.10);
+            --teal-glow: rgba(45,212,191,0.18);
+            --rose: #f43f5e;
+            --rose-subtle: rgba(244,63,94,0.10);
+            --rose-glow: rgba(244,63,94,0.18);
+            --amber: #fbbf24;
+            --amber-subtle: rgba(251,191,36,0.10);
+            --amber-glow: rgba(251,191,36,0.18);
+            --green: #34d399;
+            --green-subtle: rgba(52,211,153,0.10);
+            --green-glow: rgba(52,211,153,0.18);
+            --orange: #fb923c;
+            --orange-subtle: rgba(251,146,60,0.10);
             --radius: 10px;
             --radius-lg: 14px;
             --safe-top: env(safe-area-inset-top, 0px);
@@ -85,16 +96,16 @@ HTML_TEMPLATE = """
             gap: 14px;
         }
         .header-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--blue-vivid), var(--purple));
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 22px;
             flex-shrink: 0;
+            box-shadow: 0 4px 16px var(--blue-glow);
         }
         .header-text h1 {
             font-size: 20px;
@@ -105,9 +116,9 @@ HTML_TEMPLATE = """
         }
         .header-text p {
             font-size: 13px;
-            color: var(--text-tertiary);
+            color: var(--text-secondary);
             font-weight: 400;
-            margin-top: 1px;
+            margin-top: 2px;
         }
 
         .card {
@@ -117,7 +128,23 @@ HTML_TEMPLATE = """
             padding: 20px;
             margin-bottom: 12px;
             animation: slideUp 0.4s ease both;
+            position: relative;
+            overflow: hidden;
         }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+        .card-blue::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+        .card-teal::before { background: linear-gradient(90deg, var(--teal), var(--green)); }
+        .card-amber::before { background: linear-gradient(90deg, var(--amber), var(--orange)); }
+        .card-rose::before { background: linear-gradient(90deg, var(--rose), var(--orange)); }
+        .card-purple::before { background: linear-gradient(90deg, var(--purple), var(--rose)); }
+        .card-green::before { background: linear-gradient(90deg, var(--green), var(--teal)); }
         .card-1 { animation-delay: 0.05s; }
         .card-2 { animation-delay: 0.1s; }
         .card-3 { animation-delay: 0.15s; }
@@ -127,22 +154,17 @@ HTML_TEMPLATE = """
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.2px;
-            color: var(--text-tertiary);
             margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .card-label::before {
-            content: '';
-            width: 3px;
-            height: 14px;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
-        .card-label.label-blue::before { background: var(--accent); }
-        .card-label.label-green::before { background: var(--success); }
-        .card-label.label-amber::before { background: var(--warning); }
+        .card-label.label-blue { color: var(--blue); }
+        .card-label.label-teal { color: var(--teal); }
+        .card-label.label-amber { color: var(--amber); }
+        .card-label.label-rose { color: var(--rose); }
+        .card-label.label-purple { color: var(--purple); }
+        .card-label.label-green { color: var(--green); }
 
         .field { margin-bottom: 12px; }
         .field label {
@@ -167,8 +189,8 @@ HTML_TEMPLATE = """
         }
         .field input::placeholder { color: var(--text-tertiary); }
         .field input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-subtle);
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px var(--blue-subtle);
         }
         .field input[type="date"] { color-scheme: dark; }
         .field input[type="date"]::-webkit-calendar-picker-indicator {
@@ -190,29 +212,30 @@ HTML_TEMPLATE = """
             letter-spacing: 0.3px;
         }
         .btn:active { transform: scale(0.98); }
-        .btn-accent {
-            background: var(--accent);
+        .btn-blue {
+            background: linear-gradient(135deg, var(--blue-vivid), var(--blue));
             color: #fff;
+            box-shadow: 0 2px 12px var(--blue-glow);
         }
-        .btn-accent:hover { background: var(--accent-hover); }
-        .btn-surface {
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
+        .btn-blue:hover { box-shadow: 0 4px 20px rgba(91,154,255,0.30); }
+        .btn-teal {
+            background: linear-gradient(135deg, var(--teal), var(--green));
+            color: #0c0c10;
+            box-shadow: 0 2px 12px var(--teal-glow);
         }
-        .btn-surface:hover { border-color: var(--border-focus); }
+        .btn-teal:hover { box-shadow: 0 4px 20px rgba(45,212,191,0.30); }
 
         .saved-banner {
             display: none;
             align-items: center;
             gap: 8px;
             padding: 10px 14px;
-            background: var(--success-subtle);
-            border: 1px solid rgba(34,197,94,0.12);
+            background: var(--green-subtle);
+            border: 1px solid rgba(52,211,153,0.15);
             border-radius: var(--radius);
             margin-bottom: 12px;
             font-size: 13px;
-            color: var(--success);
+            color: var(--green);
             font-weight: 500;
         }
         .saved-banner.show { display: flex; }
@@ -254,16 +277,19 @@ HTML_TEMPLATE = """
             line-height: 1.4;
         }
         .badge-upcoming {
-            background: var(--success-subtle);
-            color: var(--success);
+            background: var(--green-subtle);
+            color: var(--green);
+            border: 1px solid rgba(52,211,153,0.12);
         }
         .badge-overdue {
-            background: var(--danger-subtle);
-            color: var(--danger);
+            background: var(--rose-subtle);
+            color: var(--rose);
+            border: 1px solid rgba(244,63,94,0.12);
         }
         .badge-today {
-            background: var(--warning-subtle);
-            color: var(--warning);
+            background: var(--amber-subtle);
+            color: var(--amber);
+            border: 1px solid rgba(251,191,36,0.12);
         }
         .reminder-del {
             background: none;
@@ -277,8 +303,8 @@ HTML_TEMPLATE = """
             line-height: 1;
         }
         .reminder-del:hover {
-            color: var(--danger);
-            background: var(--danger-subtle);
+            color: var(--rose);
+            background: var(--rose-subtle);
         }
         .reminder-cal {
             display: flex;
@@ -298,20 +324,32 @@ HTML_TEMPLATE = """
             font-family: var(--font);
             text-decoration: none;
             cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--bg-surface);
-            color: var(--text-secondary);
-            transition: border-color 0.15s, color 0.15s, background 0.15s;
-        }
-        .cal-btn:hover {
-            border-color: var(--border-focus);
-            color: var(--text-primary);
-            background: var(--bg-elevated);
+            transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
         }
         .cal-btn svg {
             width: 13px;
             height: 13px;
             flex-shrink: 0;
+        }
+        .cal-btn-gcal {
+            border: 1px solid rgba(91,154,255,0.15);
+            background: var(--blue-subtle);
+            color: var(--blue);
+        }
+        .cal-btn-gcal:hover {
+            border-color: rgba(91,154,255,0.30);
+            background: rgba(91,154,255,0.14);
+            box-shadow: 0 2px 10px var(--blue-subtle);
+        }
+        .cal-btn-ics {
+            border: 1px solid rgba(167,139,250,0.15);
+            background: var(--purple-subtle);
+            color: var(--purple);
+        }
+        .cal-btn-ics:hover {
+            border-color: rgba(167,139,250,0.30);
+            background: rgba(167,139,250,0.14);
+            box-shadow: 0 2px 10px var(--purple-subtle);
         }
 
         .empty {
@@ -334,11 +372,7 @@ HTML_TEMPLATE = """
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            transition: border-color 0.15s ease, background 0.15s ease;
-        }
-        .service-link:hover {
-            border-color: var(--border-focus);
-            background: rgba(255,255,255,0.03);
+            transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
         }
         .service-link .svc-icon {
             width: 34px;
@@ -349,16 +383,32 @@ HTML_TEMPLATE = """
             justify-content: center;
             font-size: 16px;
             flex-shrink: 0;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
         }
         .service-link .svc-text { flex: 1; }
         .service-link .svc-arrow {
             color: var(--text-tertiary);
             font-size: 14px;
-            transition: transform 0.15s ease;
+            transition: transform 0.15s ease, color 0.15s ease;
         }
         .service-link:hover .svc-arrow { transform: translateX(2px); }
+        .svc-blue .svc-icon { background: var(--blue-subtle); color: var(--blue); }
+        .svc-blue:hover { border-color: rgba(91,154,255,0.20); background: rgba(91,154,255,0.04); }
+        .svc-blue:hover .svc-arrow { color: var(--blue); }
+        .svc-rose .svc-icon { background: var(--rose-subtle); color: var(--rose); }
+        .svc-rose:hover { border-color: rgba(244,63,94,0.20); background: rgba(244,63,94,0.04); }
+        .svc-rose:hover .svc-arrow { color: var(--rose); }
+        .svc-purple .svc-icon { background: var(--purple-subtle); color: var(--purple); }
+        .svc-purple:hover { border-color: rgba(167,139,250,0.20); background: rgba(167,139,250,0.04); }
+        .svc-purple:hover .svc-arrow { color: var(--purple); }
+        .svc-amber .svc-icon { background: var(--amber-subtle); color: var(--amber); }
+        .svc-amber:hover { border-color: rgba(251,191,36,0.20); background: rgba(251,191,36,0.04); }
+        .svc-amber:hover .svc-arrow { color: var(--amber); }
+        .svc-teal .svc-icon { background: var(--teal-subtle); color: var(--teal); }
+        .svc-teal:hover { border-color: rgba(45,212,191,0.20); background: rgba(45,212,191,0.04); }
+        .svc-teal:hover .svc-arrow { color: var(--teal); }
+        .svc-green .svc-icon { background: var(--green-subtle); color: var(--green); }
+        .svc-green:hover { border-color: rgba(52,211,153,0.20); background: rgba(52,211,153,0.04); }
+        .svc-green:hover .svc-arrow { color: var(--green); }
 
         .section-divider {
             height: 1px;
@@ -403,9 +453,9 @@ HTML_TEMPLATE = """
         }
         .nav-btn:hover { color: var(--text-secondary); }
         .nav-btn.active {
-            color: var(--text-primary);
-            background: var(--bg-elevated);
-            border-color: var(--border);
+            color: var(--blue);
+            background: var(--blue-subtle);
+            border-color: rgba(91,154,255,0.12);
         }
         .nav-btn svg {
             width: 18px;
@@ -437,9 +487,9 @@ HTML_TEMPLATE = """
             pointer-events: none;
             transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
             opacity: 0;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
+            background: rgba(52,211,153,0.12);
+            border: 1px solid rgba(52,211,153,0.20);
+            color: var(--green);
             box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
         .toast.show {
@@ -468,7 +518,7 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="tab-dashboard" class="tab active">
-            <div class="card card-1">
+            <div class="card card-blue card-1">
                 <div class="card-label label-blue">Profile</div>
                 <form action="/save-profile" method="POST">
                     <div class="saved-banner {% if profile_saved %}show{% endif %}">
@@ -483,12 +533,12 @@ HTML_TEMPLATE = """
                         <label>License Plate</label>
                         <input type="text" name="plate" placeholder="e.g. ABCD 123" value="{{ profile.plate }}" required style="text-transform: uppercase; font-family: var(--font-mono);">
                     </div>
-                    <button type="submit" class="btn btn-accent">Save Profile</button>
+                    <button type="submit" class="btn btn-blue">Save Profile</button>
                 </form>
             </div>
 
-            <div class="card card-2">
-                <div class="card-label label-green">Add Fine Reminder</div>
+            <div class="card card-teal card-2">
+                <div class="card-label label-teal">Add Fine Reminder</div>
                 <form action="/add-reminder" method="POST">
                     <div class="field">
                         <label>Ticket / Reference Number</label>
@@ -498,11 +548,11 @@ HTML_TEMPLATE = """
                         <label>Due Date</label>
                         <input type="date" name="due_date" required>
                     </div>
-                    <button type="submit" class="btn btn-surface">Add Reminder</button>
+                    <button type="submit" class="btn btn-teal">Add Reminder</button>
                 </form>
             </div>
 
-            <div class="card card-3">
+            <div class="card card-amber card-3">
                 <div class="card-label label-amber">Reminders</div>
                 {% if reminders %}
                     {% for r in reminders %}
@@ -519,11 +569,11 @@ HTML_TEMPLATE = """
                                 </form>
                             </div>
                             <div class="reminder-cal">
-                                <a href="{{ r.gcal_url }}" target="_blank" rel="noopener" class="cal-btn">
+                                <a href="{{ r.gcal_url }}" target="_blank" rel="noopener" class="cal-btn cal-btn-gcal">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                     Google Calendar
                                 </a>
-                                <a href="/calendar/ics/{{ loop.index0 }}" class="cal-btn" download>
+                                <a href="/calendar/ics/{{ loop.index0 }}" class="cal-btn cal-btn-ics" download>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                     Download .ics
                                 </a>
@@ -537,20 +587,20 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="tab-services" class="tab">
-            <div class="card card-1">
+            <div class="card card-blue card-1">
                 <div class="card-label label-blue">Parking Violations</div>
                 <div class="service-list">
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/pay-your-parking-violation/" target="_blank" rel="noopener" class="service-link">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/pay-your-parking-violation/" target="_blank" rel="noopener" class="service-link svc-blue">
                         <div class="svc-icon">&#x1F4B3;</div>
                         <span class="svc-text">Pay Parking Ticket</span>
                         <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/dispute-your-parking-violation/" target="_blank" rel="noopener" class="service-link">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/dispute-your-parking-violation/" target="_blank" rel="noopener" class="service-link svc-purple">
                         <div class="svc-icon">&#x2696;</div>
                         <span class="svc-text">Dispute Ticket</span>
                         <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/about-parking-violations/" target="_blank" rel="noopener" class="service-link">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/about-parking-violations/" target="_blank" rel="noopener" class="service-link svc-teal">
                         <div class="svc-icon">&#x2139;</div>
                         <span class="svc-text">About Parking Violations</span>
                         <span class="svc-arrow">&#x203A;</span>
@@ -558,20 +608,20 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
-            <div class="card card-2">
-                <div class="card-label label-amber">Speed & Red Light Cameras</div>
+            <div class="card card-rose card-2">
+                <div class="card-label label-rose">Speed & Red Light Cameras</div>
                 <div class="service-list">
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/" target="_blank" rel="noopener" class="service-link">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/" target="_blank" rel="noopener" class="service-link svc-rose">
                         <div class="svc-icon">&#x1F4F7;</div>
                         <span class="svc-text">Pay Camera Fine</span>
                         <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/dispute-your-red-light-camera-penalty/" target="_blank" rel="noopener" class="service-link">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/dispute-your-red-light-camera-penalty/" target="_blank" rel="noopener" class="service-link svc-amber">
                         <div class="svc-icon">&#x2696;</div>
                         <span class="svc-text">Dispute Camera Fine</span>
                         <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/dispute-your-red-light-camera-penalty/" target="_blank" rel="noopener" class="service-link">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/dispute-your-red-light-camera-penalty/" target="_blank" rel="noopener" class="service-link svc-purple">
                         <div class="svc-icon">&#x2139;</div>
                         <span class="svc-text">About Camera Penalties</span>
                         <span class="svc-arrow">&#x203A;</span>
@@ -579,10 +629,10 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
-            <div class="card card-3">
+            <div class="card card-green card-3">
                 <div class="card-label label-green">Court Services</div>
                 <div class="service-list">
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/" target="_blank" rel="noopener" class="service-link">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/" target="_blank" rel="noopener" class="service-link svc-green">
                         <div class="svc-icon">&#x1F3DB;</div>
                         <span class="svc-text">Court Services & Provincial Offences</span>
                         <span class="svc-arrow">&#x203A;</span>
