@@ -1,0 +1,174 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+
+app = Flask(__name__)
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DriveSafe TO | GPS Guardian</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #58a6ff; --danger: #da3633; --warning: #d29922; 
+            --bg: #010409; --glass: rgba(22, 27, 34, 0.9);
+        }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px 20px 100px; }
+        
+        .card { background: var(--glass); border: 1px solid #30363d; border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        
+        /* GPS ALERT BANNER */
+        .gps-alert {
+            background: linear-gradient(90deg, #8b0000, #da3633);
+            color: white; padding: 15px; border-radius: 12px;
+            text-align: center; font-weight: bold; margin-bottom: 20px;
+            display: none; /* Hidden by default */
+            animation: pulse 1s infinite alternate;
+            box-shadow: 0 4px 20px rgba(218, 54, 51, 0.6);
+            border: 2px solid #ff7b72;
+        }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.02); } }
+
+        .btn { display: block; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; text-decoration: none; text-align: center; margin-bottom: 10px; color: white; }
+        .btn-gps { background: linear-gradient(45deg, #1f6feb, #58a6ff); }
+
+        #map { height: 250px; border-radius: 12px; border: 1px solid #30363d; margin-top: 15px; }
+
+        .nav-bar { position: fixed; bottom: 15px; left: 15px; right: 15px; height: 70px; background: rgba(22, 27, 34, 0.98); border-radius: 25px; border: 1px solid #30363d; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-item { color: #8b949e; text-decoration: none; font-size: 10px; text-align: center; }
+        .nav-item.active { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="header" style="text-align: center; margin-bottom: 20px;">
+        <h1 style="margin:0;">DriveSafe <span style="color:var(--primary)">TO</span></h1>
+        <p style="color:#8b949e; margin-top:5px; font-size: 14px;">Vision Zero GPS Guardian</p>
+    </div>
+
+    <div id="gpsAlertBanner" class="gps-alert">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 24px; display: block; margin-bottom: 5px;"></i>
+        <span id="gpsAlertText">WARNING!</span>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;"><i class="fa-solid fa-location-crosshairs"></i> Proximity Scanner</h3>
+        <p style="font-size: 12px; color: #8b949e;">Detects $200 Bike Lane & $100 Hydrant fines nearby.</p>
+        
+        <button class="btn btn-gps" onclick="startGPSGuardian()" id="gpsBtn">
+            <i class="fa-solid fa-satellite-dish"></i> Start Live GPS Guardian
+        </button>
+        
+        <div id="map"></div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-shield-halved"></i><br>Guardian</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-map"></i><br>Parking</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-receipt"></i><br>Tickets</a>
+    </nav>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // 1. Initialize Map
+        // Default to Downtown Toronto (Richmond & Spadina area)
+        var map = L.map('map').setView([43.648, -79.396], 16);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+        // 2. Add "Hazard" Data (Simulating Open Data)
+        // Bike Lane (Red Line) - Representing Richmond St W Cycle Track
+        var bikeLaneCoords = [
+            [43.6475, -79.3980], 
+            [43.6490, -79.3920]
+        ];
+        var bikeLane = L.polyline(bikeLaneCoords, {color: '#da3633', weight: 6, opacity: 0.8}).addTo(map);
+        bikeLane.bindPopup("Protected Bike Lane - $200 Fine Zone");
+
+        // Fire Hydrant (Yellow Circle)
+        var hydrantPos = [43.6485, -79.3950];
+        var hydrant = L.circleMarker(hydrantPos, {color: '#d29922', radius: 8, fillOpacity: 1}).addTo(map);
+        hydrant.bindPopup("Fire Hydrant - Must be 3m away ($100 Fine)");
+
+        // 3. User Tracking Variables
+        var userMarker = null;
+        var watchId = null;
+
+        // 4. GPS Guardian Logic
+        function startGPSGuardian() {
+            var btn = document.getElementById('gpsBtn');
+            btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Locating...";
+            btn.style.background = "#238636"; // Turn green
+
+            if ("geolocation" in navigator) {
+                // Start tracking the user
+                watchId = navigator.geolocation.watchPosition(updatePosition, handleError, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0
+                });
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        function updatePosition(position) {
+            document.getElementById('gpsBtn').innerHTML = "<i class='fa-solid fa-satellite-dish'></i> Guardian Active";
+            
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var userLatLng = L.latLng(lat, lng);
+
+            // Update User Marker (Blue Dot)
+            if (!userMarker) {
+                userMarker = L.circleMarker(userLatLng, {color: '#58a6ff', radius: 8, fillOpacity: 1}).addTo(map);
+                map.setView(userLatLng, 17);
+            } else {
+                userMarker.setLatLng(userLatLng);
+            }
+
+            // --- PROXIMITY CHECKING ---
+            var alertBanner = document.getElementById('gpsAlertBanner');
+            var alertText = document.getElementById('gpsAlertText');
+            var isHazard = false;
+
+            // Check distance to Hydrant (in meters)
+            var distToHydrant = userLatLng.distanceTo(L.latLng(hydrantPos[0], hydrantPos[1]));
+            
+            // Check distance to middle of Bike Lane (Simplified for Demo)
+            var distToBikeLane = userLatLng.distanceTo(L.latLng(43.6482, -79.3950)); 
+
+            if (distToHydrant < 20) {
+                alertText.innerHTML = "PULL FORWARD! <br> You are too close to a Fire Hydrant ($100 Fine).";
+                alertBanner.style.display = "block";
+                isHazard = true;
+            } else if (distToBikeLane < 25) {
+                alertText.innerHTML = "DO NOT STOP! <br> You are in a Protected Bike Lane ($200 Fine).";
+                alertBanner.style.display = "block";
+                isHazard = true;
+            } 
+            
+            if (!isHazard) {
+                alertBanner.style.display = "none";
+            }
+        }
+
+        function handleError(error) {
+            alert("Error accessing location. Please ensure Location Services are enabled for your browser.");
+            document.getElementById('gpsBtn').innerHTML = "Start Live GPS Guardian";
+            document.getElementById('gpsBtn').style.background = "linear-gradient(45deg, #1f6feb, #58a6ff)";
+        }
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_TEMPLATE)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)

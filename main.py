@@ -1023,6 +1023,55 @@ HTML_TEMPLATE = """
             font-weight: 500;
         }
 
+        .gps-alert {
+            background: linear-gradient(90deg, #8b0000, var(--rose));
+            color: white;
+            padding: 16px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: none;
+            animation: pulseDanger 1.5s infinite;
+            box-shadow: 0 4px 20px rgba(244,63,94,0.5);
+            border: 2px solid rgba(255,123,114,0.6);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        .gps-alert.show { display: block; }
+        .gps-alert i { font-size: 24px; display: block; margin-bottom: 6px; }
+
+        .btn-gps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            background: linear-gradient(45deg, #1f6feb, var(--blue));
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: var(--font);
+            box-shadow: 0 4px 16px var(--blue-glow);
+        }
+        .btn-gps:active { transform: scale(0.95); }
+        .btn-gps.active-gps {
+            background: linear-gradient(45deg, #238636, var(--green));
+            box-shadow: 0 4px 16px var(--green-glow);
+        }
+        .gps-status {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -1368,7 +1417,21 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="tab-hotspots" class="tab">
-            <div class="card card-rose card-1">
+            <div id="gpsAlertBanner" class="gps-alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span id="gpsAlertText">WARNING!</span>
+            </div>
+
+            <div class="card card-blue card-1">
+                <div class="card-label label-blue"><i class="fa-solid fa-location-crosshairs"></i> Proximity Scanner</div>
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Detects $200 Bike Lane and $100 Fire Hydrant fine zones near your live GPS position.</p>
+                <button class="btn-gps" onclick="startGPSGuardian()" id="gpsBtn">
+                    <i class="fa-solid fa-satellite-dish"></i> Start Live GPS Guardian
+                </button>
+                <p class="gps-status">Requires location permission. Works best on mobile.</p>
+            </div>
+
+            <div class="card card-rose card-2">
                 <div class="card-label label-rose"><i class="fa-solid fa-map-location-dot"></i> Live Ticket Hotspots</div>
                 <div id="map"></div>
                 <div class="legend">
@@ -1376,7 +1439,7 @@ HTML_TEMPLATE = """
                     <div class="legend-item"><span class="legend-dot dot-med"></span> Moderate</div>
                     <div class="legend-item"><span class="legend-dot dot-low"></span> Low activity</div>
                 </div>
-                <p class="map-caption">Simulated enforcement hotspots across Toronto.<br>Check the map before you park.</p>
+                <p class="map-caption">Simulated enforcement hotspots across Toronto.<br>Bike lanes and hydrants shown when GPS is active.</p>
             </div>
         </div>
     </div>
@@ -1442,6 +1505,114 @@ HTML_TEMPLATE = """
                 maxZoom: 15,
                 gradient: { 0.3: '#3b82f6', 0.5: '#06b6d4', 0.7: '#84cc16', 0.85: '#f59e0b', 1.0: '#ef4444' }
             }).addTo(mapInstance);
+
+            var bikeLaneCoords = [
+                [43.6475, -79.3980],
+                [43.6490, -79.3920]
+            ];
+            var bikeLane = L.polyline(bikeLaneCoords, {color: '#da3633', weight: 6, opacity: 0.8}).addTo(mapInstance);
+            bikeLane.bindPopup('<b>Protected Bike Lane</b><br>$200 Fine Zone');
+
+            var hydrantPos = [43.6485, -79.3950];
+            var hydrant = L.circleMarker(hydrantPos, {color: '#d29922', radius: 8, fillOpacity: 1}).addTo(mapInstance);
+            hydrant.bindPopup('<b>Fire Hydrant</b><br>Must be 3m away ($100 Fine)');
+        }
+
+        var userMarker = null;
+        var gpsWatchId = null;
+        var hydrantLatLng = L.latLng(43.6485, -79.3950);
+        var bikeLaneSegments = [
+            [L.latLng(43.6475, -79.3980), L.latLng(43.6490, -79.3920)]
+        ];
+
+        function distToSegment(p, a, b) {
+            var dx = b.lng - a.lng, dy = b.lat - a.lat;
+            if (dx === 0 && dy === 0) return p.distanceTo(a);
+            var t = ((p.lng - a.lng) * dx + (p.lat - a.lat) * dy) / (dx * dx + dy * dy);
+            t = Math.max(0, Math.min(1, t));
+            var proj = L.latLng(a.lat + t * dy, a.lng + t * dx);
+            return p.distanceTo(proj);
+        }
+
+        function distToBikeLane(userLatLng) {
+            var minDist = Infinity;
+            for (var i = 0; i < bikeLaneSegments.length; i++) {
+                var d = distToSegment(userLatLng, bikeLaneSegments[i][0], bikeLaneSegments[i][1]);
+                if (d < minDist) minDist = d;
+            }
+            return minDist;
+        }
+
+        function startGPSGuardian() {
+            var btn = document.getElementById('gpsBtn');
+
+            if (gpsWatchId !== null) {
+                navigator.geolocation.clearWatch(gpsWatchId);
+                gpsWatchId = null;
+                btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Start Live GPS Guardian';
+                btn.classList.remove('active-gps');
+                document.getElementById('gpsAlertBanner').classList.remove('show');
+                if (userMarker) { mapInstance.removeLayer(userMarker); userMarker = null; }
+                showToast('GPS Guardian stopped');
+                return;
+            }
+
+            if (!('geolocation' in navigator)) {
+                showToast('Geolocation is not supported by your browser');
+                return;
+            }
+
+            initMap();
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
+            btn.classList.add('active-gps');
+
+            gpsWatchId = navigator.geolocation.watchPosition(
+                function(position) {
+                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Guardian Active — Tap to Stop';
+
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    var userLatLng = L.latLng(lat, lng);
+
+                    if (!userMarker) {
+                        userMarker = L.circleMarker(userLatLng, {color: '#58a6ff', radius: 10, fillOpacity: 1, weight: 3}).addTo(mapInstance);
+                        userMarker.bindPopup('<b>You are here</b>');
+                        mapInstance.setView(userLatLng, 17);
+                    } else {
+                        userMarker.setLatLng(userLatLng);
+                    }
+
+                    var alertBanner = document.getElementById('gpsAlertBanner');
+                    var alertText = document.getElementById('gpsAlertText');
+                    var isHazard = false;
+
+                    var distToHydrant = userLatLng.distanceTo(hydrantLatLng);
+                    var distToBike = distToBikeLane(userLatLng);
+
+                    if (distToHydrant < 20) {
+                        alertText.innerHTML = 'PULL FORWARD! <br>You are too close to a Fire Hydrant ($100 Fine)';
+                        alertBanner.classList.add('show');
+                        isHazard = true;
+                    } else if (distToBike < 25) {
+                        alertText.innerHTML = 'DO NOT STOP! <br>You are in a Protected Bike Lane ($200 Fine)';
+                        alertBanner.classList.add('show');
+                        isHazard = true;
+                    }
+
+                    if (!isHazard) {
+                        alertBanner.classList.remove('show');
+                    }
+                },
+                function(error) {
+                    showToast('Location access denied. Please enable Location Services.');
+                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Start Live GPS Guardian';
+                    btn.classList.remove('active-gps');
+                    document.getElementById('gpsAlertBanner').classList.remove('show');
+                    if (userMarker) { mapInstance.removeLayer(userMarker); userMarker = null; }
+                    gpsWatchId = null;
+                },
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+            );
         }
 
         function checkStreet() {

@@ -26,7 +26,7 @@ The app runs on port 5000 via `python main.py`.
 - Street Parking Checker: dropdown for 4 Toronto areas (Queen St W, Bloor/Yorkville, Kensington, Front St) showing rates, enforcement hours, free parking times, rush hour warnings, plus Green P app link
 - Dispute Script Builder: 4 pre-written legal dispute templates (hidden sign, wrong data, broken meter, valid permit) with copy-to-clipboard
 - Vehicle Towed link: direct link to Toronto Police towing services
-- Hotspots tab with Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap)
+- Hotspots tab with GPS Guardian Proximity Scanner (live geolocation tracking detects $200 bike lane and $100 fire hydrant fine zones, red pulsing alert banner on proximity) and Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap) plus bike lane polyline and hydrant markers
 - All external links open in new tabs to official Toronto portals
 - Guide tab: step-by-step walkthrough of all app features, shown as the default landing page with a "Get Started" button
 - 4-tab floating pill-shaped bottom navigation bar (Guide, Dashboard, Services, Hotspots) with Font Awesome icons
