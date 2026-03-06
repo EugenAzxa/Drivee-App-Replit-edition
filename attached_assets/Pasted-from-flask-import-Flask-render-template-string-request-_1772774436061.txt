@@ -1,0 +1,142 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+
+app = Flask(__name__)
+
+users_data = []
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto Fine Tracker PRO</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/tesseract.js@v4.0.1/dist/tesseract.min.js"></script>
+    
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; padding: 20px; 
+            background-color: #0d1117; color: #c9d1d9; 
+        }
+        .container { 
+            max-width: 500px; margin: auto; 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 25px; border-radius: 20px; 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        h1, h2 { color: #58a6ff; text-align: center; }
+
+        /* NOTIFICATION SECTION */
+        .notif-card {
+            background: linear-gradient(90deg, #1f6feb, #111);
+            padding: 15px; border-radius: 12px; margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            border: 1px solid #388bfd;
+        }
+        .notif-btn {
+            background: #58a6ff; color: #0d1117; border: none;
+            padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer;
+        }
+
+        .scan-btn {
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            color: white; padding: 15px; border-radius: 12px;
+            text-align: center; font-weight: bold; margin-bottom: 20px;
+            cursor: pointer; border: none; width: 100%;
+        }
+
+        #map { height: 180px; border-radius: 12px; margin: 20px 0; border: 1px solid #30363d; }
+
+        input { 
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #30363d;
+            background: #161b22; color: white; font-size: 16px; margin-bottom: 10px;
+        }
+        
+        button.save-btn { width: 100%; padding: 14px; background-color: #238636; color: white; border: none; border-radius: 8px; font-weight: bold; }
+        .ticket-card { background: rgba(255,255,255,0.03); padding: 15px; margin-top: 15px; border-radius: 12px; border: 1px solid #30363d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FineTracker TO</h1>
+
+        <div class="notif-card">
+            <span style="font-size: 14px; font-weight: bold;">🔔 24h Deadline Alerts</span>
+            <button class="notif-btn" onclick="enableNotifications()">Enable</button>
+        </div>
+        
+        <button class="scan-btn" onclick="document.getElementById('imageUpload').click()">
+            📸 AI Ticket Scan
+        </button>
+        <input type="file" id="imageUpload" accept="image/*" capture="environment" style="display:none" onchange="performOCR(event)">
+
+        <form action="/add" method="POST">
+            <input type="text" name="plate" id="plateInput" placeholder="Plate Number" required>
+            <input type="date" name="due_date" id="dateInput" required>
+            <button type="submit" class="save-btn">Save & Set Reminder</button>
+        </form>
+
+        <div id="map"></div>
+
+        <h2>Active Reminders</h2>
+        {% for ticket in users_data %}
+            <div class="ticket-card">
+                <p>🚗 <strong>{{ ticket.plate }}</strong></p>
+                <p>🕒 Due: {{ ticket.due_date }}</p>
+                <p style="color: #ff7b72; font-size: 12px;">Alert set: 24h before price jump.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // --- NOTIFICATION LOGIC ---
+        function enableNotifications() {
+            if (!("Notification" in window)) {
+                alert("This browser does not support desktop notification");
+            } else if (Notification.permission === "granted") {
+                alert("Notifications already active!");
+            } else {
+                Notification.requestPermission().then((permission) => {
+                    if (permission === "granted") {
+                        new Notification("Notifications Active!", {
+                            body: "We will alert you 24h before fees increase.",
+                            icon: "https://www.toronto.ca/wp-content/themes/toronto/assets/images/toronto-logo.png"
+                        });
+                    }
+                });
+            }
+        }
+
+        // --- AI SCAN LOGIC ---
+        async function performOCR(event) {
+            const file = event.target.files[0];
+            const result = await Tesseract.recognize(file, 'eng');
+            const text = result.data.text;
+            const plateMatch = text.match(/[A-Z]{4}\s?\d{3}/);
+            if(plateMatch) document.getElementById('plateInput').value = plateMatch[0];
+            alert("AI Scan Done!");
+        }
+
+        // --- MAP LOGIC ---
+        var map = L.map('map').setView([43.6532, -79.3832], 12);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index(): return render_template_string(HTML_TEMPLATE, users_data=users_data)
+
+@app.route('/add', methods=['POST'])
+def add_ticket():
+    users_data.append({'plate': request.form.get('plate').upper(), 'due_date': request.form.get('due_date')})
+    return redirect(url_for('index'))
+
+if __name__ == '__main__': app.run(host='0.0.0.0', port=8080)

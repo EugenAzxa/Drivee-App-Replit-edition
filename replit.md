@@ -16,6 +16,7 @@ The app runs on port 5000 via `python main.py`.
 
 ## Features
 - Dashboard with AI ticket scanner, profile, deadline ROI calculator, and fine reminders with due dates
+- 24h Deadline Alerts: browser notification permission banner at top of Dashboard; requests Notification API permission, shows green "Active" state when granted, sends confirmation notification
 - AI Ticket Scanner: uses Tesseract.js OCR (v4.0.1 from CDN) to photograph physical parking tickets and extract Ontario plate numbers (ABCD 123 format) and dates; auto-fills the Add Fine Reminder form
 - Deadline ROI Calculator: enter a base fine amount and see how Toronto late fees escalate ($15.39 address search + $32.10 late payment + $32.10 plate denial = $79.59 total penalties)
 - Reminders show status badges (Upcoming, Today, Overdue)

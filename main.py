@@ -538,6 +538,69 @@ HTML_TEMPLATE = """
         .dot-low { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
         .leaflet-container { background: var(--bg-root) !important; }
 
+        .notif-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(91,154,255,0.12), rgba(91,154,255,0.04));
+            border: 1px solid rgba(91,154,255,0.20);
+            margin-bottom: 16px;
+        }
+        .notif-banner.granted {
+            background: linear-gradient(135deg, rgba(52,211,153,0.10), rgba(52,211,153,0.03));
+            border-color: rgba(52,211,153,0.20);
+        }
+        .notif-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+        .notif-banner-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .notif-banner-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+        .notif-banner-text small {
+            display: block;
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+        .notif-enable-btn {
+            flex-shrink: 0;
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: none;
+            background: var(--blue);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.12s ease, background 0.15s ease;
+            font-family: var(--font);
+        }
+        .notif-enable-btn:hover {
+            transform: scale(1.04);
+        }
+        .notif-enable-btn:active {
+            transform: scale(0.96);
+        }
+        .notif-enable-btn.active {
+            background: var(--green);
+            cursor: default;
+        }
+
         .scan-btn {
             background: linear-gradient(135deg, var(--purple), var(--rose));
             color: #fff;
@@ -722,6 +785,17 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="tab-dashboard" class="tab active">
+            <div id="notifBanner" class="notif-banner">
+                <div class="notif-banner-left">
+                    <span class="notif-banner-icon">&#x1F514;</span>
+                    <div class="notif-banner-text">
+                        <span id="notifTitle">24h Deadline Alerts</span>
+                        <small id="notifDesc">Get notified before your fine fees increase.</small>
+                    </div>
+                </div>
+                <button id="notifBtn" class="notif-enable-btn" onclick="enableNotifications()">Enable</button>
+            </div>
+
             <div class="card card-purple card-1">
                 <div class="card-label label-purple">AI Ticket Scanner</div>
                 <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Photograph a physical parking ticket to auto-extract the plate number and date.</p>
@@ -956,6 +1030,60 @@ HTML_TEMPLATE = """
                 gradient: { 0.3: '#3b82f6', 0.5: '#06b6d4', 0.7: '#84cc16', 0.85: '#f59e0b', 1.0: '#ef4444' }
             }).addTo(mapInstance);
         }
+
+        function enableNotifications() {
+            var banner = document.getElementById('notifBanner');
+            var btn = document.getElementById('notifBtn');
+            var title = document.getElementById('notifTitle');
+            var desc = document.getElementById('notifDesc');
+            if (!('Notification' in window)) {
+                showToast('Your browser does not support notifications');
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                banner.classList.add('granted');
+                btn.textContent = 'Active';
+                btn.classList.add('active');
+                title.textContent = 'Alerts Active';
+                desc.textContent = 'You will be notified 24h before fees increase.';
+                showToast('Notifications already enabled');
+                return;
+            }
+            if (Notification.permission === 'denied') {
+                showToast('Notifications blocked. Please enable in browser settings.');
+                return;
+            }
+            Notification.requestPermission().then(function(perm) {
+                if (perm === 'granted') {
+                    banner.classList.add('granted');
+                    btn.textContent = 'Active';
+                    btn.classList.add('active');
+                    title.textContent = 'Alerts Active';
+                    desc.textContent = 'You will be notified 24h before fees increase.';
+                    new Notification('TO Fine Tracker', {
+                        body: 'Deadline alerts enabled. We will notify you 24h before fees increase.',
+                        icon: 'https://www.toronto.ca/wp-content/themes/toronto/assets/images/toronto-logo.png'
+                    });
+                    showToast('Notifications enabled');
+                } else {
+                    showToast('Notification permission denied');
+                }
+            });
+        }
+
+        (function checkNotifState() {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                var banner = document.getElementById('notifBanner');
+                var btn = document.getElementById('notifBtn');
+                var title = document.getElementById('notifTitle');
+                var desc = document.getElementById('notifDesc');
+                banner.classList.add('granted');
+                btn.textContent = 'Active';
+                btn.classList.add('active');
+                title.textContent = 'Alerts Active';
+                desc.textContent = 'You will be notified 24h before fees increase.';
+            }
+        })();
 
         var scannedPlate = '';
         var scannedDate = '';
