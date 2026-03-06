@@ -440,7 +440,7 @@ HTML_TEMPLATE = """
             right: 20px;
             z-index: 100;
             height: 70px;
-            background: rgba(22, 27, 34, 0.95);
+            background: rgba(22, 27, 34, 0.6);
             backdrop-filter: blur(20px) saturate(1.2);
             -webkit-backdrop-filter: blur(20px) saturate(1.2);
             border-radius: 25px;
