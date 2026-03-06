@@ -1,0 +1,217 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+
+app = Flask(__name__)
+users_data = []
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DriveSafe TO</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/tesseract.js@v4.0.1/dist/tesseract.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #58a6ff;
+            --success: #2ea043;
+            --danger: #da3633;
+            --warning: #d29922;
+            --bg: #010409;
+            --card-bg: rgba(22, 27, 34, 0.8);
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            margin: 0; padding: 0;
+            background-color: var(--bg); color: #c9d1d9;
+            overflow-x: hidden;
+            padding-bottom: 100px; /* Space for Nav Bar */
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(218, 54, 51, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(218, 54, 51, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(218, 54, 51, 0); }
+        }
+
+        .animate-in { animation: fadeIn 0.6s ease-out forwards; }
+
+        /* --- LAYOUT --- */
+        .header {
+            padding: 40px 20px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(88,166,255,0.1) 0%, transparent 100%);
+        }
+
+        .container { max-width: 500px; margin: auto; padding: 0 20px; }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        /* --- UI COMPONENTS --- */
+        .btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px; border-radius: 14px;
+            font-weight: 700; font-size: 16px; border: none; cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none; color: white; margin-bottom: 10px;
+        }
+        .btn:active { transform: scale(0.95); }
+
+        .btn-danger { background: var(--danger); animation: pulse 2s infinite; }
+        .btn-primary { background: var(--primary); }
+        .btn-success { background: var(--success); }
+        .btn-outline { background: transparent; border: 1px solid #30363d; }
+
+        select, input, textarea {
+            width: 100%; padding: 14px; border-radius: 12px;
+            background: #0d1117; border: 1px solid #30363d;
+            color: white; font-size: 16px; margin-bottom: 15px;
+        }
+
+        /* --- NAVIGATION --- */
+        .nav-bar {
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            height: 70px; background: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .nav-item { color: #8b949e; text-decoration: none; text-align: center; font-size: 10px; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        .nav-item.active { color: var(--primary); }
+
+        /* Map Styles */
+        #map { height: 200px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #30363d; }
+        
+        .badge { background: #d29922; color: black; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header animate-in">
+        <h1 style="margin:0; font-size: 28px;">DriveSafe <span style="color:var(--primary)">TO</span></h1>
+        <p style="color:#8b949e; margin-top:5px;">Intelligent Toronto Driver Assistant</p>
+    </div>
+
+    <div class="container">
+        
+        <div class="card animate-in" style="border-color: var(--danger);">
+            <a href="https://www.tps.ca/services/towing/" class="btn btn-danger">
+                <i class="fa-solid fa-truck-ramp-box"></i> FIND TOWED CAR
+            </a>
+            <p style="text-align:center; font-size:12px; margin:0; color:#8b949e;">Storage fees start at $75/day. Act fast.</p>
+        </div>
+
+        <div class="card animate-in" style="animation-delay: 0.1s">
+            <h3 style="margin-top:0;"><i class="fa-solid fa-square-p" style="color:var(--success)"></i> Live Street Rates</h3>
+            <select id="streetSelect" onchange="checkStreet()">
+                <option value="">Search a street...</option>
+                <option value="queen_west">Queen St W</option>
+                <option value="bloor_yorkville">Bloor St W</option>
+                <option value="kensington">Kensington Market</option>
+            </select>
+            <div id="rateInfo" style="display:none; background: #0d1117; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                <p id="streetName" style="font-weight:bold; color:var(--primary);"></p>
+                <p id="streetRate" style="font-size: 14px; margin: 5px 0;"></p>
+                <span class="badge" id="streetStatus">LIVE STATUS</span>
+            </div>
+            <a href="https://apps.apple.com/ca/app/green-p-parking/id983111045" class="btn btn-success">
+                <i class="fa-solid fa-mobile-screen"></i> OPEN GREEN P
+            </a>
+        </div>
+
+        <div class="card animate-in" style="animation-delay: 0.2s">
+            <h3 style="margin-top:0;"><i class="fa-solid fa-map-location-dot"></i> Enforcement Map</h3>
+            <div id="map"></div>
+        </div>
+
+        <div class="card animate-in" style="animation-delay: 0.3s">
+            <h3 style="margin-top:0;"><i class="fa-solid fa-receipt"></i> Smart Ticket Scanner</h3>
+            <button class="btn btn-primary" onclick="document.getElementById('imageUpload').click()">
+                <i class="fa-solid fa-camera"></i> SCAN NEW TICKET
+            </button>
+            <input type="file" id="imageUpload" accept="image/*" capture="environment" style="display:none" onchange="performOCR(event)">
+            
+            <form action="/add" method="POST">
+                <input type="text" name="plate" id="plateInput" placeholder="Plate Number" required>
+                <input type="date" name="due_date" id="dateInput" required>
+                <button type="submit" class="btn btn-outline">SAVE & ALERT ME</button>
+            </form>
+        </div>
+
+    </div>
+
+    <nav class="nav-bar">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/" class="nav-item"><i class="fa-solid fa-credit-card"></i>Pay</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-gavel"></i>Dispute</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i>Settings</a>
+    </nav>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // --- STREET LOGIC ---
+        function checkStreet() {
+            const street = document.getElementById('streetSelect').value;
+            const rateBox = document.getElementById('rateInfo');
+            if (!street) { rateBox.style.display = "none"; return; }
+            rateBox.style.display = "block";
+            const db = {
+                "queen_west": { name: "Queen St W", rate: "$3.00/hr. Free after 9PM." },
+                "bloor_yorkville": { name: "Bloor St W", rate: "$4.00/hr. Towing active 3:30PM-6:30PM." },
+                "kensington": { name: "Kensington Market", rate: "$2.25/hr. Free Sunday Mornings." }
+            };
+            document.getElementById('streetName').innerText = db[street].name;
+            document.getElementById('streetRate').innerText = db[street].rate;
+        }
+
+        // --- MAP LOGIC ---
+        var map = L.map('map', {zoomControl: false}).setView([43.6532, -79.3832], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+        // --- OCR LOGIC ---
+        async function performOCR(event) {
+            alert("AI Scanning Ticket... Please wait.");
+            const file = event.target.files[0];
+            const result = await Tesseract.recognize(file, 'eng');
+            const plateMatch = result.data.text.match(/[A-Z]{4}\s?\d{3}/);
+            if(plateMatch) document.getElementById('plateInput').value = plateMatch[0];
+            alert("Scan Finished!");
+        }
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index(): return render_template_string(HTML_TEMPLATE, users_data=users_data)
+
+@app.route('/add', methods=['POST'])
+def add_ticket():
+    users_data.append({'plate': request.form.get('plate').upper(), 'due_date': request.form.get('due_date')})
+    return redirect(url_for('index'))
+
+if __name__ == '__main__': app.run(host='0.0.0.0', port=8080)

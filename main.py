@@ -25,6 +25,7 @@ HTML_TEMPLATE = """
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
     <script src="https://unpkg.com/tesseract.js@v4.0.1/dist/tesseract.min.js"></script>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -85,12 +86,16 @@ HTML_TEMPLATE = """
             margin: 0 auto;
             padding: 0 20px;
             padding-top: calc(var(--safe-top) + 12px);
-            padding-bottom: calc(var(--safe-bottom) + 88px);
+            padding-bottom: calc(var(--safe-bottom) + 120px);
         }
 
         .header {
-            padding: 20px 0 24px;
-            animation: fadeIn 0.5s ease both;
+            padding: 40px 0 24px;
+            animation: fadeIn 0.6s ease-out both;
+            background: linear-gradient(180deg, rgba(91,154,255,0.08) 0%, transparent 100%);
+            margin: 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
         }
         .header-top {
             display: flex;
@@ -124,14 +129,17 @@ HTML_TEMPLATE = """
         }
 
         .card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
+            background: rgba(22, 27, 34, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
             padding: 20px;
-            margin-bottom: 12px;
-            animation: slideUp 0.4s ease both;
+            margin-bottom: 16px;
+            animation: slideUp 0.5s ease-out both;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         .card::before {
             content: '';
@@ -150,6 +158,9 @@ HTML_TEMPLATE = """
         .card-1 { animation-delay: 0.05s; }
         .card-2 { animation-delay: 0.1s; }
         .card-3 { animation-delay: 0.15s; }
+        .card-4 { animation-delay: 0.2s; }
+        .card-5 { animation-delay: 0.25s; }
+        .card-6 { animation-delay: 0.3s; }
 
         .card-label {
             font-size: 11px;
@@ -202,18 +213,22 @@ HTML_TEMPLATE = """
         }
 
         .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             border: none;
-            border-radius: var(--radius);
+            border-radius: 14px;
             font-family: var(--font);
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.15s ease, transform 0.15s ease;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             letter-spacing: 0.3px;
         }
-        .btn:active { transform: scale(0.98); }
+        .btn:active { transform: scale(0.95); }
         .btn-blue {
             background: linear-gradient(135deg, var(--blue-vivid), var(--blue));
             color: #fff;
@@ -420,48 +435,56 @@ HTML_TEMPLATE = """
 
         .nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
             z-index: 100;
-            background: rgba(16,16,20,0.92);
-            backdrop-filter: blur(24px) saturate(1.2);
-            -webkit-backdrop-filter: blur(24px) saturate(1.2);
-            border-top: 1px solid var(--border);
-            padding: 6px 0;
-            padding-bottom: calc(6px + var(--safe-bottom));
+            height: 70px;
+            background: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(20px) saturate(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(1.2);
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            padding-bottom: var(--safe-bottom);
         }
         .nav-inner {
             display: flex;
-            justify-content: center;
-            gap: 8px;
+            justify-content: space-around;
+            align-items: center;
+            height: 100%;
             max-width: 460px;
             margin: 0 auto;
+            padding: 0 8px;
         }
         .nav-btn {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
-            padding: 8px 20px;
-            border-radius: 8px;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 14px;
             cursor: pointer;
-            border: 1px solid transparent;
+            border: none;
             background: none;
-            color: var(--text-tertiary);
+            color: #8b949e;
             font-family: var(--font);
-            font-size: 13px;
+            font-size: 10px;
             font-weight: 500;
-            transition: color 0.15s, background 0.15s, border-color 0.15s;
+            transition: color 0.2s, background 0.2s;
         }
         .nav-btn:hover { color: var(--text-secondary); }
         .nav-btn.active {
             color: var(--blue);
-            background: var(--blue-subtle);
-            border-color: rgba(91,154,255,0.12);
+        }
+        .nav-btn i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 2px;
         }
         .nav-btn svg {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
         }
 
         .tab { display: none; }
@@ -604,38 +627,39 @@ HTML_TEMPLATE = """
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             margin-top: 14px;
-            padding: 12px;
-            border-radius: var(--radius);
-            background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.06));
-            border: 1px solid rgba(52,211,153,0.20);
-            color: var(--green);
+            padding: 16px;
+            border-radius: 14px;
+            background: var(--green);
+            color: #0c0c10;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: background 0.15s ease;
+            font-weight: 700;
+            font-size: 16px;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
         }
-        .green-p-link:hover {
-            background: linear-gradient(135deg, rgba(52,211,153,0.22), rgba(52,211,153,0.10));
+        .green-p-link:active {
+            transform: scale(0.95);
         }
         .towed-link {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 14px;
-            border-radius: var(--radius);
-            background: linear-gradient(135deg, rgba(244,63,94,0.12), rgba(244,63,94,0.04));
-            border: 1px solid rgba(244,63,94,0.20);
-            color: var(--rose);
+            gap: 10px;
+            padding: 16px;
+            border-radius: 14px;
+            background: var(--rose);
+            color: #fff;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: background 0.15s ease;
+            font-weight: 700;
+            font-size: 16px;
+            animation: pulseDanger 2s infinite;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
         }
-        .towed-link:hover {
-            background: linear-gradient(135deg, rgba(244,63,94,0.20), rgba(244,63,94,0.08));
+        .towed-link:active {
+            transform: scale(0.95);
         }
         .dispute-select {
             width: 100%;
@@ -887,6 +911,11 @@ HTML_TEMPLATE = """
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+        @keyframes pulseDanger {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
         .scan-result {
             background: rgba(167,139,250,0.06);
             border: 1px solid rgba(167,139,250,0.15);
@@ -994,8 +1023,16 @@ HTML_TEMPLATE = """
             font-weight: 500;
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
         @media (max-width: 380px) {
-            .app { padding: 0 14px; padding-bottom: calc(var(--safe-bottom) + 80px); }
+            .app { padding: 0 14px; padding-bottom: calc(var(--safe-bottom) + 110px); }
             .card { padding: 16px; }
             #map { height: 300px; }
         }
@@ -1017,7 +1054,7 @@ HTML_TEMPLATE = """
 
         <div id="tab-guide" class="tab active">
             <div class="card card-blue card-1">
-                <div class="card-label label-blue">How to Use This App</div>
+                <div class="card-label label-blue"><i class="fa-solid fa-book-open"></i> How to Use This App</div>
                 <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">Welcome to TO Fine Tracker — your all-in-one Toronto parking and traffic fine manager. Here is a quick walkthrough of everything you can do.</p>
 
                 <div class="guide-step">
@@ -1085,7 +1122,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-teal card-2">
-                <div class="card-label label-teal">Quick Tips</div>
+                <div class="card-label label-teal"><i class="fa-solid fa-lightbulb"></i> Quick Tips</div>
                 <div class="guide-step">
                     <div class="guide-num guide-num-5">&#x26A1;</div>
                     <div class="guide-content">
@@ -1122,10 +1159,10 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-purple card-1">
-                <div class="card-label label-purple">AI Ticket Scanner</div>
+                <div class="card-label label-purple"><i class="fa-solid fa-receipt"></i> AI Ticket Scanner</div>
                 <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Photograph a physical parking ticket to auto-extract the plate number and date.</p>
                 <button class="scan-btn" onclick="document.getElementById('imageUpload').click()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    <i class="fa-solid fa-camera"></i>
                     Scan Ticket Photo
                 </button>
                 <input type="file" id="imageUpload" accept="image/*" capture="environment" style="display:none" onchange="performOCR(event)">
@@ -1141,7 +1178,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-blue card-2">
-                <div class="card-label label-blue">Profile</div>
+                <div class="card-label label-blue"><i class="fa-solid fa-user"></i> Profile</div>
                 <form action="/save-profile" method="POST">
                     <div class="saved-banner {% if profile_saved %}show{% endif %}">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -1160,7 +1197,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-rose card-3">
-                <div class="card-label label-rose">Deadline ROI Calculator</div>
+                <div class="card-label label-rose"><i class="fa-solid fa-calculator"></i> Deadline ROI Calculator</div>
                 <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">See how much extra you'll pay by missing parking ticket deadlines.</p>
                 <div class="field">
                     <label>Base Ticket Amount</label>
@@ -1180,7 +1217,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-teal card-4">
-                <div class="card-label label-teal">Add Fine Reminder</div>
+                <div class="card-label label-teal"><i class="fa-solid fa-bell"></i> Add Fine Reminder</div>
                 <form action="/add-reminder" method="POST">
                     <div class="field">
                         <label>Ticket / Reference Number</label>
@@ -1195,7 +1232,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-amber card-5">
-                <div class="card-label label-amber">Reminders</div>
+                <div class="card-label label-amber"><i class="fa-solid fa-clock"></i> Reminders</div>
                 {% if reminders %}
                     {% for r in reminders %}
                         <div class="reminder" style="animation-delay: {{ 0.15 + loop.index * 0.04 }}s;">
@@ -1230,7 +1267,7 @@ HTML_TEMPLATE = """
 
         <div id="tab-services" class="tab">
             <div class="card card-blue card-1">
-                <div class="card-label label-blue">Parking Violations</div>
+                <div class="card-label label-blue"><i class="fa-solid fa-ticket"></i> Parking Violations</div>
                 <div class="service-list">
                     <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/pay-your-parking-violation/" target="_blank" rel="noopener" class="service-link svc-blue">
                         <div class="svc-icon">&#x1F4B3;</div>
@@ -1251,7 +1288,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-rose card-2">
-                <div class="card-label label-rose">Speed & Red Light Cameras</div>
+                <div class="card-label label-rose"><i class="fa-solid fa-camera"></i> Speed & Red Light Cameras</div>
                 <div class="service-list">
                     <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/" target="_blank" rel="noopener" class="service-link svc-rose">
                         <div class="svc-icon">&#x1F4F7;</div>
@@ -1272,7 +1309,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-green card-3">
-                <div class="card-label label-green">Court Services</div>
+                <div class="card-label label-green"><i class="fa-solid fa-gavel"></i> Court Services</div>
                 <div class="service-list">
                     <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/" target="_blank" rel="noopener" class="service-link svc-green">
                         <div class="svc-icon">&#x1F3DB;</div>
@@ -1283,7 +1320,7 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-green card-4">
-                <div class="card-label label-green">Street Parking Checker</div>
+                <div class="card-label label-green"><i class="fa-solid fa-square-parking"></i> Street Parking Checker</div>
                 <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Select a street to see rates, enforcement hours, and free parking times.</p>
                 <select id="streetSelect" class="street-select" onchange="checkStreet()">
                     <option value="">Choose a Street / Area</option>
@@ -1300,19 +1337,20 @@ HTML_TEMPLATE = """
                     <div class="rate-row"><span class="rate-row-icon">&#x26A0;</span> <span class="rate-row-label">Rush</span> <span class="rate-row-value rate-warn" id="streetRush"></span></div>
                 </div>
                 <a href="https://apps.apple.com/ca/app/green-p-parking/id983111045" target="_blank" rel="noopener" class="green-p-link">
-                    &#x1F17F; Pay with Green P App
+                    <i class="fa-solid fa-mobile-screen"></i> OPEN GREEN P
                 </a>
             </div>
 
             <div class="card card-rose card-5">
-                <div class="card-label label-rose">Vehicle Towed?</div>
+                <div class="card-label label-rose"><i class="fa-solid fa-truck-ramp-box"></i> Vehicle Towed?</div>
                 <a href="https://www.tps.ca/services/towing/" target="_blank" rel="noopener" class="towed-link">
-                    &#x1F6A8; Find which pound has your car
+                    <i class="fa-solid fa-truck-ramp-box"></i> FIND TOWED CAR
                 </a>
+                <p style="text-align:center; font-size:12px; margin-top:10px; color:#8b949e;">Storage fees start at $75/day. Act fast.</p>
             </div>
 
             <div class="card card-purple card-6">
-                <div class="card-label label-purple">Dispute Script Builder</div>
+                <div class="card-label label-purple"><i class="fa-solid fa-scroll"></i> Dispute Script Builder</div>
                 <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">Select a reason to generate a pre-written dispute script for your ticket.</p>
                 <select id="disputeReason" class="dispute-select" onchange="generateScript()">
                     <option value="">Select a Reason</option>
@@ -1331,7 +1369,7 @@ HTML_TEMPLATE = """
 
         <div id="tab-hotspots" class="tab">
             <div class="card card-rose card-1">
-                <div class="card-label label-rose">Live Ticket Hotspots</div>
+                <div class="card-label label-rose"><i class="fa-solid fa-map-location-dot"></i> Live Ticket Hotspots</div>
                 <div id="map"></div>
                 <div class="legend">
                     <div class="legend-item"><span class="legend-dot dot-high"></span> High enforcement</div>
@@ -1346,19 +1384,19 @@ HTML_TEMPLATE = """
     <nav class="nav">
         <div class="nav-inner">
             <button class="nav-btn active" onclick="switchTab('guide', this)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <i class="fa-solid fa-circle-question"></i>
                 Guide
             </button>
             <button class="nav-btn" onclick="switchTab('dashboard', this)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <i class="fa-solid fa-house"></i>
                 Dashboard
             </button>
             <button class="nav-btn" onclick="switchTab('services', this)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                <i class="fa-solid fa-credit-card"></i>
                 Services
             </button>
             <button class="nav-btn" onclick="switchTab('hotspots', this)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <i class="fa-solid fa-map-location-dot"></i>
                 Hotspots
             </button>
         </div>

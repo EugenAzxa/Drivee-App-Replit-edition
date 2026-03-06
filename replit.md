@@ -29,14 +29,20 @@ The app runs on port 5000 via `python main.py`.
 - Hotspots tab with Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap)
 - All external links open in new tabs to official Toronto portals
 - Guide tab: step-by-step walkthrough of all app features, shown as the default landing page with a "Get Started" button
-- 4-tab bottom navigation bar (Guide, Dashboard, Services, Hotspots)
+- 4-tab floating pill-shaped bottom navigation bar (Guide, Dashboard, Services, Hotspots) with Font Awesome icons
 - Toast notifications on save/delete actions
-- Refined dark mode with vibrant color palette (DM Sans + JetBrains Mono typography), layered surface cards, gradient top borders, SVG icons
+- Dark mode glassmorphism design: backdrop-filter blur on cards, gradient header, box-shadows, staggered entrance animations, cubic-bezier button transitions
+- Font Awesome 6.5.1 icons throughout (nav bar, card labels, buttons)
+- Pulsing red "Find Towed Car" danger button with urgency animation
+- Solid-color action buttons (green for Green P, red for towed car, gradient for scan/save)
+- prefers-reduced-motion accessibility support
+- DM Sans + JetBrains Mono typography, gradient top borders on cards
 
 ## External Dependencies (CDN)
 - Leaflet.js 1.9.4 (map rendering)
 - leaflet.heat (heatmap layer plugin)
 - Tesseract.js 4.0.1 (client-side OCR for ticket scanning)
+- Font Awesome 6.5.1 (icon library)
 - Google Fonts (DM Sans, JetBrains Mono)
 
 ## Routes
