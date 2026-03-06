@@ -28,7 +28,8 @@ The app runs on port 5000 via `python main.py`.
 - Vehicle Towed link: direct link to Toronto Police towing services
 - Hotspots tab with Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap)
 - All external links open in new tabs to official Toronto portals
-- 3-tab bottom navigation bar (Dashboard, Services, Hotspots)
+- Guide tab: step-by-step walkthrough of all app features, shown as the default landing page with a "Get Started" button
+- 4-tab bottom navigation bar (Guide, Dashboard, Services, Hotspots)
 - Toast notifications on save/delete actions
 - Refined dark mode with vibrant color palette (DM Sans + JetBrains Mono typography), layered surface cards, gradient top borders, SVG icons
 

@@ -697,6 +697,78 @@ HTML_TEMPLATE = """
             background: rgba(167,139,250,0.2);
         }
 
+        .guide-step {
+            display: flex;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .guide-step:last-child { border-bottom: none; }
+        .guide-num {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+        .guide-num-1 { background: rgba(91,154,255,0.15); color: var(--blue); }
+        .guide-num-2 { background: rgba(167,139,250,0.15); color: var(--purple); }
+        .guide-num-3 { background: rgba(45,212,191,0.15); color: var(--teal); }
+        .guide-num-4 { background: rgba(244,63,94,0.15); color: var(--rose); }
+        .guide-num-5 { background: rgba(251,191,36,0.15); color: var(--amber); }
+        .guide-num-6 { background: rgba(52,211,153,0.15); color: var(--green); }
+        .guide-num-7 { background: rgba(251,146,60,0.15); color: var(--orange); }
+        .guide-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .guide-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .guide-desc {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            line-height: 1.5;
+        }
+        .guide-tab-ref {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 6px;
+        }
+        .guide-tab-dash { background: rgba(91,154,255,0.12); color: var(--blue); }
+        .guide-tab-svc { background: rgba(45,212,191,0.12); color: var(--teal); }
+        .guide-tab-hot { background: rgba(244,63,94,0.12); color: var(--rose); }
+        .guide-start-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius);
+            border: none;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 16px rgba(91,154,255,0.25);
+            margin-top: 8px;
+        }
+        .guide-start-btn:hover { transform: scale(1.02); }
+        .guide-start-btn:active { transform: scale(0.98); }
+
         .notif-banner {
             display: flex;
             align-items: center;
@@ -943,7 +1015,101 @@ HTML_TEMPLATE = """
             </div>
         </div>
 
-        <div id="tab-dashboard" class="tab active">
+        <div id="tab-guide" class="tab active">
+            <div class="card card-blue card-1">
+                <div class="card-label label-blue">How to Use This App</div>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">Welcome to TO Fine Tracker — your all-in-one Toronto parking and traffic fine manager. Here is a quick walkthrough of everything you can do.</p>
+
+                <div class="guide-step">
+                    <div class="guide-num guide-num-1">1</div>
+                    <div class="guide-content">
+                        <div class="guide-title">Save Your Profile</div>
+                        <div class="guide-desc">Enter your name and licence plate number. This is stored locally so you do not have to re-enter it each time.</div>
+                        <span class="guide-tab-ref guide-tab-dash">Dashboard</span>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-num guide-num-2">2</div>
+                    <div class="guide-content">
+                        <div class="guide-title">Scan a Ticket with AI</div>
+                        <div class="guide-desc">Tap "Scan Ticket Photo" to photograph a physical parking ticket. The AI reads the plate number and date automatically, then fills in the reminder form for you.</div>
+                        <span class="guide-tab-ref guide-tab-dash">Dashboard</span>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-num guide-num-3">3</div>
+                    <div class="guide-content">
+                        <div class="guide-title">Add Fine Reminders</div>
+                        <div class="guide-desc">Enter your ticket number and due date to create a reminder. Each reminder shows whether it is upcoming, due today, or overdue. You can also add it to Google Calendar or download an .ics file.</div>
+                        <span class="guide-tab-ref guide-tab-dash">Dashboard</span>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-num guide-num-4">4</div>
+                    <div class="guide-content">
+                        <div class="guide-title">Check Late Fee Costs</div>
+                        <div class="guide-desc">Use the Deadline ROI Calculator to see exactly how much extra you will pay if you miss the 15-day, 31-day, or 60-day deadlines. Enter your base fine amount and the total is calculated instantly.</div>
+                        <span class="guide-tab-ref guide-tab-dash">Dashboard</span>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-num guide-num-5">5</div>
+                    <div class="guide-content">
+                        <div class="guide-title">Pay or Dispute Your Fine</div>
+                        <div class="guide-desc">Go to the Services tab for direct links to the City of Toronto payment portals for parking tickets, camera fines, and court services. Use the Dispute Script Builder to generate a pre-written legal letter you can copy and paste.</div>
+                        <span class="guide-tab-ref guide-tab-svc">Services</span>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-num guide-num-6">6</div>
+                    <div class="guide-content">
+                        <div class="guide-title">Check Parking Rates</div>
+                        <div class="guide-desc">The Street Parking Checker shows rates, enforcement hours, free parking times, and rush-hour tow warnings for popular Toronto streets. There is also a link to download the Green P payment app.</div>
+                        <span class="guide-tab-ref guide-tab-svc">Services</span>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-num guide-num-7">7</div>
+                    <div class="guide-content">
+                        <div class="guide-title">View Enforcement Hotspots</div>
+                        <div class="guide-desc">The Hotspots tab shows an interactive heatmap of Toronto areas with heavy parking enforcement. Check it before you park to avoid high-risk zones.</div>
+                        <span class="guide-tab-ref guide-tab-hot">Hotspots</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-teal card-2">
+                <div class="card-label label-teal">Quick Tips</div>
+                <div class="guide-step">
+                    <div class="guide-num guide-num-5">&#x26A1;</div>
+                    <div class="guide-content">
+                        <div class="guide-desc">Enable 24h Deadline Alerts on the Dashboard to get browser notifications before your fees increase.</div>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <div class="guide-num guide-num-6">&#x1F4F1;</div>
+                    <div class="guide-content">
+                        <div class="guide-desc">Add this app to your iPhone home screen for a full-screen experience: tap the Share button in Safari, then "Add to Home Screen."</div>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <div class="guide-num guide-num-4">&#x1F6A8;</div>
+                    <div class="guide-content">
+                        <div class="guide-desc">If your car was towed, use the "Vehicle Towed?" link on the Services tab to find which impound lot has it.</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="guide-start-btn" onclick="switchTab('dashboard', document.querySelectorAll('.nav-btn')[1])">Get Started</button>
+        </div>
+
+        <div id="tab-dashboard" class="tab">
             <div id="notifBanner" class="notif-banner">
                 <div class="notif-banner-left">
                     <span class="notif-banner-icon">&#x1F514;</span>
@@ -1179,7 +1345,11 @@ HTML_TEMPLATE = """
 
     <nav class="nav">
         <div class="nav-inner">
-            <button class="nav-btn active" onclick="switchTab('dashboard', this)">
+            <button class="nav-btn active" onclick="switchTab('guide', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                Guide
+            </button>
+            <button class="nav-btn" onclick="switchTab('dashboard', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 Dashboard
             </button>
