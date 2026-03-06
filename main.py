@@ -1,0 +1,96 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+from datetime import datetime
+
+app = Flask(__name__)
+
+users_data = []
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto Fine Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="date"] { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .ticket-card { border: 1px solid #ccc; padding: 15px; margin-top: 15px; border-radius: 4px; background: #fafafa; }
+        .pay-btn { display: inline-block; margin-top: 10px; padding: 10px 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; }
+        .pay-btn:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Toronto Fine Tracker & Reminders</h1>
+        
+        <h2>Add a New Ticket Reminder</h2>
+        <form action="/add" method="POST">
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" name="name" required>
+            </div>
+            <div class="form-group">
+                <label>License Plate:</label>
+                <input type="text" name="plate" required>
+            </div>
+            <div class="form-group">
+                <label>Ticket Number (Optional):</label>
+                <input type="text" name="ticket_num">
+            </div>
+            <div class="form-group">
+                <label>Due Date:</label>
+                <input type="date" name="due_date" required>
+            </div>
+            <button type="submit">Save Reminder</button>
+        </form>
+
+        <h2>Your Saved Reminders</h2>
+        {% if users_data %}
+            {% for ticket in users_data %}
+                <div class="ticket-card">
+                    <p><strong>Name:</strong> {{ ticket.name }}</p>
+                    <p><strong>License Plate:</strong> {{ ticket.plate }}</p>
+                    <p><strong>Ticket Number:</strong> {{ ticket.ticket_num }}</p>
+                    <p><strong>Due Date:</strong> {{ ticket.due_date }}</p>
+                    <a class="pay-btn" href="https://www.toronto.ca/services-payments/tickets-fines-penalties/" target="_blank">
+                        Pay on Official Toronto Portal
+                    </a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No tickets saved currently.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_TEMPLATE, users_data=users_data)
+
+@app.route('/add', methods=['POST'])
+def add_ticket():
+    name = request.form.get('name')
+    plate = request.form.get('plate')
+    ticket_num = request.form.get('ticket_num')
+    due_date = request.form.get('due_date')
+
+    users_data.append({
+        'name': name,
+        'plate': plate.upper(),
+        'ticket_num': ticket_num,
+        'due_date': due_date
+    })
+
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
