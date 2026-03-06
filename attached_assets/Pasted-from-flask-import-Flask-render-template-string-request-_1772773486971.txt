@@ -1,0 +1,186 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+
+app = Flask(__name__)
+
+users_data = []
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto Fine Tracker</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; padding: 20px; 
+            background-color: #0d1117; color: #c9d1d9; 
+        }
+        .container { 
+            max-width: 500px; margin: auto; 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 25px; border-radius: 16px; 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        h1, h2 { color: #58a6ff; text-align: center; }
+        
+        /* Form Inputs */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #8b949e;}
+        input[type="text"], input[type="date"], input[type="number"] { 
+            width: 100%; padding: 12px; 
+            box-sizing: border-box; 
+            border-radius: 8px; border: none; 
+            background: #161b22; color: white;
+            font-size: 16px;
+        }
+        
+        /* ROI Calculator Styles */
+        .roi-box {
+            background: #161b22;
+            border-left: 4px solid #da3633;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+        .roi-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;}
+        .roi-total { font-weight: bold; color: #ff7b72; font-size: 18px; margin-top: 10px; border-top: 1px solid #30363d; padding-top: 10px;}
+        
+        /* Map Container */
+        #map { height: 250px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* Buttons */
+        button { 
+            width: 100%; padding: 14px; 
+            background-color: #238636; color: white; 
+            border: none; border-radius: 8px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; 
+            transition: transform 0.1s ease;
+        }
+        button:hover { transform: scale(1.02); }
+
+        .ticket-card { 
+            background: rgba(0,0,0,0.4); 
+            padding: 20px; margin-top: 20px; 
+            border-radius: 12px; border: 1px solid #30363d; 
+        }
+        
+        .btn-link { 
+            display: block; text-align: center; 
+            padding: 12px; margin-top: 10px; 
+            border-radius: 8px; text-decoration: none; 
+            font-weight: bold; color: white;
+        }
+        .btn-parking { background-color: #1f6feb; }
+        .btn-speed { background-color: #da3633; }
+        .btn-court { background-color: #bf8700; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Toronto Fine Tracker</h1>
+        
+        <h2>Deadline ROI Calculator</h2>
+        <p style="text-align:center; font-size:12px; color:#8b949e;">See how much money you lose by missing parking ticket deadlines.</p>
+        
+        <div class="form-group">
+            <label>Base Ticket Amount ($):</label>
+            <input type="number" id="baseAmount" placeholder="e.g. 30" oninput="calculateROI()">
+        </div>
+        
+        <div class="roi-box" id="roiResults" style="display:none;">
+            <div class="roi-row"><span>Day 1-15 (Standard Fine):</span> <span id="valBase">$0.00</span></div>
+            <div class="roi-row"><span>Day 16 (Address Search Fee):</span> <span style="color:#ff7b72;">+$15.39</span></div>
+            <div class="roi-row"><span>Day 31 (Late Payment Fee):</span> <span style="color:#ff7b72;">+$32.10</span></div>
+            <div class="roi-row"><span>Day 60 (Plate Denial Fee):</span> <span style="color:#ff7b72;">+$32.10</span></div>
+            <div class="roi-row roi-total"><span>Total if paid after 60 days:</span> <span id="valTotal">$0.00</span></div>
+            <div style="text-align:center; margin-top:10px; font-size:12px; color:#58a6ff;">You save $79.59 by paying today.</div>
+        </div>
+
+        <hr style="border-color:#30363d; margin: 30px 0;">
+
+        <h2>Live Ticket Hotspots</h2>
+        <div id="map"></div>
+
+        <h2>Add Reminder</h2>
+        <form action="/add" method="POST">
+            <div class="form-group">
+                <label>License Plate:</label>
+                <input type="text" name="plate" placeholder="e.g. ABCD 123" required>
+            </div>
+            <div class="form-group">
+                <label>Due Date:</label>
+                <input type="date" name="due_date" required>
+            </div>
+            <button type="submit">Save Ticket</button>
+        </form>
+
+        <h2>Your Tickets</h2>
+        {% if users_data %}
+            {% for ticket in users_data %}
+                <div class="ticket-card">
+                    <p><strong>Plate:</strong> {{ ticket.plate }}</p>
+                    <p><strong>Due Date:</strong> {{ ticket.due_date }}</p>
+                    <hr style="border-color:#30363d; margin: 15px 0;">
+                    <a class="btn-link btn-parking" href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/pay-your-parking-violation/" target="_blank">Pay Parking Ticket</a>
+                    <a class="btn-link btn-speed" href="https://www.toronto.ca/services-payments/tickets-fines-penalties/red-light-camera-penalties/" target="_blank">Pay Camera Fine</a>
+                    <a class="btn-link btn-court" href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/" target="_blank">Court Services</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center; color:#8b949e;">No tickets saved currently.</p>
+        {% endif %}
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    
+    <script>
+        // --- ROI CALCULATOR LOGIC ---
+        function calculateROI() {
+            var input = document.getElementById('baseAmount').value;
+            var roiBox = document.getElementById('roiResults');
+            
+            if(input > 0) {
+                roiBox.style.display = 'block';
+                var base = parseFloat(input);
+                var total = base + 15.39 + 32.10 + 32.10; // Official Toronto late fees
+                
+                document.getElementById('valBase').innerText = "$" + base.toFixed(2);
+                document.getElementById('valTotal').innerText = "$" + total.toFixed(2);
+            } else {
+                roiBox.style.display = 'none';
+            }
+        }
+
+        // --- MAP LOGIC ---
+        var map = L.map('map').setView([43.6532, -79.3832], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
+        var parkingHotspots = [
+            [43.659153, -79.362650, 1.0], [43.653200, -79.383200, 0.8], 
+            [43.642600, -79.387100, 0.9], [43.648800, -79.380200, 0.7]
+        ];
+        var heat = L.heatLayer(parkingHotspots, { radius: 25, blur: 15, maxZoom: 15, gradient: {0.4: 'blue', 0.6: 'lime', 1: 'red'} }).addTo(map);
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_TEMPLATE, users_data=users_data)
+
+@app.route('/add', methods=['POST'])
+def add_ticket():
+    plate = request.form.get('plate')
+    due_date = request.form.get('due_date')
+    users_data.append({'plate': plate.upper(), 'due_date': due_date})
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)

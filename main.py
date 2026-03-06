@@ -537,6 +537,66 @@ HTML_TEMPLATE = """
         .dot-low { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
         .leaflet-container { background: var(--bg-root) !important; }
 
+        .roi-input-wrap {
+            position: relative;
+        }
+        .roi-input-wrap .currency-sign {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+            font-size: 15px;
+            pointer-events: none;
+        }
+        .roi-input-wrap input {
+            padding-left: 28px !important;
+            font-family: var(--font-mono);
+        }
+        .roi-box {
+            background: rgba(244,63,94,0.06);
+            border-left: 3px solid var(--rose);
+            padding: 14px 16px;
+            margin-top: 14px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            animation: fadeIn 0.25s ease;
+        }
+        .roi-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .roi-row span:last-child {
+            font-family: var(--font-mono);
+            font-weight: 500;
+        }
+        .roi-fee {
+            color: var(--rose) !important;
+        }
+        .roi-total {
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
+            padding-top: 10px;
+        }
+        .roi-total span {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+        }
+        .roi-total span:last-child {
+            color: var(--rose);
+        }
+        .roi-savings {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--green);
+            font-weight: 500;
+        }
+
         @media (max-width: 380px) {
             .app { padding: 0 14px; padding-bottom: calc(var(--safe-bottom) + 80px); }
             .card { padding: 16px; }
@@ -578,7 +638,27 @@ HTML_TEMPLATE = """
                 </form>
             </div>
 
-            <div class="card card-teal card-2">
+            <div class="card card-rose card-2">
+                <div class="card-label label-rose">Deadline ROI Calculator</div>
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 14px; line-height: 1.5;">See how much extra you'll pay by missing parking ticket deadlines.</p>
+                <div class="field">
+                    <label>Base Ticket Amount</label>
+                    <div class="roi-input-wrap">
+                        <span class="currency-sign">$</span>
+                        <input type="number" id="baseAmount" placeholder="e.g. 30" oninput="calculateROI()" min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="roi-box" id="roiResults" style="display:none;">
+                    <div class="roi-row"><span>Day 1–15 (Standard Fine)</span> <span id="valBase">$0.00</span></div>
+                    <div class="roi-row"><span>Day 16 (Address Search Fee)</span> <span class="roi-fee">+$15.39</span></div>
+                    <div class="roi-row"><span>Day 31 (Late Payment Fee)</span> <span class="roi-fee">+$32.10</span></div>
+                    <div class="roi-row"><span>Day 60 (Plate Denial Fee)</span> <span class="roi-fee">+$32.10</span></div>
+                    <div class="roi-row roi-total"><span>Total if paid after 60 days</span> <span id="valTotal">$0.00</span></div>
+                    <div class="roi-savings" id="roiSavings">You save $79.59 by paying today.</div>
+                </div>
+            </div>
+
+            <div class="card card-teal card-3">
                 <div class="card-label label-teal">Add Fine Reminder</div>
                 <form action="/add-reminder" method="POST">
                     <div class="field">
@@ -593,7 +673,7 @@ HTML_TEMPLATE = """
                 </form>
             </div>
 
-            <div class="card card-amber card-3">
+            <div class="card card-amber card-4">
                 <div class="card-label label-amber">Reminders</div>
                 {% if reminders %}
                     {% for r in reminders %}
@@ -753,6 +833,22 @@ HTML_TEMPLATE = """
                 maxZoom: 15,
                 gradient: { 0.3: '#3b82f6', 0.5: '#06b6d4', 0.7: '#84cc16', 0.85: '#f59e0b', 1.0: '#ef4444' }
             }).addTo(mapInstance);
+        }
+
+        function calculateROI() {
+            var input = document.getElementById('baseAmount').value;
+            var roiBox = document.getElementById('roiResults');
+            if (input > 0) {
+                roiBox.style.display = 'block';
+                var base = parseFloat(input);
+                var total = base + 15.39 + 32.10 + 32.10;
+                var savings = 79.59;
+                document.getElementById('valBase').innerText = '$' + base.toFixed(2);
+                document.getElementById('valTotal').innerText = '$' + total.toFixed(2);
+                document.getElementById('roiSavings').innerText = 'You save $' + savings.toFixed(2) + ' by paying today.';
+            } else {
+                roiBox.style.display = 'none';
+            }
         }
 
         function switchTab(tab, btn) {

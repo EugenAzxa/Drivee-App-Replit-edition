@@ -15,7 +15,8 @@ A mobile-friendly Flask web app for managing Toronto traffic fines. Features a d
 The app runs on port 5000 via `python main.py`.
 
 ## Features
-- Dashboard with profile (name + license plate) and fine reminders with due dates
+- Dashboard with profile (name + license plate), deadline ROI calculator, and fine reminders with due dates
+- Deadline ROI Calculator: enter a base fine amount and see how Toronto late fees escalate ($15.39 address search + $32.10 late payment + $32.10 plate denial = $79.59 total penalties)
 - Reminders show status badges (Upcoming, Today, Overdue)
 - Calendar integration: Google Calendar link (opens pre-filled event) and .ics file download (works with Apple Calendar, Outlook, etc.)
 - .ics files include VALARM reminders (1 day before and day-of)
