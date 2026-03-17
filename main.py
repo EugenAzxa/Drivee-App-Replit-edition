@@ -1686,6 +1686,44 @@ HTML_TEMPLATE = """
                     Copy Script
                 </button>
             </div>
+
+            <div class="card card-blue card-7">
+                <div class="card-label label-blue"><i class="fa-solid fa-flag-usa"></i> Got a Ticket in the USA?</div>
+                <p class="card-desc">Quick links to pay or dispute US parking tickets and toll violations from any state.</p>
+                <div class="service-list">
+                    <a href="https://www.dmv.org/traffic-tickets/" target="_blank" rel="noopener" class="service-link svc-blue">
+                        <div class="svc-icon">&#x1F17F;</div>
+                        <span class="svc-text">Pay US Parking Ticket (All States)</span>
+                        <span class="svc-arrow">&#x203A;</span>
+                    </a>
+                    <a href="https://www.usa.gov/traffic-tickets" target="_blank" rel="noopener" class="service-link svc-teal">
+                        <div class="svc-icon">&#x1F1FA;&#x1F1F8;</div>
+                        <span class="svc-text">USA.gov — Find Your State Portal</span>
+                        <span class="svc-arrow">&#x203A;</span>
+                    </a>
+                    <a href="https://www.e-zpassiag.com" target="_blank" rel="noopener" class="service-link svc-purple">
+                        <div class="svc-icon">&#x1F6E3;</div>
+                        <span class="svc-text">E-ZPass Toll Violations (18 States)</span>
+                        <span class="svc-arrow">&#x203A;</span>
+                    </a>
+                    <a href="https://www.platepass.com" target="_blank" rel="noopener" class="service-link svc-amber">
+                        <div class="svc-icon">&#x1F697;</div>
+                        <span class="svc-text">PlatePass — Rental Car Toll Bills</span>
+                        <span class="svc-arrow">&#x203A;</span>
+                    </a>
+                    <a href="https://www.sunpass.com/en/tollpayment/tollPayment.shtml" target="_blank" rel="noopener" class="service-link svc-green">
+                        <div class="svc-icon">&#x2600;</div>
+                        <span class="svc-text">SunPass — Florida Toll Roads</span>
+                        <span class="svc-arrow">&#x203A;</span>
+                    </a>
+                    <a href="https://www.txtag.org/txTag/en/index.shtml" target="_blank" rel="noopener" class="service-link svc-rose">
+                        <div class="svc-icon">&#x2B50;</div>
+                        <span class="svc-text">TxTag — Texas Toll Roads</span>
+                        <span class="svc-arrow">&#x203A;</span>
+                    </a>
+                </div>
+                <p style="text-align:center; font-size:11px; margin-top:10px; color:var(--text-secondary);">Canadian plates are tracked on US toll systems. Unpaid tolls can block cross-border vehicle registration.</p>
+            </div>
         </div>
 
         <div id="tab-hotspots" class="tab">
