@@ -1791,6 +1791,16 @@ HTML_TEMPLATE = """
                         <span class="svc-text">Court Services & Provincial Offences</span>
                         <span class="svc-arrow">&#x203A;</span>
                     </a>
+                    <a href="https://www.ontario.ca/page/traffic-ticket" target="_blank" rel="noopener" class="service-link svc-amber">
+                        <div class="svc-icon">&#x1F6A8;</div>
+                        <span class="svc-text">Speed Violation — Pay or Dispute</span>
+                        <span class="svc-arrow">&#x203A;</span>
+                    </a>
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/pay-a-fine-at-court/" target="_blank" rel="noopener" class="service-link svc-teal">
+                        <div class="svc-icon">&#x1F4B8;</div>
+                        <span class="svc-text">Pay a Fine at Court</span>
+                        <span class="svc-arrow">&#x203A;</span>
+                    </a>
                 </div>
             </div>
 
