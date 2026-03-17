@@ -1699,7 +1699,7 @@ HTML_TEMPLATE = """
             <div class="card card-2 firm-card" id="firm-xcopper">
                 <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
                 <div class="firm-name">X-Copper Professional Corporation</div>
-                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; From $350&ndash;$900</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Stunt Driving</span>
                     <span class="specialty-pill">Speeding</span>
@@ -1717,7 +1717,7 @@ HTML_TEMPLATE = """
             <div class="card card-3 firm-card" id="firm-xcops">
                 <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
                 <div class="firm-name">X-COPS Traffic Ticket Fighters</div>
-                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; From $200&ndash;$600</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Speeding</span>
                     <span class="specialty-pill">Red Light Camera</span>
@@ -1734,7 +1734,7 @@ HTML_TEMPLATE = """
             <div class="card card-4 firm-card" id="firm-pointts">
                 <div class="firm-type-badge firm-type-mixed">Lawyer &amp; Paralegal</div>
                 <div class="firm-name">POINTTS Advisory Services</div>
-                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; From $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Speeding</span>
                     <span class="specialty-pill">School Zone</span>
@@ -1751,7 +1751,7 @@ HTML_TEMPLATE = """
             <div class="card card-5 firm-card" id="firm-ottlegal">
                 <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
                 <div class="firm-name">OTT Legal — Ontario Traffic Tickets</div>
-                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; From $200&ndash;$550</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Red Light Camera</span>
                     <span class="specialty-pill">Speeding</span>
@@ -1768,7 +1768,7 @@ HTML_TEMPLATE = """
             <div class="card card-6 firm-card" id="firm-xpolice">
                 <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
                 <div class="firm-name">X-Police / Fight Your Ticket</div>
-                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; From $300&ndash;$800</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Stunt Driving</span>
                     <span class="specialty-pill">DUI / Impaired</span>
@@ -1785,7 +1785,7 @@ HTML_TEMPLATE = """
             <div class="card firm-card" id="firm-streetlegal">
                 <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
                 <div class="firm-name">Street Legal Paralegal Services</div>
-                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; From $150&ndash;$500</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Speeding</span>
                     <span class="specialty-pill">Bike Lane</span>
@@ -1802,7 +1802,7 @@ HTML_TEMPLATE = """
             <div class="card firm-card" id="firm-trafficexperts">
                 <div class="firm-type-badge firm-type-mixed">Lawyer &amp; Paralegal</div>
                 <div class="firm-name">Traffic Ticket Experts</div>
-                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; From $200&ndash;$650</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">All HTA Charges</span>
                     <span class="specialty-pill">Speeding</span>
@@ -1819,7 +1819,7 @@ HTML_TEMPLATE = """
             <div class="card firm-card" id="firm-hwylaw">
                 <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
                 <div class="firm-name">HWY-LAW Criminal Defence</div>
-                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; From $400&ndash;$1,200</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">DUI / Impaired</span>
                     <span class="specialty-pill">Criminal HTA</span>
