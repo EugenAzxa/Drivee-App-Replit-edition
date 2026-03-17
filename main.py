@@ -27,7 +27,7 @@ HTML_TEMPLATE = """
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-    <title>DriveSafe TO | Professional</title>
+    <title>Drivee | Professional</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -1274,7 +1274,7 @@ HTML_TEMPLATE = """
         <div class="header">
             <div class="header-top">
                 <div class="header-text">
-                    <h1>DriveSafe <span>TO</span></h1>
+                    <h1>Drivee</h1>
                     <p>Community Infrastructure Tracker</p>
                 </div>
             </div>
@@ -1283,7 +1283,7 @@ HTML_TEMPLATE = """
         <div id="tab-guide" class="tab active">
             <div class="card card-blue card-1">
                 <div class="card-label label-blue"><i class="fa-solid fa-book-open"></i> How to Use This App</div>
-                <p class="card-desc">Welcome to DriveSafe TO — your all-in-one Toronto parking and traffic fine manager. Here is a quick walkthrough of everything you can do.</p>
+                <p class="card-desc">Welcome to Drivee — your all-in-one Toronto parking and traffic fine manager. Here is a quick walkthrough of everything you can do.</p>
 
                 <div class="guide-step">
                     <div class="guide-num guide-num-1">1</div>
@@ -1690,7 +1690,7 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Criminal</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@xcopper.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@xcopper.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.xcopper.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
@@ -1706,7 +1706,7 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Careless Driving</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@x-cops.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@x-cops.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.x-cops.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
@@ -1722,7 +1722,7 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Insurance Impact</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:toronto@pointts.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:toronto@pointts.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.pointts.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
@@ -1738,7 +1738,7 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">HOV Lane</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@ontariotraffictickets.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@ontariotraffictickets.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.ontariotraffictickets.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
@@ -1754,7 +1754,7 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Careless Driving</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:help@xpolice.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:help@xpolice.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.xpolice.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
@@ -1770,7 +1770,7 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Cell Phone</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@street-legal.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@street-legal.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.street-legal.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
@@ -1786,7 +1786,7 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Red Light</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@trafficticket.legal?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@trafficticket.legal?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.trafficticket.legal" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
@@ -1802,7 +1802,7 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Stunt Driving</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@hwy-law.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@hwy-law.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.hwy-law.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
@@ -2076,7 +2076,7 @@ HTML_TEMPLATE = """
                     btn.classList.add('active');
                     title.textContent = 'Alerts Active';
                     desc.textContent = 'You will be notified 24h before fees increase.';
-                    new Notification('DriveSafe TO', {
+                    new Notification('Drivee', {
                         body: 'Deadline alerts enabled. We will notify you 24h before fees increase.',
                         icon: 'https://www.toronto.ca/wp-content/themes/toronto/assets/images/toronto-logo.png'
                     });
@@ -2395,7 +2395,7 @@ def build_ics_content(ticket_num, due_date_str, plate=''):
     lines = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//DriveSafe TO//EN',
+        'PRODID:-//Drivee//EN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
         'BEGIN:VEVENT',
