@@ -1691,7 +1691,7 @@ HTML_TEMPLATE = """
                 </div>
                 <div class="firm-actions">
                     <a class="firm-btn firm-btn-email" href="mailto:info@xcopper.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
-                    <a class="firm-btn firm-btn-web" href="https://www.xcopper.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.xcopper.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
 
@@ -1707,7 +1707,7 @@ HTML_TEMPLATE = """
                 </div>
                 <div class="firm-actions">
                     <a class="firm-btn firm-btn-email" href="mailto:info@x-cops.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
-                    <a class="firm-btn firm-btn-web" href="https://www.x-cops.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.x-cops.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
 
@@ -1723,7 +1723,7 @@ HTML_TEMPLATE = """
                 </div>
                 <div class="firm-actions">
                     <a class="firm-btn firm-btn-email" href="mailto:toronto@pointts.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
-                    <a class="firm-btn firm-btn-web" href="https://www.pointts.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.pointts.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
 
@@ -1739,7 +1739,7 @@ HTML_TEMPLATE = """
                 </div>
                 <div class="firm-actions">
                     <a class="firm-btn firm-btn-email" href="mailto:info@ontariotraffictickets.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
-                    <a class="firm-btn firm-btn-web" href="https://www.ontariotraffictickets.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.ontariotraffictickets.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
 
@@ -1755,7 +1755,7 @@ HTML_TEMPLATE = """
                 </div>
                 <div class="firm-actions">
                     <a class="firm-btn firm-btn-email" href="mailto:help@xpolice.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
-                    <a class="firm-btn firm-btn-web" href="https://www.xpolice.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.xpolice.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
 
@@ -1771,7 +1771,7 @@ HTML_TEMPLATE = """
                 </div>
                 <div class="firm-actions">
                     <a class="firm-btn firm-btn-email" href="mailto:info@street-legal.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
-                    <a class="firm-btn firm-btn-web" href="https://www.street-legal.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.street-legal.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
 
@@ -1787,7 +1787,7 @@ HTML_TEMPLATE = """
                 </div>
                 <div class="firm-actions">
                     <a class="firm-btn firm-btn-email" href="mailto:info@trafficticket.legal?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
-                    <a class="firm-btn firm-btn-web" href="https://www.trafficticket.legal" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.trafficticket.legal" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
 
@@ -1803,7 +1803,7 @@ HTML_TEMPLATE = """
                 </div>
                 <div class="firm-actions">
                     <a class="firm-btn firm-btn-email" href="mailto:info@hwy-law.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
-                    <a class="firm-btn firm-btn-web" href="https://www.hwy-law.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.hwy-law.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
             </div>
 
@@ -2153,8 +2153,9 @@ HTML_TEMPLATE = """
 
                 var existing = document.getElementById('lawyerBanner');
                 if (existing) existing.remove();
+                var scanSucceeded = !!(scannedPlate || scannedDate);
                 var highSeverity = /stunt|plate.?den|denial|impaired|dui|careless|dangerous|red.?light|bike.?lane|\$[2-9]\d{2}|\$[1-9]\d{3}/i.test(text);
-                if (highSeverity) {
+                if (scanSucceeded && highSeverity) {
                     var banner = document.createElement('div');
                     banner.id = 'lawyerBanner';
                     banner.className = 'lawyer-banner';
