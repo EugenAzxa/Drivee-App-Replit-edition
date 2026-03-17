@@ -13,9 +13,9 @@ users_data = {
 }
 
 reports_data = [
-    {"type": "Pothole", "lat": 43.650, "lng": -79.390, "status": "Pending 311"},
-    {"type": "Broken Meter", "lat": 43.652, "lng": -79.383, "status": "Pending 311"},
-    {"type": "Hidden Sign", "lat": 43.648, "lng": -79.396, "status": "Pending 311"}
+    {"type": "Pothole", "lat": 43.650, "lng": -79.390, "status": "Pending 311", "name": "Alex T.", "color": "#0A84FF"},
+    {"type": "Broken Meter", "lat": 43.652, "lng": -79.383, "status": "Pending 311", "name": "Sara M.", "color": "#30D158"},
+    {"type": "Hidden Sign", "lat": 43.648, "lng": -79.396, "status": "Pending 311", "name": "James K.", "color": "#BF5AF2"}
 ]
 
 HTML_TEMPLATE = """
@@ -1291,6 +1291,120 @@ HTML_TEMPLATE = """
             color: var(--blue);
         }
 
+        /* Report email panel */
+        .report-email-panel {
+            display: none;
+            margin-top: 14px;
+            padding: 14px;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            animation: fadeIn 0.2s ease;
+        }
+        .report-email-panel.show { display: block; }
+        .report-email-panel-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .report-ai-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .report-name-input {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-family: var(--font);
+            color: var(--text-primary);
+            box-sizing: border-box;
+            margin-bottom: 8px;
+        }
+        .report-email-textarea {
+            width: 100%;
+            min-height: 120px;
+            background: var(--bg-surface);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 11.5px;
+            font-family: var(--font);
+            color: var(--text-primary);
+            resize: none;
+            box-sizing: border-box;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .report-email-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+        .report-email-btn {
+            flex: 1;
+            min-width: 110px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            border: none;
+            font-size: 11.5px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: opacity 0.15s;
+        }
+        .report-email-btn:active { opacity: 0.8; }
+        .report-btn-311 { background: var(--blue); color: #fff; }
+        .report-btn-greenp { background: var(--green); color: #000; }
+        .report-btn-police { background: var(--rose); color: #fff; }
+        .report-btn-cycling { background: var(--purple); color: #fff; }
+        .report-pin-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 11px;
+            border-radius: 9px;
+            border: none;
+            background: var(--purple);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: opacity 0.15s;
+        }
+        .report-pin-btn:active { opacity: 0.8; }
+        /* Avatar markers on map */
+        .report-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.35);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.55);
+            font-family: var(--font);
+        }
+
         .loading-overlay {
             display: none;
             position: fixed;
@@ -1807,30 +1921,47 @@ HTML_TEMPLATE = """
 
             <div class="card card-purple card-3">
                 <div class="card-label label-purple"><i class="fa-solid fa-bullhorn"></i> Report an Issue</div>
-                <p class="card-desc" style="margin-bottom: 4px;">Tap to instantly map a hazard using your live GPS. Reports appear on the map for other drivers.</p>
+                <p class="card-desc" style="margin-bottom: 4px;">Tap a problem type — AI drafts your 311 email instantly. Send it directly, then pin your report on the community map with your name.</p>
                 <div class="report-count"><i class="fa-solid fa-map-pin"></i> {{ reports|length }} community reports on the map</div>
                 <div class="report-grid">
-                    <button class="report-btn" onclick="submitReport('Broken Meter')">
+                    <button class="report-btn" onclick="openReportPanel('Broken Meter')">
                         <i class="fa-solid fa-plug-circle-xmark"></i>
                         Broken Meter
                     </button>
-                    <button class="report-btn" onclick="submitReport('Hidden Sign')">
+                    <button class="report-btn" onclick="openReportPanel('Hidden Sign')">
                         <i class="fa-solid fa-eye-slash"></i>
                         Hidden Sign
                     </button>
-                    <button class="report-btn" onclick="submitReport('Pothole')">
+                    <button class="report-btn" onclick="openReportPanel('Pothole')">
                         <i class="fa-solid fa-road"></i>
                         Pothole
                     </button>
-                    <button class="report-btn" onclick="submitReport('Bike Lane Blocked')">
+                    <button class="report-btn" onclick="openReportPanel('Bike Lane Blocked')">
                         <i class="fa-solid fa-bicycle"></i>
                         Bike Lane Block
                     </button>
                 </div>
+
+                <div id="reportEmailPanel" class="report-email-panel">
+                    <div class="report-email-panel-title">
+                        <i class="fa-solid fa-robot" style="color:var(--purple);"></i>
+                        <span id="reportPanelTitle">AI Email Draft</span>
+                    </div>
+                    <input type="text" id="reporterName" class="report-name-input" placeholder="Your name (shown on map pin)">
+                    <div class="report-ai-label"><i class="fa-solid fa-wand-magic-sparkles"></i> AI-drafted — edit freely before sending</div>
+                    <textarea id="reportEmailBody" class="report-email-textarea"></textarea>
+                    <div class="report-email-actions" id="reportEmailButtons"></div>
+                    <button class="report-pin-btn" onclick="pinAndSubmitReport()">
+                        <i class="fa-solid fa-map-pin"></i> Pin on Community Map
+                    </button>
+                </div>
+
                 <form id="reportForm" action="/report_311" method="POST" style="display:none;">
                     <input type="hidden" name="issue_type" id="issueTypeInput">
                     <input type="hidden" name="lat" id="latInput">
                     <input type="hidden" name="lng" id="lngInput">
+                    <input type="hidden" name="reporter_name" id="reporterNameInput">
+                    <input type="hidden" name="reporter_color" id="reporterColorInput">
                 </form>
             </div>
         </div>
@@ -2097,8 +2228,17 @@ HTML_TEMPLATE = """
 
             var liveReports = {{ reports_json|safe }};
             liveReports.forEach(function(report) {
-                var marker = L.marker([report.lat, report.lng], {icon: hazardIcon}).addTo(mapInstance);
-                marker.bindPopup('<b style="font-family:-apple-system,sans-serif;">' + report.type + '</b><br><span style="color:#8E8E93; font-size:12px;">' + report.status + '</span>');
+                var name = report.name || 'Community';
+                var color = report.color || '#0A84FF';
+                var initials = name.split(' ').filter(function(w){return w.length>0;}).map(function(w){return w[0].toUpperCase();}).join('').slice(0,2) || '?';
+                var avIcon = L.divIcon({
+                    className: '',
+                    html: '<div class="report-avatar" style="background:' + color + ';">' + initials + '</div>',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+                var marker = L.marker([report.lat, report.lng], {icon: avIcon}).addTo(mapInstance);
+                marker.bindPopup('<b>' + name + '</b><br>' + report.type + '<br><span style="color:#8E8E93;font-size:12px;">' + report.status + '</span>');
             });
         }
 
@@ -2446,29 +2586,116 @@ HTML_TEMPLATE = """
             }
         }
 
-        function submitReport(issueType) {
-            var overlay = document.getElementById('loadingOverlay');
-            overlay.classList.add('show');
+        var currentReportType = '';
+        var currentReportLat = null;
+        var currentReportLng = null;
+        var reportAvatarColors = ['#0A84FF','#30D158','#BF5AF2','#FF453A','#FFD60A','#FF9F0A','#5E5CE6'];
 
-            if (!('geolocation' in navigator)) {
-                overlay.classList.remove('show');
-                showToast('Geolocation is not supported by your browser');
-                return;
+        function openReportPanel(issueType) {
+            currentReportType = issueType;
+            document.getElementById('reportPanelTitle').textContent = issueType + ' — AI Email Draft';
+            var savedName = localStorage.getItem('drivee_name') || '';
+            document.getElementById('reporterName').value = savedName;
+            buildEmailButtons(issueType);
+            var panel = document.getElementById('reportEmailPanel');
+            panel.classList.add('show');
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function(pos) {
+                        currentReportLat = pos.coords.latitude;
+                        currentReportLng = pos.coords.longitude;
+                        generateReportEmail(issueType, pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5));
+                    },
+                    function() { generateReportEmail(issueType, 'Toronto (location unavailable)'); },
+                    { enableHighAccuracy: true, timeout: 8000 }
+                );
+            } else {
+                generateReportEmail(issueType, 'Toronto');
             }
+            setTimeout(function() { panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+        }
 
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    document.getElementById('issueTypeInput').value = issueType;
-                    document.getElementById('latInput').value = position.coords.latitude;
-                    document.getElementById('lngInput').value = position.coords.longitude;
-                    document.getElementById('reportForm').submit();
-                },
-                function(error) {
-                    overlay.classList.remove('show');
-                    showToast('Could not get your location. Please enable GPS.');
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
+        function generateReportEmail(issueType, location) {
+            var today = new Date().toLocaleDateString('en-CA');
+            var name = (document.getElementById('reporterName').value || 'A Drivee User').trim();
+            var bodies = {
+                'Broken Meter': 'Subject: Broken Parking Meter — ' + location + '\n\nDear Toronto Parking Authority,\n\nI am writing to report a broken parking meter at ' + location + ', observed on ' + today + '.\n\nThe meter appears to be malfunctioning (e.g., screen blank, card reader not responding, or unable to issue a receipt). This creates an unfair situation for drivers who may receive tickets despite attempting to pay.\n\nPlease arrange for inspection and repair at your earliest convenience. If a ticket was issued due to the broken meter, I request it be reviewed accordingly.\n\nReported via Drivee Community App.\n\nThank you,\n' + name,
+                'Hidden Sign': 'Subject: Hidden or Obscured Parking Sign — ' + location + '\n\nDear Toronto 311,\n\nI am writing to report a parking sign that is hidden, obscured, or missing at ' + location + ', observed on ' + today + '.\n\nThe sign may be blocked by overgrown vegetation, vandalism, or physical damage, making it impossible for drivers to see parking restrictions. This has led (or could lead) to unfair ticketing.\n\nPlease arrange for inspection and correction at your earliest convenience.\n\nReported via Drivee Community App.\n\nThank you,\n' + name,
+                'Pothole': 'Subject: Pothole / Road Damage — ' + location + '\n\nDear Toronto 311,\n\nI am writing to report a pothole or significant road damage at ' + location + ', observed on ' + today + '.\n\nThe damage poses a safety risk to vehicles, cyclists, and pedestrians. Prompt attention is requested to prevent accidents and vehicle damage.\n\nPlease arrange for inspection and repair at your earliest convenience.\n\nReported via Drivee Community App.\n\nThank you,\n' + name,
+                'Bike Lane Blocked': 'Subject: Bike Lane Obstruction — ' + location + '\n\nDear Toronto 311,\n\nI am writing to report a blocked or obstructed bike lane at ' + location + ', observed on ' + today + '.\n\nA vehicle or other obstruction is blocking the designated bike lane, forcing cyclists into active traffic and creating a dangerous situation.\n\nPlease arrange for enforcement or removal at your earliest convenience.\n\nReported via Drivee Community App.\n\nThank you,\n' + name
+            };
+            var body = bodies[issueType] || ('Subject: Community Issue — ' + location + '\n\nDear Toronto 311,\n\nI am writing to report a ' + issueType + ' at ' + location + ' on ' + today + '.\n\nPlease arrange for inspection at your earliest convenience.\n\nReported via Drivee Community App.\n\nThank you,\n' + name);
+            document.getElementById('reportEmailBody').value = body;
+        }
+
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.id === 'reporterName' && currentReportType) {
+                generateReportEmail(currentReportType, currentReportLat ? currentReportLat.toFixed(5) + ', ' + currentReportLng.toFixed(5) : 'Toronto');
+            }
+        });
+
+        function buildEmailButtons(issueType) {
+            var c = document.getElementById('reportEmailButtons');
+            c.innerHTML = '';
+            function makeBtn(label, email, cls, icon) {
+                var b = document.createElement('button');
+                b.className = 'report-email-btn ' + cls;
+                b.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + label;
+                b.onclick = function() { sendReportEmail(email); };
+                c.appendChild(b);
+            }
+            makeBtn('Email 311', '311@toronto.ca', 'report-btn-311', 'fa-envelope');
+            if (issueType === 'Broken Meter') {
+                makeBtn('Email Green P', 'customerservice@greenp.com', 'report-btn-greenp', 'fa-square-parking');
+                makeBtn('Police Enforcement', 'tpsparkingcomplaints@torontopolice.on.ca', 'report-btn-police', 'fa-shield-halved');
+            } else if (issueType === 'Bike Lane Blocked') {
+                makeBtn('Email Cycling', 'cycling@toronto.ca', 'report-btn-cycling', 'fa-bicycle');
+            }
+        }
+
+        function sendReportEmail(toEmail) {
+            var body = document.getElementById('reportEmailBody').value;
+            var lines = body.split('\n');
+            var subject = lines[0].replace(/^Subject:\s*/i, '').trim();
+            var emailBody = lines.slice(2).join('\n').trim();
+            window.open('mailto:' + toEmail + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(emailBody), '_blank');
+            showToast('Email app opened — review and send!');
+        }
+
+        function pinAndSubmitReport() {
+            var name = (document.getElementById('reporterName').value || 'Anonymous').trim();
+            var color = reportAvatarColors[(name.charCodeAt(0) || 65) % reportAvatarColors.length];
+            var doSubmit = function(lat, lng) {
+                initMap();
+                addAvatarMarkerToMap(lat, lng, name, color, currentReportType);
+                document.getElementById('issueTypeInput').value = currentReportType;
+                document.getElementById('latInput').value = lat;
+                document.getElementById('lngInput').value = lng;
+                document.getElementById('reporterNameInput').value = name;
+                document.getElementById('reporterColorInput').value = color;
+                document.getElementById('reportForm').submit();
+            };
+            if (currentReportLat && currentReportLng) {
+                doSubmit(currentReportLat, currentReportLng);
+            } else {
+                navigator.geolocation.getCurrentPosition(
+                    function(p) { doSubmit(p.coords.latitude, p.coords.longitude); },
+                    function() { showToast('Could not get your location. Please enable GPS.'); },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            }
+        }
+
+        function addAvatarMarkerToMap(lat, lng, name, color, issueType) {
+            var initials = name.split(' ').filter(function(w){return w.length>0;}).map(function(w){return w[0].toUpperCase();}).join('').slice(0,2) || '?';
+            var avIcon = L.divIcon({
+                className: '',
+                html: '<div class="report-avatar" style="background:' + color + ';">' + initials + '</div>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+            var marker = L.marker([lat, lng], {icon: avIcon}).addTo(mapInstance);
+            marker.bindPopup('<b>' + name + '</b><br>' + issueType + '<br><span style="color:#8E8E93;font-size:12px;">Just now</span>');
         }
 
         function switchTab(tab, btn) {
@@ -2952,13 +3179,17 @@ def handle_311_report():
     issue_type = request.form.get('issue_type', '').strip()
     lat = request.form.get('lat')
     lng = request.form.get('lng')
+    reporter_name = (request.form.get('reporter_name', '') or 'Anonymous').strip()
+    reporter_color = (request.form.get('reporter_color', '') or '#0A84FF').strip()
     if issue_type and lat and lng:
         try:
             reports_data.append({
                 "type": issue_type,
                 "lat": float(lat),
                 "lng": float(lng),
-                "status": "Logged in Community App"
+                "status": "Community Report",
+                "name": reporter_name,
+                "color": reporter_color
             })
         except (ValueError, TypeError):
             pass
