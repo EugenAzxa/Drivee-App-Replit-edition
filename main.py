@@ -869,6 +869,72 @@ HTML_TEMPLATE = """
         .advisor-result-urgent { background: var(--rose-subtle); }
         .advisor-result-urgent .advisor-severity { color: var(--rose); }
 
+        /* Legal ticket scanner verdict */
+        .legal-verdict {
+            display: none;
+            margin-top: 14px;
+            padding: 16px;
+            border-radius: var(--radius);
+        }
+        .legal-verdict.show { display: block; animation: fadeIn 0.25s ease; }
+        .legal-verdict-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            margin-bottom: 7px;
+        }
+        .verdict-headline {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        .verdict-fine-pill {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 6px;
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        .verdict-detail {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin-bottom: 14px;
+        }
+        .verdict-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .verdict-cta:active { opacity: 0.8; }
+        .verdict-pay { background: var(--green-subtle); }
+        .verdict-pay .legal-verdict-badge { color: var(--green); }
+        .verdict-contest { background: var(--blue-subtle); }
+        .verdict-contest .legal-verdict-badge { color: var(--blue); }
+        .verdict-paralegal { background: var(--amber-subtle); }
+        .verdict-paralegal .legal-verdict-badge { color: var(--amber); }
+        .verdict-paralegal .verdict-cta { background: var(--amber); color: #000; }
+        .verdict-lawyer { background: var(--rose-subtle); }
+        .verdict-lawyer .legal-verdict-badge { color: var(--rose); }
+        .verdict-lawyer .verdict-cta { background: var(--rose); color: #fff; }
+
         .lawyer-banner {
             display: flex;
             align-items: center;
@@ -1680,7 +1746,27 @@ HTML_TEMPLATE = """
 
         <div id="tab-legal" class="tab">
 
-            <div class="card card-1">
+            <div class="card card-1" id="legalScanCard">
+                <div class="card-label label-rose"><i class="fa-solid fa-camera"></i> Scan Ticket — AI Verdict</div>
+                <p class="card-desc">Photograph any Toronto traffic or parking ticket. AI reads it in seconds and tells you exactly what to do: pay up, fight it yourself, or get legal help.</p>
+                <button class="scan-btn" onclick="document.getElementById('legalTicketUpload').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    Photograph My Ticket
+                </button>
+                <input type="file" id="legalTicketUpload" accept="image/*" capture="environment" style="display:none" onchange="performLegalScan(event)">
+                <div id="legalScanStatus" class="scan-status"></div>
+                <div id="legalVerdict" class="legal-verdict">
+                    <div class="legal-verdict-badge" id="legalVerdictBadge"></div>
+                    <div class="verdict-headline" id="legalVerdictHeadline"></div>
+                    <div class="verdict-fine-pill" id="legalVerdictFine" style="display:none;"></div>
+                    <div class="verdict-detail" id="legalVerdictDetail"></div>
+                    <button class="verdict-cta" id="legalVerdictCTA" style="display:none;" onclick="scrollToFirms()">
+                        <i class="fa-solid fa-building-columns"></i> See Matched Law Firms Below
+                    </button>
+                </div>
+            </div>
+
+            <div class="card card-2">
                 <div class="card-label label-purple"><i class="fa-solid fa-robot"></i> AI Ticket Advisor</div>
                 <p class="card-desc">Describe your ticket and get an instant severity assessment and legal recommendation — no account needed.</p>
                 <textarea id="advisorInput" class="advisor-textarea" placeholder="e.g. I got a 50 km/h over the limit stunt driving charge in Toronto…" rows="3"></textarea>
@@ -2284,6 +2370,96 @@ HTML_TEMPLATE = """
             if (tab === 'hotspots') {
                 setTimeout(initMap, 100);
             }
+        }
+
+        async function performLegalScan(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            var statusEl = document.getElementById('legalScanStatus');
+            var verdictEl = document.getElementById('legalVerdict');
+            statusEl.className = 'scan-status loading';
+            statusEl.textContent = 'AI is reading your ticket\u2026';
+            verdictEl.className = 'legal-verdict';
+
+            try {
+                var dataUrl = await fileToDataURL(file);
+                var result = await Tesseract.recognize(dataUrl, 'eng');
+                var rawText = result.data.text || '';
+                var textUpper = rawText.toUpperCase();
+
+                var fineMatch = rawText.match(/\$\s*(\d+(?:\.\d{2})?)/);
+                var fineAmount = fineMatch ? parseFloat(fineMatch[1]) : 0;
+
+                var urgent = /STUNT|IMPAIRED|DUI|CRIMINAL CODE|DANGEROUS DRIVING|FAIL TO REMAIN|HIT.?AND.?RUN|RACING|STREET RACING/.test(textUpper);
+                var serious = /CARELESS|SCHOOL ZONE|CONSTRUCTION ZONE|RED LIGHT CAMERA|CELL PHONE|HANDHELD|BIKE LANE|PHOTO RADAR|PLATE DENIED|FOLLOW TOO CLOSE|SEATBELT|SEAT BELT|NO INSURANCE|INSURANCE/.test(textUpper) || fineAmount >= 200;
+
+                var badge, headline, detail, cssClass, showCTA;
+
+                if (urgent) {
+                    badge = 'Get a Lawyer — Serious Consequences';
+                    headline = 'Do NOT pay this ticket';
+                    detail = 'This charge may result in criminal charges, licence suspension, vehicle impoundment, or a permanent record. Paying is an admission of guilt. Contact a traffic lawyer today — free consultation with any firm below.';
+                    cssClass = 'verdict-lawyer';
+                    showCTA = true;
+                } else if (serious) {
+                    badge = 'Get a Paralegal — Worth Fighting';
+                    headline = 'This ticket is worth contesting';
+                    detail = 'This charge carries demerit points or a significant fine that could raise your insurance premium for 3+ years. A licensed paralegal can often get it reduced or withdrawn. Free consultation — see firms below.';
+                    cssClass = 'verdict-paralegal';
+                    showCTA = true;
+                } else if (fineAmount >= 100) {
+                    badge = 'Consider a Paralegal';
+                    headline = 'High fine — may be worth fighting';
+                    detail = 'A fine this size is worth a free 15-minute paralegal consult. They can often reduce or dismiss it, saving you more than their fee. See the firms listed below.';
+                    cssClass = 'verdict-paralegal';
+                    showCTA = true;
+                } else if (fineAmount > 0 && fineAmount < 100) {
+                    badge = 'Pay It — Not Worth Fighting';
+                    headline = 'Small fine, easiest to pay';
+                    detail = 'This is a low-value infraction with minimal impact on your record. Legal fees would likely exceed the ticket amount. Pay online at toronto.ca to close it out quickly.';
+                    cssClass = 'verdict-pay';
+                    showCTA = false;
+                } else {
+                    badge = 'Contest It Yourself';
+                    headline = 'You can fight this without a lawyer';
+                    detail = 'Request a trial by mail at your local courthouse within 15 days of receiving the ticket. Use the Dispute Script Builder on the Services tab to write your case. No lawyer needed.';
+                    cssClass = 'verdict-contest';
+                    showCTA = false;
+                }
+
+                statusEl.className = 'scan-status done';
+                statusEl.textContent = 'Ticket analysed!';
+
+                document.getElementById('legalVerdictBadge').textContent = badge;
+                document.getElementById('legalVerdictHeadline').textContent = headline;
+                document.getElementById('legalVerdictDetail').textContent = detail;
+
+                var fineEl = document.getElementById('legalVerdictFine');
+                if (fineAmount > 0) {
+                    fineEl.textContent = 'Detected fine: $' + fineAmount.toFixed(2);
+                    fineEl.style.display = 'inline-block';
+                } else {
+                    fineEl.style.display = 'none';
+                }
+
+                var ctaEl = document.getElementById('legalVerdictCTA');
+                ctaEl.style.display = showCTA ? 'flex' : 'none';
+
+                verdictEl.className = 'legal-verdict show ' + cssClass;
+
+                if (document.getElementById('advisorInput')) {
+                    document.getElementById('advisorInput').value = rawText;
+                }
+            } catch (err) {
+                statusEl.className = 'scan-status error';
+                statusEl.textContent = 'Scan failed. Try a clearer, well-lit photo.';
+            }
+            event.target.value = '';
+        }
+
+        function scrollToFirms() {
+            var firstFirm = document.querySelector('.firm-card');
+            if (firstFirm) firstFirm.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function analyseTicket() {
