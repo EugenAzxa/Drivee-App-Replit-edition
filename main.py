@@ -793,6 +793,24 @@ HTML_TEMPLATE = """
         .firm-btn:active { opacity: 0.75; }
         .firm-btn-email { background: var(--blue-subtle); color: var(--blue); }
         .firm-btn-web { background: var(--bg-elevated); color: var(--text-secondary); }
+        .firm-promo {
+            margin-top: 12px;
+            padding: 9px 12px;
+            background: var(--green-subtle);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--green);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            line-height: 1.4;
+        }
+        .firm-promo strong {
+            font-weight: 700;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
         .firm-card-highlight {
             box-shadow: 0 0 0 2px var(--blue), 0 4px 24px rgba(10,132,255,0.18) !important;
             transition: box-shadow 0.3s ease;
@@ -1681,7 +1699,7 @@ HTML_TEMPLATE = """
             <div class="card card-2 firm-card" id="firm-xcopper">
                 <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
                 <div class="firm-name">X-Copper Professional Corporation</div>
-                <div class="firm-price">Free consultation &middot; $350&ndash;$900</div>
+                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Stunt Driving</span>
                     <span class="specialty-pill">Speeding</span>
@@ -1690,15 +1708,16 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Criminal</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@xcopper.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@xcopper.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee&body=Hi%2C%20I%27m%20reaching%20out%20via%20Drivee%20about%20my%20traffic%20ticket.%20Please%20apply%20my%20Drivee%20code%3A%20DRIVEE%20(5%E2%80%9310%25%20off%20your%20fee)."><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.xcopper.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
+                <div class="firm-promo"><i class="fa-solid fa-tag"></i> Email via Drivee with code <strong>DRIVEE</strong> &mdash; get 5&ndash;10% off your fee</div>
             </div>
 
             <div class="card card-3 firm-card" id="firm-xcops">
                 <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
                 <div class="firm-name">X-COPS Traffic Ticket Fighters</div>
-                <div class="firm-price">Free consultation &middot; $200&ndash;$600</div>
+                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Speeding</span>
                     <span class="specialty-pill">Red Light Camera</span>
@@ -1706,15 +1725,16 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Careless Driving</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@x-cops.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@x-cops.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee&body=Hi%2C%20I%27m%20reaching%20out%20via%20Drivee%20about%20my%20traffic%20ticket.%20Please%20apply%20my%20Drivee%20code%3A%20DRIVEE%20(5%E2%80%9310%25%20off%20your%20fee)."><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.x-cops.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
+                <div class="firm-promo"><i class="fa-solid fa-tag"></i> Email via Drivee with code <strong>DRIVEE</strong> &mdash; get 5&ndash;10% off your fee</div>
             </div>
 
             <div class="card card-4 firm-card" id="firm-pointts">
                 <div class="firm-type-badge firm-type-mixed">Lawyer &amp; Paralegal</div>
                 <div class="firm-name">POINTTS Advisory Services</div>
-                <div class="firm-price">Free consultation &middot; $250&ndash;$700</div>
+                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Speeding</span>
                     <span class="specialty-pill">School Zone</span>
@@ -1722,15 +1742,16 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Insurance Impact</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:toronto@pointts.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:toronto@pointts.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee&body=Hi%2C%20I%27m%20reaching%20out%20via%20Drivee%20about%20my%20traffic%20ticket.%20Please%20apply%20my%20Drivee%20code%3A%20DRIVEE%20(5%E2%80%9310%25%20off%20your%20fee)."><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.pointts.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
+                <div class="firm-promo"><i class="fa-solid fa-tag"></i> Email via Drivee with code <strong>DRIVEE</strong> &mdash; get 5&ndash;10% off your fee</div>
             </div>
 
             <div class="card card-5 firm-card" id="firm-ottlegal">
                 <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
                 <div class="firm-name">OTT Legal — Ontario Traffic Tickets</div>
-                <div class="firm-price">Free consultation &middot; $200&ndash;$550</div>
+                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Red Light Camera</span>
                     <span class="specialty-pill">Speeding</span>
@@ -1738,15 +1759,16 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">HOV Lane</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@ontariotraffictickets.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@ontariotraffictickets.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee&body=Hi%2C%20I%27m%20reaching%20out%20via%20Drivee%20about%20my%20traffic%20ticket.%20Please%20apply%20my%20Drivee%20code%3A%20DRIVEE%20(5%E2%80%9310%25%20off%20your%20fee)."><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.ontariotraffictickets.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
+                <div class="firm-promo"><i class="fa-solid fa-tag"></i> Email via Drivee with code <strong>DRIVEE</strong> &mdash; get 5&ndash;10% off your fee</div>
             </div>
 
             <div class="card card-6 firm-card" id="firm-xpolice">
                 <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
                 <div class="firm-name">X-Police / Fight Your Ticket</div>
-                <div class="firm-price">Free consultation &middot; $300&ndash;$800</div>
+                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Stunt Driving</span>
                     <span class="specialty-pill">DUI / Impaired</span>
@@ -1754,15 +1776,16 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Careless Driving</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:help@xpolice.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:help@xpolice.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee&body=Hi%2C%20I%27m%20reaching%20out%20via%20Drivee%20about%20my%20traffic%20ticket.%20Please%20apply%20my%20Drivee%20code%3A%20DRIVEE%20(5%E2%80%9310%25%20off%20your%20fee)."><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.xpolice.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
+                <div class="firm-promo"><i class="fa-solid fa-tag"></i> Email via Drivee with code <strong>DRIVEE</strong> &mdash; get 5&ndash;10% off your fee</div>
             </div>
 
             <div class="card firm-card" id="firm-streetlegal">
                 <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
                 <div class="firm-name">Street Legal Paralegal Services</div>
-                <div class="firm-price">Free consultation &middot; $150&ndash;$500</div>
+                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">Speeding</span>
                     <span class="specialty-pill">Bike Lane</span>
@@ -1770,15 +1793,16 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Cell Phone</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@street-legal.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@street-legal.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee&body=Hi%2C%20I%27m%20reaching%20out%20via%20Drivee%20about%20my%20traffic%20ticket.%20Please%20apply%20my%20Drivee%20code%3A%20DRIVEE%20(5%E2%80%9310%25%20off%20your%20fee)."><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.street-legal.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
+                <div class="firm-promo"><i class="fa-solid fa-tag"></i> Email via Drivee with code <strong>DRIVEE</strong> &mdash; get 5&ndash;10% off your fee</div>
             </div>
 
             <div class="card firm-card" id="firm-trafficexperts">
                 <div class="firm-type-badge firm-type-mixed">Lawyer &amp; Paralegal</div>
                 <div class="firm-name">Traffic Ticket Experts</div>
-                <div class="firm-price">Free consultation &middot; $200&ndash;$650</div>
+                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">All HTA Charges</span>
                     <span class="specialty-pill">Speeding</span>
@@ -1786,15 +1810,16 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Red Light</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@trafficticket.legal?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@trafficticket.legal?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee&body=Hi%2C%20I%27m%20reaching%20out%20via%20Drivee%20about%20my%20traffic%20ticket.%20Please%20apply%20my%20Drivee%20code%3A%20DRIVEE%20(5%E2%80%9310%25%20off%20your%20fee)."><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.trafficticket.legal" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
+                <div class="firm-promo"><i class="fa-solid fa-tag"></i> Email via Drivee with code <strong>DRIVEE</strong> &mdash; get 5&ndash;10% off your fee</div>
             </div>
 
             <div class="card firm-card" id="firm-hwylaw">
                 <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
                 <div class="firm-name">HWY-LAW Criminal Defence</div>
-                <div class="firm-price">Free consultation &middot; $400&ndash;$1,200</div>
+                <div class="firm-price">Free consultation &middot; Ticket case $250&ndash;$700</div>
                 <div class="specialty-pills">
                     <span class="specialty-pill">DUI / Impaired</span>
                     <span class="specialty-pill">Criminal HTA</span>
@@ -1802,9 +1827,10 @@ HTML_TEMPLATE = """
                     <span class="specialty-pill">Stunt Driving</span>
                 </div>
                 <div class="firm-actions">
-                    <a class="firm-btn firm-btn-email" href="mailto:info@hwy-law.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-email" href="mailto:info@hwy-law.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20Drivee&body=Hi%2C%20I%27m%20reaching%20out%20via%20Drivee%20about%20my%20traffic%20ticket.%20Please%20apply%20my%20Drivee%20code%3A%20DRIVEE%20(5%E2%80%9310%25%20off%20your%20fee)."><i class="fa-solid fa-envelope"></i> Email Firm</a>
                     <a class="firm-btn firm-btn-web" href="https://www.hwy-law.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website</a>
                 </div>
+                <div class="firm-promo"><i class="fa-solid fa-tag"></i> Email via Drivee with code <strong>DRIVEE</strong> &mdash; get 5&ndash;10% off your fee</div>
             </div>
 
         </div>
