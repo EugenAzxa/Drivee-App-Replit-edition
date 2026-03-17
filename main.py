@@ -2628,14 +2628,43 @@ HTML_TEMPLATE = """
         function generateReportEmail(issueType, location) {
             var today = new Date().toLocaleDateString('en-CA');
             var name = (document.getElementById('reporterName').value || 'A Drivee User').trim();
+            var nl = String.fromCharCode(10);
+            function body311(subject, greeting, detail, action) {
+                return [subject, '', greeting, '', detail, '', action, '', 'Reported via Drivee Community App.', '', 'Thank you,', name].join(nl);
+            }
             var bodies = {
-                'Broken Meter': 'Subject: Broken Parking Meter — ' + location + '\n\nDear Toronto Parking Authority,\n\nI am writing to report a broken parking meter at ' + location + ', observed on ' + today + '.\n\nThe meter appears to be malfunctioning (e.g., screen blank, card reader not responding, or unable to issue a receipt). This creates an unfair situation for drivers who may receive tickets despite attempting to pay.\n\nPlease arrange for inspection and repair at your earliest convenience. If a ticket was issued due to the broken meter, I request it be reviewed accordingly.\n\nReported via Drivee Community App.\n\nThank you,\n' + name,
-                'Hidden Sign': 'Subject: Hidden or Obscured Parking Sign — ' + location + '\n\nDear Toronto 311,\n\nI am writing to report a parking sign that is hidden, obscured, or missing at ' + location + ', observed on ' + today + '.\n\nThe sign may be blocked by overgrown vegetation, vandalism, or physical damage, making it impossible for drivers to see parking restrictions. This has led (or could lead) to unfair ticketing.\n\nPlease arrange for inspection and correction at your earliest convenience.\n\nReported via Drivee Community App.\n\nThank you,\n' + name,
-                'Pothole': 'Subject: Pothole / Road Damage — ' + location + '\n\nDear Toronto 311,\n\nI am writing to report a pothole or significant road damage at ' + location + ', observed on ' + today + '.\n\nThe damage poses a safety risk to vehicles, cyclists, and pedestrians. Prompt attention is requested to prevent accidents and vehicle damage.\n\nPlease arrange for inspection and repair at your earliest convenience.\n\nReported via Drivee Community App.\n\nThank you,\n' + name,
-                'Bike Lane Blocked': 'Subject: Bike Lane Obstruction — ' + location + '\n\nDear Toronto 311,\n\nI am writing to report a blocked or obstructed bike lane at ' + location + ', observed on ' + today + '.\n\nA vehicle or other obstruction is blocking the designated bike lane, forcing cyclists into active traffic and creating a dangerous situation.\n\nPlease arrange for enforcement or removal at your earliest convenience.\n\nReported via Drivee Community App.\n\nThank you,\n' + name
+                'Broken Meter': body311(
+                    'Subject: Broken Parking Meter — ' + location,
+                    'Dear Toronto Parking Authority,',
+                    'I am writing to report a broken parking meter at ' + location + ', observed on ' + today + '. The meter appears to be malfunctioning (screen blank, card reader not responding, or unable to issue a receipt). This creates an unfair situation for drivers who may receive tickets despite attempting to pay.',
+                    'Please arrange for inspection and repair at your earliest convenience. If a ticket was issued due to the broken meter, I request it be reviewed accordingly.'
+                ),
+                'Hidden Sign': body311(
+                    'Subject: Hidden or Obscured Parking Sign — ' + location,
+                    'Dear Toronto 311,',
+                    'I am writing to report a parking sign that is hidden, obscured, or missing at ' + location + ', observed on ' + today + '. The sign may be blocked by overgrown vegetation, vandalism, or physical damage, making it impossible for drivers to see parking restrictions.',
+                    'Please arrange for inspection and correction at your earliest convenience.'
+                ),
+                'Pothole': body311(
+                    'Subject: Pothole / Road Damage — ' + location,
+                    'Dear Toronto 311,',
+                    'I am writing to report a pothole or significant road damage at ' + location + ', observed on ' + today + '. The damage poses a safety risk to vehicles, cyclists, and pedestrians.',
+                    'Please arrange for inspection and repair at your earliest convenience.'
+                ),
+                'Bike Lane Blocked': body311(
+                    'Subject: Bike Lane Obstruction — ' + location,
+                    'Dear Toronto 311,',
+                    'I am writing to report a blocked or obstructed bike lane at ' + location + ', observed on ' + today + '. A vehicle or other obstruction is forcing cyclists into active traffic and creating a dangerous situation.',
+                    'Please arrange for enforcement or removal at your earliest convenience.'
+                )
             };
-            var body = bodies[issueType] || ('Subject: Community Issue — ' + location + '\n\nDear Toronto 311,\n\nI am writing to report a ' + issueType + ' at ' + location + ' on ' + today + '.\n\nPlease arrange for inspection at your earliest convenience.\n\nReported via Drivee Community App.\n\nThank you,\n' + name);
-            document.getElementById('reportEmailBody').value = body;
+            var emailText = bodies[issueType] || body311(
+                'Subject: Community Issue — ' + location,
+                'Dear Toronto 311,',
+                'I am writing to report a ' + issueType + ' at ' + location + ', observed on ' + today + '.',
+                'Please arrange for inspection at your earliest convenience.'
+            );
+            document.getElementById('reportEmailBody').value = emailText;
         }
 
         document.addEventListener('input', function(e) {
