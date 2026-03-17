@@ -29,8 +29,9 @@ The app runs on port 5000 via `python main.py` (dev) or `gunicorn --bind=0.0.0.0
 - Vehicle Towed link: direct link to Toronto Police towing services
 - Hotspots tab with GPS Guardian Proximity Scanner (live geolocation tracking detects $200 bike lane and $100 fire hydrant fine zones, red alert banner on proximity), 311 Community Hazard Reporter (4 report types: Broken Meter, Hidden Sign, Pothole, Bike Lane Blocked — GPS-located, stored server-side, shown as blue markers on map), and Leaflet.js interactive map showing simulated Toronto enforcement hotspots as a heatmap (uses leaflet.heat plugin, dark CartoDB basemap) plus bike lane polyline and hydrant markers
 - All external links open in new tabs to official Toronto portals
-- Guide tab: step-by-step walkthrough of all app features, shown as the default landing page with a "Get Started" button
-- 4-tab iOS-style full-width bottom tab bar (Guide, Dashboard, Services, Hotspots) with Font Awesome icons
+- Guide tab: step-by-step walkthrough of all app features (8 steps), shown as the default landing page with a "Get Started" button
+- Legal tab: Toronto traffic defence firm directory (8 real firms: X-Copper, X-COPS, POINTTS, OTT Legal, X-Police, Street Legal, Traffic Ticket Experts, HWY-LAW) with firm type badges, specialty pills, price ranges, "Email Firm" mailto links, and "Visit Website" links; AI Ticket Advisor with rule-based keyword analyser for severity (Minor/Serious/Urgent) and recommendation; lawyer case banner auto-shown on Dashboard after OCR scan if high-severity keywords detected
+- 5-tab iOS-style full-width bottom tab bar (Guide, Dashboard, Services, Hotspots, Legal) with Font Awesome icons
 - Toast notifications on save/delete actions
 
 ## Design System (Apple/iOS Native)

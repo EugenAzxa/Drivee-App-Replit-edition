@@ -699,6 +699,7 @@ HTML_TEMPLATE = """
         .guide-num-5 { background: rgba(251,191,36,0.15); color: var(--amber); }
         .guide-num-6 { background: rgba(52,211,153,0.15); color: var(--green); }
         .guide-num-7 { background: rgba(251,146,60,0.15); color: var(--orange); }
+        .guide-num-8 { background: rgba(191,90,242,0.15); color: var(--purple); }
         .guide-content {
             flex: 1;
             min-width: 0;
@@ -727,6 +728,175 @@ HTML_TEMPLATE = """
         .guide-tab-dash { background: rgba(91,154,255,0.12); color: var(--blue); }
         .guide-tab-svc { background: rgba(45,212,191,0.12); color: var(--teal); }
         .guide-tab-hot { background: rgba(244,63,94,0.12); color: var(--rose); }
+        .guide-tab-legal { background: rgba(191,90,242,0.12); color: var(--purple); }
+
+        .firm-type-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 10px;
+        }
+        .firm-type-lawyer { background: rgba(10,132,255,0.15); color: var(--blue); }
+        .firm-type-paralegal { background: rgba(191,90,242,0.15); color: var(--purple); }
+        .firm-type-mixed { background: rgba(100,210,255,0.15); color: var(--teal); }
+
+        .firm-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+            margin-bottom: 6px;
+        }
+        .firm-price {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+        }
+        .specialty-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 14px;
+        }
+        .specialty-pill {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+        }
+        .firm-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .firm-btn {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.15s;
+        }
+        .firm-btn:active { opacity: 0.75; }
+        .firm-btn-email { background: var(--blue-subtle); color: var(--blue); }
+        .firm-btn-web { background: var(--bg-elevated); color: var(--text-secondary); }
+        .firm-card-highlight {
+            box-shadow: 0 0 0 2px var(--blue), 0 4px 24px rgba(10,132,255,0.18) !important;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .advisor-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-elevated);
+            border: none;
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: var(--font);
+            font-weight: 400;
+            outline: none;
+            resize: none;
+            min-height: 90px;
+            transition: box-shadow 0.2s ease;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .advisor-textarea::placeholder { color: var(--text-tertiary); }
+        .advisor-textarea:focus { box-shadow: 0 0 0 2px var(--blue); }
+
+        .advisor-result {
+            display: none;
+            padding: 14px;
+            border-radius: var(--radius);
+            margin-top: 12px;
+            animation: slideUp 0.3s ease;
+        }
+        .advisor-result.show { display: block; }
+        .advisor-severity {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+        }
+        .advisor-action {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .advisor-reason {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .advisor-result-minor { background: var(--green-subtle); }
+        .advisor-result-minor .advisor-severity { color: var(--green); }
+        .advisor-result-serious { background: var(--amber-subtle); }
+        .advisor-result-serious .advisor-severity { color: var(--amber); }
+        .advisor-result-urgent { background: var(--rose-subtle); }
+        .advisor-result-urgent .advisor-severity { color: var(--rose); }
+
+        .lawyer-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 14px;
+            background: var(--blue-subtle);
+            border-radius: var(--radius);
+            margin-top: 12px;
+            animation: slideUp 0.3s ease;
+        }
+        .lawyer-banner-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--blue);
+            flex: 1;
+        }
+        .lawyer-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .lawyer-banner-go {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            background: var(--blue);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .lawyer-banner-go:active { opacity: 0.8; }
+        .lawyer-banner-dismiss {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: none;
+            background: none;
+            color: var(--text-tertiary);
+            font-size: 14px;
+            cursor: pointer;
+            font-family: var(--font);
+        }
         .guide-start-btn {
             width: 100%;
             padding: 16px;
@@ -1177,6 +1347,15 @@ HTML_TEMPLATE = """
                         <span class="guide-tab-ref guide-tab-hot">Hotspots</span>
                     </div>
                 </div>
+
+                <div class="guide-step">
+                    <div class="guide-num guide-num-8">8</div>
+                    <div class="guide-content">
+                        <div class="guide-title">Get Legal Help</div>
+                        <div class="guide-desc">If you received a serious charge — stunt driving, careless driving, DUI, or a high-fine camera offence — the Legal tab connects you with Toronto's top traffic defence firms. Use the AI Ticket Advisor to find out if you need a lawyer.</div>
+                        <span class="guide-tab-ref guide-tab-legal">Legal</span>
+                    </div>
+                </div>
             </div>
 
             <div class="card card-teal card-2">
@@ -1480,6 +1659,155 @@ HTML_TEMPLATE = """
                 </form>
             </div>
         </div>
+
+        <div id="tab-legal" class="tab">
+
+            <div class="card card-1">
+                <div class="card-label label-purple"><i class="fa-solid fa-robot"></i> AI Ticket Advisor</div>
+                <p class="card-desc">Describe your ticket and get an instant severity assessment and legal recommendation — no account needed.</p>
+                <textarea id="advisorInput" class="advisor-textarea" placeholder="e.g. I got a 50 km/h over the limit stunt driving charge in Toronto…" rows="3"></textarea>
+                <button class="btn btn-blue" onclick="analyseTicket()"><i class="fa-solid fa-magnifying-glass"></i> Analyse My Ticket</button>
+                <div id="advisorResult" class="advisor-result">
+                    <div class="advisor-severity" id="advisorSeverity"></div>
+                    <div class="advisor-action" id="advisorAction"></div>
+                    <div class="advisor-reason" id="advisorReason"></div>
+                </div>
+            </div>
+
+            <div class="card card-label-text card-2" style="margin-bottom:8px; padding:14px 20px;">
+                <div style="font-size:13px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px;">Toronto Traffic Defence Directory</div>
+            </div>
+
+            <div class="card card-2 firm-card" id="firm-xcopper">
+                <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
+                <div class="firm-name">X-Copper Professional Corporation</div>
+                <div class="firm-price">Free consultation &middot; $350&ndash;$900</div>
+                <div class="specialty-pills">
+                    <span class="specialty-pill">Stunt Driving</span>
+                    <span class="specialty-pill">Speeding</span>
+                    <span class="specialty-pill">DUI</span>
+                    <span class="specialty-pill">Careless Driving</span>
+                    <span class="specialty-pill">Criminal</span>
+                </div>
+                <div class="firm-actions">
+                    <a class="firm-btn firm-btn-email" href="mailto:info@xcopper.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.xcopper.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                </div>
+            </div>
+
+            <div class="card card-3 firm-card" id="firm-xcops">
+                <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
+                <div class="firm-name">X-COPS Traffic Ticket Fighters</div>
+                <div class="firm-price">Free consultation &middot; $200&ndash;$600</div>
+                <div class="specialty-pills">
+                    <span class="specialty-pill">Speeding</span>
+                    <span class="specialty-pill">Red Light Camera</span>
+                    <span class="specialty-pill">Parking Tickets</span>
+                    <span class="specialty-pill">Careless Driving</span>
+                </div>
+                <div class="firm-actions">
+                    <a class="firm-btn firm-btn-email" href="mailto:info@x-cops.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.x-cops.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                </div>
+            </div>
+
+            <div class="card card-4 firm-card" id="firm-pointts">
+                <div class="firm-type-badge firm-type-mixed">Lawyer &amp; Paralegal</div>
+                <div class="firm-name">POINTTS Advisory Services</div>
+                <div class="firm-price">Free consultation &middot; $250&ndash;$700</div>
+                <div class="specialty-pills">
+                    <span class="specialty-pill">Speeding</span>
+                    <span class="specialty-pill">School Zone</span>
+                    <span class="specialty-pill">Careless Driving</span>
+                    <span class="specialty-pill">Insurance Impact</span>
+                </div>
+                <div class="firm-actions">
+                    <a class="firm-btn firm-btn-email" href="mailto:toronto@pointts.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.pointts.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                </div>
+            </div>
+
+            <div class="card card-5 firm-card" id="firm-ottlegal">
+                <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
+                <div class="firm-name">OTT Legal — Ontario Traffic Tickets</div>
+                <div class="firm-price">Free consultation &middot; $200&ndash;$550</div>
+                <div class="specialty-pills">
+                    <span class="specialty-pill">Red Light Camera</span>
+                    <span class="specialty-pill">Speeding</span>
+                    <span class="specialty-pill">Parking</span>
+                    <span class="specialty-pill">HOV Lane</span>
+                </div>
+                <div class="firm-actions">
+                    <a class="firm-btn firm-btn-email" href="mailto:info@ontariotraffictickets.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.ontariotraffictickets.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                </div>
+            </div>
+
+            <div class="card card-6 firm-card" id="firm-xpolice">
+                <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
+                <div class="firm-name">X-Police / Fight Your Ticket</div>
+                <div class="firm-price">Free consultation &middot; $300&ndash;$800</div>
+                <div class="specialty-pills">
+                    <span class="specialty-pill">Stunt Driving</span>
+                    <span class="specialty-pill">DUI / Impaired</span>
+                    <span class="specialty-pill">Criminal HTA</span>
+                    <span class="specialty-pill">Careless Driving</span>
+                </div>
+                <div class="firm-actions">
+                    <a class="firm-btn firm-btn-email" href="mailto:help@xpolice.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.xpolice.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                </div>
+            </div>
+
+            <div class="card firm-card" id="firm-streetlegal">
+                <div class="firm-type-badge firm-type-paralegal">Paralegal</div>
+                <div class="firm-name">Street Legal Paralegal Services</div>
+                <div class="firm-price">Free consultation &middot; $150&ndash;$500</div>
+                <div class="specialty-pills">
+                    <span class="specialty-pill">Speeding</span>
+                    <span class="specialty-pill">Bike Lane</span>
+                    <span class="specialty-pill">Parking Tickets</span>
+                    <span class="specialty-pill">Cell Phone</span>
+                </div>
+                <div class="firm-actions">
+                    <a class="firm-btn firm-btn-email" href="mailto:info@street-legal.ca?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.street-legal.ca" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                </div>
+            </div>
+
+            <div class="card firm-card" id="firm-trafficexperts">
+                <div class="firm-type-badge firm-type-mixed">Lawyer &amp; Paralegal</div>
+                <div class="firm-name">Traffic Ticket Experts</div>
+                <div class="firm-price">Free consultation &middot; $200&ndash;$650</div>
+                <div class="specialty-pills">
+                    <span class="specialty-pill">All HTA Charges</span>
+                    <span class="specialty-pill">Speeding</span>
+                    <span class="specialty-pill">Stunt Driving</span>
+                    <span class="specialty-pill">Red Light</span>
+                </div>
+                <div class="firm-actions">
+                    <a class="firm-btn firm-btn-email" href="mailto:info@trafficticket.legal?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.trafficticket.legal" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                </div>
+            </div>
+
+            <div class="card firm-card" id="firm-hwylaw">
+                <div class="firm-type-badge firm-type-lawyer">Lawyer</div>
+                <div class="firm-name">HWY-LAW Criminal Defence</div>
+                <div class="firm-price">Free consultation &middot; $400&ndash;$1,200</div>
+                <div class="specialty-pills">
+                    <span class="specialty-pill">DUI / Impaired</span>
+                    <span class="specialty-pill">Criminal HTA</span>
+                    <span class="specialty-pill">Dangerous Driving</span>
+                    <span class="specialty-pill">Stunt Driving</span>
+                </div>
+                <div class="firm-actions">
+                    <a class="firm-btn firm-btn-email" href="mailto:info@hwy-law.com?subject=Traffic%20Ticket%20Defence%20Inquiry%20%E2%80%93%20DriveSafe%20TO"><i class="fa-solid fa-envelope"></i> Email Firm</a>
+                    <a class="firm-btn firm-btn-web" href="https://www.hwy-law.com" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <nav class="nav">
@@ -1499,6 +1827,10 @@ HTML_TEMPLATE = """
             <button class="nav-btn" onclick="switchTab('hotspots', this)">
                 <i class="fa-solid fa-map-location-dot"></i>
                 Hotspots
+            </button>
+            <button class="nav-btn" onclick="switchTab('legal', this)">
+                <i class="fa-solid fa-gavel"></i>
+                Legal
             </button>
         </div>
     </nav>
@@ -1818,6 +2150,39 @@ HTML_TEMPLATE = """
                     statusEl.className = 'scan-status error';
                     statusEl.textContent = 'No plate or date found. Try a clearer photo.';
                 }
+
+                var existing = document.getElementById('lawyerBanner');
+                if (existing) existing.remove();
+                var highSeverity = /stunt|plate.?den|denial|impaired|dui|careless|dangerous|red.?light|bike.?lane|\$[2-9]\d{2}|\$[1-9]\d{3}/i.test(text);
+                if (highSeverity) {
+                    var banner = document.createElement('div');
+                    banner.id = 'lawyerBanner';
+                    banner.className = 'lawyer-banner';
+
+                    var bannerText = document.createElement('div');
+                    bannerText.className = 'lawyer-banner-text';
+                    bannerText.innerHTML = '<i class="fa-solid fa-scale-balanced" style="margin-right:6px;"></i>This may be a lawyer case \u2014 see Legal tab for free consultations.';
+                    banner.appendChild(bannerText);
+
+                    var bannerActions = document.createElement('div');
+                    bannerActions.className = 'lawyer-banner-actions';
+
+                    var goBtn = document.createElement('button');
+                    goBtn.className = 'lawyer-banner-go';
+                    goBtn.textContent = 'See Legal Tab';
+                    goBtn.onclick = function() { switchTab('legal', document.querySelectorAll('.nav-btn')[4]); };
+                    bannerActions.appendChild(goBtn);
+
+                    var dismissBtn = document.createElement('button');
+                    dismissBtn.className = 'lawyer-banner-dismiss';
+                    dismissBtn.title = 'Dismiss';
+                    dismissBtn.textContent = '\u00d7';
+                    dismissBtn.onclick = function() { banner.remove(); };
+                    bannerActions.appendChild(dismissBtn);
+
+                    banner.appendChild(bannerActions);
+                    resultEl.after(banner);
+                }
             } catch (err) {
                 statusEl.className = 'scan-status error';
                 statusEl.textContent = 'Scan failed. Try a clearer photo.';
@@ -1891,6 +2256,91 @@ HTML_TEMPLATE = """
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (tab === 'hotspots') {
                 setTimeout(initMap, 100);
+            }
+        }
+
+        function analyseTicket() {
+            var text = (document.getElementById('advisorInput').value || '').toLowerCase();
+            var resultEl = document.getElementById('advisorResult');
+            var severityEl = document.getElementById('advisorSeverity');
+            var actionEl = document.getElementById('advisorAction');
+            var reasonEl = document.getElementById('advisorReason');
+
+            if (!text.trim()) {
+                showToast('Please describe your ticket first');
+                return;
+            }
+
+            var urgent = /stunt|impaired|dui|criminal|dangerous driving|fail to remain|hit.?and.?run|100\s*km|over 50|50\s*(km|over)|60\s*(km|over)/i.test(text);
+            var serious = /careless|school zone|construction zone|red light camera|cell phone|handheld|bike lane|40\s*(km|over)|45\s*(km|over)|30\s*(km|over)|35\s*(km|over)|photo radar|plate den/i.test(text);
+
+            var severity, action, reason, cssClass, highlights;
+
+            if (urgent) {
+                severity = 'Urgent — Get a Lawyer Now';
+                cssClass = 'advisor-result-urgent';
+                if (/stunt/i.test(text)) {
+                    action = 'Retain a traffic defence lawyer immediately';
+                    reason = 'Stunt Driving (50+ km/h over or aggressive manoeuvres) carries an automatic 30-day licence suspension, vehicle impoundment, and fines up to $10,000. A conviction can lead to criminal charges. You must contest this.';
+                    highlights = ['firm-xcopper', 'firm-xpolice', 'firm-hwylaw'];
+                } else if (/impaired|dui/i.test(text)) {
+                    action = 'Contact a criminal defence lawyer today';
+                    reason = 'DUI / Impaired Driving is a criminal offence in Canada. A conviction means a criminal record, mandatory driving suspension, and significant fines. You need an experienced criminal HTA lawyer.';
+                    highlights = ['firm-hwylaw', 'firm-xpolice', 'firm-xcopper'];
+                } else {
+                    action = 'Retain a traffic defence lawyer immediately';
+                    reason = 'This charge carries serious consequences including potential licence suspension, vehicle impoundment, criminal record, or insurance surcharge. Do not pay — contest it with legal representation.';
+                    highlights = ['firm-xcopper', 'firm-hwylaw', 'firm-xpolice'];
+                }
+            } else if (serious) {
+                severity = 'Serious — Consider a Paralegal';
+                cssClass = 'advisor-result-serious';
+                if (/careless/i.test(text)) {
+                    action = 'Hire a paralegal or traffic lawyer';
+                    reason = 'Careless Driving carries 6 demerit points and fines up to $2,000. It can be reduced to a lesser charge by an experienced paralegal or lawyer.';
+                    highlights = ['firm-xcops', 'firm-pointts', 'firm-trafficexperts'];
+                } else if (/red light|photo radar/i.test(text)) {
+                    action = 'A paralegal can often get this reduced or dismissed';
+                    reason = 'Red light camera and photo radar tickets affect your insurance. A licensed paralegal can often challenge the evidence or negotiate a reduced fine.';
+                    highlights = ['firm-ottlegal', 'firm-xcops', 'firm-streetlegal'];
+                } else if (/bike lane/i.test(text)) {
+                    action = 'A paralegal can contest this ticket';
+                    reason = 'Bike lane infractions carry fines of $150–$500 and can impact your driving record. A paralegal may be able to have it dismissed or reduced.';
+                    highlights = ['firm-streetlegal', 'firm-xcops', 'firm-ottlegal'];
+                } else {
+                    action = 'Consider hiring a paralegal to contest this';
+                    reason = 'This offence carries demerit points or a significant fine that could impact your insurance. A paralegal can often negotiate a reduction or withdrawal.';
+                    highlights = ['firm-xcops', 'firm-pointts', 'firm-trafficexperts'];
+                }
+            } else {
+                severity = 'Minor — You Can Handle This';
+                cssClass = 'advisor-result-minor';
+                action = 'Pay the fine or contest it yourself online';
+                reason = 'This appears to be a minor infraction with no demerit points or low risk to your insurance. You can pay at toronto.ca or request a trial by mail. A paralegal may still save you money on larger fines.';
+                highlights = ['firm-streetlegal', 'firm-ottlegal'];
+            }
+
+            resultEl.className = 'advisor-result show ' + cssClass;
+            severityEl.textContent = severity;
+            actionEl.textContent = action;
+            reasonEl.textContent = reason;
+
+            document.querySelectorAll('.firm-card').forEach(function(el) {
+                el.classList.remove('firm-card-highlight');
+            });
+            if (highlights && highlights.length) {
+                setTimeout(function() {
+                    highlights.forEach(function(id, i) {
+                        var el = document.getElementById(id);
+                        if (el) {
+                            el.classList.add('firm-card-highlight');
+                            if (i === 0) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                            setTimeout(function() { el.classList.remove('firm-card-highlight'); }, 3000);
+                        }
+                    });
+                }, 400);
             }
         }
 
