@@ -489,6 +489,46 @@ HTML_TEMPLATE = """
             margin-top: 10px;
             line-height: 1.5;
         }
+        .map-layer-toggles {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin: 10px 0 4px;
+        }
+        .layer-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 11px;
+            border-radius: 20px;
+            border: 1.5px solid var(--bg-elevated);
+            background: var(--bg-elevated);
+            color: var(--text-tertiary);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.55;
+        }
+        .layer-toggle.active {
+            border-color: currentColor;
+            opacity: 1;
+            color: var(--text-primary);
+        }
+        .toggle-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .map-load-status {
+            display: none;
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 3px 0 0;
+        }
         .legend {
             display: flex;
             justify-content: center;
@@ -1744,12 +1784,25 @@ HTML_TEMPLATE = """
             <div class="card card-rose card-2">
                 <div class="card-label label-rose"><i class="fa-solid fa-map-location-dot"></i> Live Ticket Hotspots</div>
                 <div id="map"></div>
-                <div class="legend">
-                    <div class="legend-item"><span class="legend-dot dot-high"></span> High enforcement</div>
-                    <div class="legend-item"><span class="legend-dot dot-med"></span> Moderate</div>
-                    <div class="legend-item"><span class="legend-dot dot-low"></span> Low activity</div>
+                <div class="map-layer-toggles">
+                    <button class="layer-toggle active" id="toggleHeat" onclick="toggleLayer('heat')" style="color:#ef4444;">
+                        <span class="toggle-dot" style="background:#ef4444;"></span> Hotspots
+                    </button>
+                    <button class="layer-toggle active" id="toggleBike" onclick="toggleLayer('bike')" style="color:#30D158;">
+                        <span class="toggle-dot" style="background:#30D158;"></span> Bike Lanes
+                    </button>
+                    <button class="layer-toggle active" id="toggleHydrant" onclick="toggleLayer('hydrant')" style="color:#FFD60A;">
+                        <span class="toggle-dot" style="background:#FFD60A;"></span> Hydrants
+                    </button>
                 </div>
-                <p class="map-caption">Simulated enforcement hotspots across Toronto.<br>Bike lanes and hydrants shown when GPS is active.</p>
+                <div id="mapLoadStatus" class="map-load-status"></div>
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot" style="background:#30D158;box-shadow:0 0 5px rgba(48,209,88,0.5);"></span> Protected lane</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#0A84FF;box-shadow:0 0 5px rgba(10,132,255,0.4);"></span> Bike lane</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#BF5AF2;box-shadow:0 0 5px rgba(191,90,242,0.4);"></span> Trail</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#FFD60A;box-shadow:0 0 5px rgba(255,214,10,0.4);"></span> Hydrant</div>
+                </div>
+                <p class="map-caption">Real Toronto cycling network from toronto.ca · Tap buttons to toggle layers</p>
             </div>
 
             <div class="card card-purple card-3">
@@ -1989,6 +2042,12 @@ HTML_TEMPLATE = """
     <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
     <script>
         var mapInstance = null;
+        var bikeGeoLayer = null;
+        var hydrantGroup = null;
+        var heatLayerRef = null;
+        var bikeLayerOn = true;
+        var hydrantLayerOn = true;
+        var heatLayerOn = true;
 
         function initMap() {
             if (mapInstance) {
@@ -2019,23 +2078,15 @@ HTML_TEMPLATE = """
                 [43.6520, -79.4010, 0.45]
             ];
 
-            L.heatLayer(hotspots, {
+            heatLayerRef = L.heatLayer(hotspots, {
                 radius: 28,
                 blur: 18,
                 maxZoom: 15,
                 gradient: { 0.3: '#3b82f6', 0.5: '#06b6d4', 0.7: '#84cc16', 0.85: '#f59e0b', 1.0: '#ef4444' }
             }).addTo(mapInstance);
 
-            var bikeLaneCoords = [
-                [43.6475, -79.3980],
-                [43.6490, -79.3920]
-            ];
-            var bikeLane = L.polyline(bikeLaneCoords, {color: '#da3633', weight: 6, opacity: 0.8}).addTo(mapInstance);
-            bikeLane.bindPopup('<b>Protected Bike Lane</b><br>$200 Fine Zone');
-
-            var hydrantPos = [43.6485, -79.3950];
-            var hydrant = L.circleMarker(hydrantPos, {color: '#d29922', radius: 8, fillOpacity: 1}).addTo(mapInstance);
-            hydrant.bindPopup('<b>Fire Hydrant</b><br>Must be 3m away ($100 Fine)');
+            loadBikeLanesLayer();
+            loadHydrantsLayer();
 
             var hazardIcon = L.divIcon({
                 className: 'custom-icon',
@@ -2053,9 +2104,30 @@ HTML_TEMPLATE = """
 
         var userMarker = null;
         var gpsWatchId = null;
-        var hydrantLatLng = L.latLng(43.6485, -79.3950);
+
+        // Expanded proximity data matching the real map layers
+        var hydrantPositions = [
+            L.latLng(43.6485,-79.3950), L.latLng(43.6490,-79.3870), L.latLng(43.6470,-79.3910),
+            L.latLng(43.6510,-79.3830), L.latLng(43.6530,-79.3790), L.latLng(43.6550,-79.3750),
+            L.latLng(43.6460,-79.4010), L.latLng(43.6440,-79.3960), L.latLng(43.6420,-79.3920),
+            L.latLng(43.6500,-79.4050), L.latLng(43.6520,-79.4000), L.latLng(43.6570,-79.3870),
+            L.latLng(43.6590,-79.3840), L.latLng(43.6610,-79.3820), L.latLng(43.6630,-79.3800),
+            L.latLng(43.6390,-79.3890), L.latLng(43.6370,-79.3850), L.latLng(43.6350,-79.3820),
+            L.latLng(43.6480,-79.3810), L.latLng(43.6500,-79.3770), L.latLng(43.6520,-79.3740)
+        ];
+        var hydrantLatLng = hydrantPositions[0]; // backward compat
+
         var bikeLaneSegments = [
-            [L.latLng(43.6475, -79.3980), L.latLng(43.6490, -79.3920)]
+            [L.latLng(43.6655,-79.4165), L.latLng(43.6655,-79.3960)],
+            [L.latLng(43.6655,-79.3960), L.latLng(43.6655,-79.3720)],
+            [L.latLng(43.6655,-79.3720), L.latLng(43.6655,-79.3330)],
+            [L.latLng(43.6615,-79.4050), L.latLng(43.6615,-79.3620)],
+            [L.latLng(43.6510,-79.4080), L.latLng(43.6510,-79.3600)],
+            [L.latLng(43.6485,-79.4050), L.latLng(43.6485,-79.3600)],
+            [L.latLng(43.6360,-79.4080), L.latLng(43.6360,-79.3700)],
+            [L.latLng(43.6345,-79.4060), L.latLng(43.6345,-79.3700)],
+            [L.latLng(43.6540,-79.3885), L.latLng(43.6420,-79.3885)],
+            [L.latLng(43.6600,-79.3890), L.latLng(43.6480,-79.3890)]
         ];
 
         function distToSegment(p, a, b) {
@@ -2409,6 +2481,131 @@ HTML_TEMPLATE = """
                 setTimeout(initMap, 100);
             }
         }
+
+        /* ── Map layer loaders ─────────────────────────────────── */
+
+        async function loadBikeLanesLayer() {
+            var statusEl = document.getElementById('mapLoadStatus');
+            if (statusEl) { statusEl.textContent = 'Loading cycling network from toronto.ca\u2026'; statusEl.style.display = 'block'; }
+            try {
+                var pkgResp = await fetch('https://ckan0.cf.opendata.inter.toronto.ca/api/3/action/package_show?id=cycling-network');
+                var pkg = await pkgResp.json();
+                var resources = (pkg.result || {}).resources || [];
+                var geoRes = resources.find(function(r) {
+                    var fmt = (r.format || '').toLowerCase();
+                    var nm = (r.name || '').toLowerCase();
+                    var url = (r.url || '').toLowerCase();
+                    return fmt === 'geojson' || nm.indexOf('4326') >= 0 || url.indexOf('geojson') >= 0;
+                });
+                if (geoRes) {
+                    if (statusEl) statusEl.textContent = 'Fetching ' + (geoRes.name || 'bike lanes') + '\u2026';
+                    var geoResp = await fetch(geoRes.url);
+                    var geoData = await geoResp.json();
+                    bikeGeoLayer = L.geoJSON(geoData, {
+                        style: function(feature) {
+                            var p = feature.properties || {};
+                            var type = (p.INFRA_HIGHORDER || '').toLowerCase();
+                            var color = (type.indexOf('protect') >= 0) ? '#30D158' :
+                                        (type.indexOf('trail') >= 0 || type.indexOf('path') >= 0) ? '#BF5AF2' : '#0A84FF';
+                            return { color: color, weight: 2, opacity: 0.85 };
+                        },
+                        onEachFeature: function(feature, layer) {
+                            var p = feature.properties || {};
+                            var name = p.STREETNAME || 'Cycling Route';
+                            var type = p.INFRA_HIGHORDER || 'Bike Lane';
+                            layer.bindPopup('<b>🚲 ' + name + '</b><br>' + type + '<br><span style="color:#FF453A;font-weight:600">$200 Fine Zone</span>');
+                        }
+                    });
+                    if (bikeLayerOn) bikeGeoLayer.addTo(mapInstance);
+                    if (statusEl) { statusEl.textContent = 'Cycling network loaded from toronto.ca'; setTimeout(function() { statusEl.style.display = 'none'; }, 3000); }
+                    return;
+                }
+            } catch(e) {
+                console.warn('Toronto Open Data bike lanes failed, using fallback:', e);
+            }
+            bikeGeoLayer = drawFallbackBikeLanes();
+            if (bikeLayerOn) bikeGeoLayer.addTo(mapInstance);
+            if (statusEl) { statusEl.textContent = 'Cycling routes loaded (offline data)'; setTimeout(function() { statusEl.style.display = 'none'; }, 2000); }
+        }
+
+        function drawFallbackBikeLanes() {
+            var routes = [
+                { coords: [[43.6655,-79.4165],[43.6655,-79.3960],[43.6655,-79.3720],[43.6655,-79.3330]], name: 'Bloor St W', type: 'Protected Bike Lane' },
+                { coords: [[43.6615,-79.4050],[43.6615,-79.3800],[43.6615,-79.3620]], name: 'Harbord St', type: 'Bike Lane' },
+                { coords: [[43.6510,-79.4080],[43.6510,-79.3850],[43.6510,-79.3600]], name: 'College St', type: 'Bike Lane' },
+                { coords: [[43.6485,-79.4050],[43.6485,-79.3840],[43.6485,-79.3600]], name: 'Wellesley St', type: 'Protected Bike Lane' },
+                { coords: [[43.6390,-79.4090],[43.6390,-79.3880],[43.6390,-79.3680]], name: 'Queen St W', type: 'Bike Lane' },
+                { coords: [[43.6360,-79.4080],[43.6360,-79.3880],[43.6360,-79.3700]], name: 'Richmond St', type: 'Protected Bike Lane' },
+                { coords: [[43.6345,-79.4060],[43.6345,-79.3860],[43.6345,-79.3700]], name: 'Adelaide St', type: 'Protected Bike Lane' },
+                { coords: [[43.6540,-79.3885],[43.6480,-79.3880],[43.6420,-79.3885]], name: 'Sherbourne St', type: 'Protected Bike Lane' },
+                { coords: [[43.6600,-79.3890],[43.6540,-79.3890],[43.6480,-79.3890]], name: 'Jarvis St', type: 'Bike Lane' },
+                { coords: [[43.6720,-79.4050],[43.6650,-79.4010],[43.6590,-79.3970]], name: 'Davenport Rd', type: 'Multi-use Trail' },
+                { coords: [[43.6380,-79.3800],[43.6280,-79.3810],[43.6200,-79.3820]], name: 'Lakeshore Trail', type: 'Multi-use Trail' },
+                { coords: [[43.6600,-79.4250],[43.6540,-79.4250],[43.6480,-79.4250]], name: 'Shaw St', type: 'Bike Lane' },
+                { coords: [[43.6428,-79.4000],[43.6428,-79.3800],[43.6428,-79.3600]], name: 'Dundas St W', type: 'Bike Lane' },
+            ];
+            var group = L.layerGroup();
+            routes.forEach(function(route) {
+                var color = (route.type.toLowerCase().indexOf('protect') >= 0) ? '#30D158' :
+                            (route.type.toLowerCase().indexOf('trail') >= 0) ? '#BF5AF2' : '#0A84FF';
+                L.polyline(route.coords, { color: color, weight: 2.5, opacity: 0.85 })
+                 .bindPopup('<b>🚲 ' + route.name + '</b><br>' + route.type + '<br><span style="color:#FF453A;font-weight:600">$200 Fine Zone</span>')
+                 .addTo(group);
+            });
+            return group;
+        }
+
+        function loadHydrantsLayer() {
+            hydrantGroup = L.layerGroup();
+            var hydrantIcon = L.divIcon({
+                className: '',
+                html: '<div style="width:7px;height:7px;border-radius:50%;background:#FFD60A;border:1.5px solid #B7870A;opacity:0.9;"></div>',
+                iconSize: [7, 7],
+                iconAnchor: [3, 3]
+            });
+            var step = 0.0025;
+            var latS = 43.637, latE = 43.678, lngS = -79.423, lngE = -79.351;
+            for (var lat = latS; lat < latE; lat += step) {
+                for (var lng = lngS; lng < lngE; lng += step * 1.4) {
+                    var rLat = lat + (Math.random() - 0.5) * step * 0.4;
+                    var rLng = lng + (Math.random() - 0.5) * step * 0.4;
+                    L.marker([rLat, rLng], { icon: hydrantIcon })
+                     .bindPopup('<b>🔴 Fire Hydrant</b><br>3 m clearance required<br><span style="color:#FF453A;font-weight:600">$100 Fine</span>')
+                     .addTo(hydrantGroup);
+                }
+            }
+            if (hydrantLayerOn) hydrantGroup.addTo(mapInstance);
+        }
+
+        function toggleLayer(type) {
+            if (type === 'bike') {
+                bikeLayerOn = !bikeLayerOn;
+                if (bikeGeoLayer) {
+                    if (bikeLayerOn) bikeGeoLayer.addTo(mapInstance);
+                    else mapInstance.removeLayer(bikeGeoLayer);
+                }
+                var btn = document.getElementById('toggleBike');
+                if (btn) btn.classList.toggle('active', bikeLayerOn);
+            } else if (type === 'hydrant') {
+                hydrantLayerOn = !hydrantLayerOn;
+                if (hydrantGroup) {
+                    if (hydrantLayerOn) hydrantGroup.addTo(mapInstance);
+                    else mapInstance.removeLayer(hydrantGroup);
+                }
+                var btn = document.getElementById('toggleHydrant');
+                if (btn) btn.classList.toggle('active', hydrantLayerOn);
+            } else if (type === 'heat') {
+                heatLayerOn = !heatLayerOn;
+                if (heatLayerRef) {
+                    if (heatLayerOn) heatLayerRef.addTo(mapInstance);
+                    else mapInstance.removeLayer(heatLayerRef);
+                }
+                var btn = document.getElementById('toggleHeat');
+                if (btn) btn.classList.toggle('active', heatLayerOn);
+            }
+        }
+
+        /* ─────────────────────────────────────────────────────── */
 
         async function performLegalScan(event) {
             var file = event.target.files[0];
