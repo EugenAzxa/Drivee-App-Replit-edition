@@ -2181,7 +2181,7 @@ HTML_TEMPLATE = """
                     bannerActions.appendChild(dismissBtn);
 
                     banner.appendChild(bannerActions);
-                    resultEl.after(banner);
+                    resultEl.before(banner);
                 }
             } catch (err) {
                 statusEl.className = 'scan-status error';
@@ -2272,7 +2272,7 @@ HTML_TEMPLATE = """
             }
 
             var urgent = /stunt|impaired|dui|criminal|dangerous driving|fail to remain|hit.?and.?run|100\s*km|over 50|50\s*(km|over)|60\s*(km|over)/i.test(text);
-            var serious = /careless|school zone|construction zone|red light camera|cell phone|handheld|bike lane|40\s*(km|over)|45\s*(km|over)|30\s*(km|over)|35\s*(km|over)|photo radar|plate den/i.test(text);
+            var serious = /careless|school zone|construction zone|red light camera|cell phone|handheld|bike lane|40\s*(km|over)|45\s*(km|over)|photo radar|plate den/i.test(text);
 
             var severity, action, reason, cssClass, highlights;
 
