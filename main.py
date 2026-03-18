@@ -2693,10 +2693,11 @@ HTML_TEMPLATE = """
         }
 
         function sendReportEmail(toEmail) {
+            var nl = String.fromCharCode(10);
             var body = document.getElementById('reportEmailBody').value;
-            var lines = body.split('\n');
+            var lines = body.split(nl);
             var subject = lines[0].replace(/^Subject:\s*/i, '').trim();
-            var emailBody = lines.slice(2).join('\n').trim();
+            var emailBody = lines.slice(2).join(nl).trim();
             window.open('mailto:' + toEmail + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(emailBody), '_blank');
             showToast('Email app opened — review and send!');
         }
