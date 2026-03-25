@@ -38,36 +38,37 @@ HTML_TEMPLATE = """
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --bg-root: #000000;
-            --bg-surface: #1C1C1E;
-            --bg-elevated: #2C2C2E;
-            --bg-input: #1C1C1E;
-            --border: rgba(255,255,255,0.08);
-            --border-focus: rgba(255,255,255,0.18);
-            --text-primary: #FFFFFF;
-            --text-secondary: #8E8E93;
-            --text-tertiary: #636366;
-            --blue: #0A84FF;
-            --blue-vivid: #0A84FF;
-            --blue-subtle: rgba(10,132,255,0.12);
-            --blue-glow: rgba(10,132,255,0.20);
-            --purple: #BF5AF2;
-            --purple-subtle: rgba(191,90,242,0.12);
-            --purple-glow: rgba(191,90,242,0.18);
-            --teal: #64D2FF;
-            --teal-subtle: rgba(100,210,255,0.12);
-            --teal-glow: rgba(100,210,255,0.18);
-            --rose: #FF453A;
-            --rose-subtle: rgba(255,69,58,0.12);
-            --rose-glow: rgba(255,69,58,0.18);
-            --amber: #FFD60A;
-            --amber-subtle: rgba(255,214,10,0.12);
-            --amber-glow: rgba(255,214,10,0.18);
-            --green: #30D158;
-            --green-subtle: rgba(48,209,88,0.12);
-            --green-glow: rgba(48,209,88,0.18);
-            --orange: #FF9F0A;
-            --orange-subtle: rgba(255,159,10,0.12);
+            --bg-root: #EEF5EE;
+            --bg-surface: #FFFFFF;
+            --bg-elevated: #F3F7F3;
+            --bg-input: #F0F4F0;
+            --border: rgba(0,0,0,0.08);
+            --border-focus: rgba(32,168,76,0.35);
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+            --blue: #2563EB;
+            --blue-vivid: #2563EB;
+            --blue-subtle: rgba(37,99,235,0.10);
+            --blue-glow: rgba(37,99,235,0.16);
+            --purple: #7C3AED;
+            --purple-subtle: rgba(124,58,237,0.10);
+            --purple-glow: rgba(124,58,237,0.16);
+            --teal: #0891B2;
+            --teal-subtle: rgba(8,145,178,0.10);
+            --teal-glow: rgba(8,145,178,0.16);
+            --rose: #DC2626;
+            --rose-subtle: rgba(220,38,38,0.10);
+            --rose-glow: rgba(220,38,38,0.16);
+            --amber: #D97706;
+            --amber-subtle: rgba(217,119,6,0.12);
+            --amber-glow: rgba(217,119,6,0.16);
+            --green: #20A84C;
+            --green-vivid: #27C95C;
+            --green-subtle: rgba(32,168,76,0.12);
+            --green-glow: rgba(32,168,76,0.18);
+            --orange: #EA580C;
+            --orange-subtle: rgba(234,88,12,0.12);
             --radius: 12px;
             --radius-lg: 16px;
             --safe-top: env(safe-area-inset-top, 0px);
@@ -91,37 +92,103 @@ HTML_TEMPLATE = """
         .app {
             max-width: 460px;
             margin: 0 auto;
-            padding: 0 20px;
-            padding-top: calc(var(--safe-top) + 12px);
-            padding-bottom: calc(var(--safe-bottom) + 120px);
+            padding: 0 16px;
+            padding-top: calc(var(--safe-top) + 80px);
+            padding-bottom: calc(var(--safe-bottom) + 110px);
         }
 
-        .header {
-            padding: 20px 0 24px;
-            animation: fadeIn 0.6s ease-out both;
-        }
-        .header-top {
+        /* ── Top Search Bar ── */
+        .top-search-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 90;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
+            padding: calc(var(--safe-top) + 10px) 16px 10px;
+            max-width: 460px;
+            margin: 0 auto;
+            background: var(--bg-root);
         }
-        .header-text h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.5px;
-            line-height: 1.2;
+        .search-input-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
         }
-        .header-text h1 span {
-            font-weight: 400;
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-tertiary);
+            font-size: 14px;
+            pointer-events: none;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 14px 12px 38px;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
+            border-radius: 50px;
             color: var(--text-secondary);
-        }
-        .header-text p {
             font-size: 15px;
-            color: var(--text-secondary);
+            font-family: var(--font);
             font-weight: 400;
-            margin-top: 4px;
+            outline: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+            cursor: pointer;
         }
+        .search-bell {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .bell-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--rose);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--bg-root);
+        }
+        .search-profile {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+
+        /* ── Legacy header (hidden) ── */
+        .header { display: none; }
 
         .card {
             background: var(--bg-surface);
@@ -131,7 +198,7 @@ HTML_TEMPLATE = """
             animation: slideUp 0.5s ease-out both;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.05);
         }
         .card-1 { animation-delay: 0.05s; }
         .card-2 { animation-delay: 0.1s; }
@@ -180,8 +247,8 @@ HTML_TEMPLATE = """
         .field input {
             width: 100%;
             padding: 12px 14px;
-            background: var(--bg-elevated);
-            border: none;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
             border-radius: var(--radius);
             color: var(--text-primary);
             font-size: 14px;
@@ -192,9 +259,10 @@ HTML_TEMPLATE = """
         }
         .field input::placeholder { color: var(--text-tertiary); }
         .field input:focus {
-            box-shadow: 0 0 0 2px var(--blue);
+            box-shadow: 0 0 0 2px var(--green);
+            border-color: var(--green);
         }
-        .field input[type="date"] { color-scheme: dark; }
+        .field input[type="date"] { color-scheme: light; }
         .field input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(0.7);
             opacity: 0.6;
@@ -218,7 +286,7 @@ HTML_TEMPLATE = """
         }
         .btn:active { opacity: 0.8; transform: scale(0.98); }
         .btn-blue {
-            background: var(--blue);
+            background: var(--green);
             color: #fff;
         }
         .btn-teal {
@@ -243,8 +311,8 @@ HTML_TEMPLATE = """
 
         .reminder {
             padding: 14px;
-            background: var(--bg-elevated);
-            border: none;
+            background: #FFFFFF;
+            border: 1px solid var(--border);
             border-radius: var(--radius);
             margin-bottom: 8px;
             animation: slideUp 0.35s ease both;
@@ -336,8 +404,8 @@ HTML_TEMPLATE = """
         }
         .cal-btn-ics {
             border: none;
-            background: var(--purple-subtle);
-            color: var(--purple);
+            background: var(--green-subtle);
+            color: var(--green);
         }
 
         .empty {
@@ -354,7 +422,7 @@ HTML_TEMPLATE = """
             gap: 12px;
             padding: 13px 14px;
             background: var(--bg-elevated);
-            border: none;
+            border: 1px solid var(--border);
             border-radius: var(--radius);
             color: var(--text-primary);
             text-decoration: none;
@@ -398,47 +466,91 @@ HTML_TEMPLATE = """
             left: 0;
             right: 0;
             z-index: 100;
-            height: 90px;
-            background: rgba(28, 28, 30, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 0.5px solid rgba(255,255,255,0.1);
             padding-bottom: var(--safe-bottom);
+            pointer-events: none;
         }
         .nav-inner {
             display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            padding-top: 12px;
-            height: 100%;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px 14px;
             max-width: 460px;
             margin: 0 auto;
+            pointer-events: none;
+        }
+        .nav-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            background: #FFFFFF;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.14), 0 1px 6px rgba(0,0,0,0.08);
+            padding: 7px 10px;
+            pointer-events: all;
         }
         .nav-btn {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             cursor: pointer;
             border: none;
             background: none;
             color: var(--text-secondary);
             font-family: var(--font);
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 500;
-            width: 60px;
-            transition: color 0.2s;
+            flex: 1;
+            padding: 9px 6px;
+            border-radius: 40px;
+            transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+            white-space: nowrap;
         }
         .nav-btn.active {
-            color: var(--blue);
+            background: var(--green);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(32,168,76,0.35);
         }
         .nav-btn i {
-            font-size: 22px;
+            font-size: 15px;
             display: block;
+            flex-shrink: 0;
         }
         .nav-btn svg {
-            width: 22px;
-            height: 22px;
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+        .nav-label {
+            display: none;
+        }
+        .nav-btn.active .nav-label {
+            display: inline;
+        }
+        .nav-fab {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 16px rgba(32,168,76,0.4);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            flex-shrink: 0;
+            pointer-events: all;
+            text-decoration: none;
+        }
+        .nav-fab:active {
+            transform: scale(0.93);
+            box-shadow: 0 2px 8px rgba(32,168,76,0.35);
         }
 
         .tab { display: none; }
@@ -466,10 +578,10 @@ HTML_TEMPLATE = """
             pointer-events: none;
             transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
             opacity: 0;
-            background: var(--bg-elevated);
+            background: #FFFFFF;
             border: none;
             color: var(--green);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.15);
         }
         .toast.show {
             transform: translateX(-50%) translateY(0);
@@ -553,7 +665,7 @@ HTML_TEMPLATE = """
         .dot-high { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
         .dot-med { background: #84cc16; box-shadow: 0 0 6px rgba(132,204,22,0.4); }
         .dot-low { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
-        .leaflet-container { background: var(--bg-root) !important; }
+        .leaflet-container { background: #e8f0e8 !important; }
 
         .street-select {
             width: 100%;
@@ -566,6 +678,8 @@ HTML_TEMPLATE = """
             font-family: var(--font);
             appearance: none;
             -webkit-appearance: none;
+            background-color: #FFFFFF;
+            border: 1.5px solid var(--border);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 14px center;
@@ -661,8 +775,8 @@ HTML_TEMPLATE = """
             width: 100%;
             padding: 12px 14px;
             border-radius: var(--radius);
-            border: none;
-            background: var(--bg-elevated);
+            border: 1.5px solid var(--border);
+            background: #FFFFFF;
             color: var(--text-primary);
             font-size: 14px;
             font-family: var(--font);
@@ -682,7 +796,8 @@ HTML_TEMPLATE = """
             padding: 12px 14px;
             border-radius: var(--radius);
             border: none;
-            background: var(--bg-elevated);
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
             color: var(--text-primary);
             font-family: var(--font-mono);
             font-size: 13px;
@@ -694,7 +809,8 @@ HTML_TEMPLATE = """
         }
         .dispute-textarea:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--purple);
+            box-shadow: 0 0 0 2px var(--green);
+            border-color: var(--green);
         }
         .copy-btn {
             display: inline-flex;
@@ -704,8 +820,8 @@ HTML_TEMPLATE = """
             padding: 8px 16px;
             border-radius: var(--radius);
             border: none;
-            background: var(--purple-subtle);
-            color: var(--purple);
+            background: var(--green-subtle);
+            color: var(--green);
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
@@ -1509,13 +1625,18 @@ HTML_TEMPLATE = """
     <div id="toast" class="toast"></div>
 
     <div class="app">
-        <div class="header">
-            <div class="header-top">
-                <div class="header-text">
-                    <h1>Drivee</h1>
-                    <p>Community Infrastructure Tracker</p>
-                </div>
+        <div class="top-search-bar">
+            <div class="search-input-wrap">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="search-input" placeholder="Find parking near..." readonly onclick="switchTab('hotspots', document.querySelectorAll('.nav-btn')[3])">
             </div>
+            <button class="search-bell" onclick="switchTab('dashboard', document.querySelectorAll('.nav-btn')[1])" title="Reminders">
+                <i class="fa-solid fa-bell"></i>
+                {% if reminders %}<span class="bell-badge">{{ reminders|length }}</span>{% endif %}
+            </button>
+            <button class="search-profile" onclick="switchTab('dashboard', document.querySelectorAll('.nav-btn')[1])" title="Profile">
+                <i class="fa-solid fa-user"></i>
+            </button>
         </div>
 
         <div id="tab-guide" class="tab active">
@@ -2156,26 +2277,31 @@ HTML_TEMPLATE = """
 
     <nav class="nav">
         <div class="nav-inner">
-            <button class="nav-btn active" onclick="switchTab('guide', this)">
-                <i class="fa-solid fa-circle-question"></i>
-                Guide
-            </button>
-            <button class="nav-btn" onclick="switchTab('dashboard', this)">
-                <i class="fa-solid fa-house"></i>
-                Dashboard
-            </button>
-            <button class="nav-btn" onclick="switchTab('services', this)">
-                <i class="fa-solid fa-credit-card"></i>
-                Services
-            </button>
-            <button class="nav-btn" onclick="switchTab('hotspots', this)">
-                <i class="fa-solid fa-map-location-dot"></i>
-                Hotspots
-            </button>
-            <button class="nav-btn" onclick="switchTab('legal', this)">
-                <i class="fa-solid fa-gavel"></i>
-                Legal
-            </button>
+            <div class="nav-pill">
+                <button class="nav-btn active" onclick="switchTab('guide', this)">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span class="nav-label">Guide</span>
+                </button>
+                <button class="nav-btn" onclick="switchTab('dashboard', this)">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="nav-label">Dashboard</span>
+                </button>
+                <button class="nav-btn" onclick="switchTab('services', this)">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span class="nav-label">Services</span>
+                </button>
+                <button class="nav-btn" onclick="switchTab('hotspots', this)">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span class="nav-label">Map</span>
+                </button>
+                <button class="nav-btn" onclick="switchTab('legal', this)">
+                    <i class="fa-solid fa-gavel"></i>
+                    <span class="nav-label">Legal</span>
+                </button>
+            </div>
+            <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/" target="_blank" rel="noopener" class="nav-fab" title="Pay Ticket">
+                <i class="fa-solid fa-receipt"></i>
+            </a>
         </div>
     </nav>
 
