@@ -595,25 +595,101 @@ HTML_TEMPLATE = """
             opacity: 1;
         }
 
+        /* ── Full-screen hero map ── */
         #map {
-            height: 370px;
-            border-radius: var(--radius);
+            height: calc(100svh - var(--safe-top) - var(--safe-bottom) - 162px);
+            min-height: 420px;
+            border-radius: 0;
             border: none;
             z-index: 1;
+            display: block;
         }
+        .map-hero-section {
+            position: relative;
+            margin: -4px -16px 16px;
+        }
+        @media (max-width: 480px) {
+            .map-hero-section { margin: -4px -14px 14px; }
+        }
+        .map-float-controls {
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            z-index: 800;
+            padding: 0 10px;
+            pointer-events: none;
+        }
+        .map-float-layers {
+            display: flex;
+            gap: 6px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 22px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.14);
+            scrollbar-width: none;
+            pointer-events: all;
+        }
+        .map-float-layers::-webkit-scrollbar { display: none; }
+        .map-float-layers .layer-toggle {
+            white-space: nowrap;
+            flex-shrink: 0;
+            background: transparent;
+            border-color: transparent;
+            padding: 5px 10px;
+        }
+        .map-float-layers .layer-toggle.active {
+            background: rgba(10,132,255,0.08);
+            border-color: rgba(10,132,255,0.2);
+        }
+        .map-load-status {
+            position: absolute;
+            bottom: 68px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 900;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 5px 14px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: none;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .map-gps-fab {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 800;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            color: var(--blue);
+            font-size: 17px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .map-gps-fab:active { transform: scale(0.92); }
+        .map-gps-fab.active-gps { background: var(--blue); color: #fff; }
         .map-caption {
             text-align: center;
             font-size: 12px;
             color: var(--text-tertiary);
             margin-top: 10px;
             line-height: 1.5;
-        }
-        .map-load-status {
             display: none;
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-align: center;
-            padding: 3px 0 0;
         }
         .legend {
             display: flex;
@@ -2458,45 +2534,34 @@ HTML_TEMPLATE = """
                 <span id="gpsAlertText">WARNING!</span>
             </div>
 
-            <div class="card card-blue card-1">
-                <div class="card-label label-blue"><i class="fa-solid fa-location-crosshairs"></i> Proximity Scanner</div>
-                <p class="card-desc">Detects $200 Bike Lane and $100 Fire Hydrant fine zones near your live GPS position.</p>
-                <button class="btn-gps" onclick="startGPSGuardian()" id="gpsBtn">
-                    <i class="fa-solid fa-satellite-dish"></i> Start Live GPS Guardian
-                </button>
-                <p class="gps-status">Requires location permission. Works best on mobile.</p>
-            </div>
-
-            <div class="card card-rose card-2">
-                <div class="card-label label-rose"><i class="fa-solid fa-map-location-dot"></i> Toronto City Map</div>
+            <div class="map-hero-section">
                 <div id="map"></div>
-                <div class="map-layer-toggles">
-                    <button class="layer-toggle active" id="toggleHeat" onclick="toggleLayer('heat')" style="color:#ef4444;">
-                        <span class="toggle-dot" style="background:#ef4444;"></span> Hotspots
-                    </button>
-                    <button class="layer-toggle active" id="toggleBike" onclick="toggleLayer('bike')" style="color:#10b981;">
-                        <span class="toggle-dot" style="background:#10b981;"></span> Bike Lanes
-                    </button>
-                    <button class="layer-toggle active" id="toggleHydrant" onclick="toggleLayer('hydrant')" style="color:#f59e0b;">
-                        <span class="toggle-dot" style="background:#f59e0b;"></span> Hydrants
-                    </button>
-                    <button class="layer-toggle active" id="toggleEV" onclick="toggleLayer('ev')" style="color:#8b5cf6;">
-                        <span class="toggle-dot" style="background:#8b5cf6;"></span> EV Charging
-                    </button>
-                    <button class="layer-toggle active" id="toggleParking" onclick="toggleLayer('parking')" style="color:#0A84FF;">
-                        <span class="toggle-dot" style="background:#0A84FF;"></span> Parking
-                    </button>
-                </div>
+
+                <button class="map-gps-fab" onclick="startGPSGuardian()" id="gpsBtn" title="GPS Guardian">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                </button>
+
                 <div id="mapLoadStatus" class="map-load-status"></div>
-                <div class="legend">
-                    <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Protected lane</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span> Bike lane</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#a78bfa;"></span> Trail</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> Hydrant</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span> EV Station</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#0A84FF;"></span> Parking</div>
+
+                <div class="map-float-controls">
+                    <div class="map-float-layers">
+                        <button class="layer-toggle active" id="toggleParking" onclick="toggleLayer('parking')" style="color:#16a34a;">
+                            <span class="toggle-dot" style="background:#16a34a;"></span> Parking
+                        </button>
+                        <button class="layer-toggle active" id="toggleEV" onclick="toggleLayer('ev')" style="color:#8b5cf6;">
+                            <span class="toggle-dot" style="background:#8b5cf6;"></span> EV Charging
+                        </button>
+                        <button class="layer-toggle active" id="toggleBike" onclick="toggleLayer('bike')" style="color:#10b981;">
+                            <span class="toggle-dot" style="background:#10b981;"></span> Bike Lanes
+                        </button>
+                        <button class="layer-toggle active" id="toggleHydrant" onclick="toggleLayer('hydrant')" style="color:#f59e0b;">
+                            <span class="toggle-dot" style="background:#f59e0b;"></span> Hydrants
+                        </button>
+                        <button class="layer-toggle active" id="toggleHeat" onclick="toggleLayer('heat')" style="color:#ef4444;">
+                            <span class="toggle-dot" style="background:#ef4444;"></span> Hotspots
+                        </button>
+                    </div>
                 </div>
-                <p class="map-caption">Toronto Open Data · Tap layer buttons to show/hide · Tap any pin for details</p>
             </div>
 
             <div class="card card-purple card-3">
@@ -2934,8 +2999,9 @@ HTML_TEMPLATE = """
             if (gpsWatchId !== null) {
                 navigator.geolocation.clearWatch(gpsWatchId);
                 gpsWatchId = null;
-                btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Start Live GPS Guardian';
+                btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i>';
                 btn.classList.remove('active-gps');
+                btn.title = 'Start GPS Guardian';
                 document.getElementById('gpsAlertBanner').classList.remove('show');
                 if (userMarker) { mapInstance.removeLayer(userMarker); userMarker = null; }
                 showToast('GPS Guardian stopped');
@@ -2948,12 +3014,13 @@ HTML_TEMPLATE = """
             }
 
             initMap();
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             btn.classList.add('active-gps');
+            btn.title = 'Guardian Active — tap to stop';
 
             gpsWatchId = navigator.geolocation.watchPosition(
                 function(position) {
-                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Guardian Active — Tap to Stop';
+                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i>';
 
                     var lat = position.coords.latitude;
                     var lng = position.coords.longitude;
@@ -2990,7 +3057,7 @@ HTML_TEMPLATE = """
                 },
                 function(error) {
                     showToast('Location access denied. Please enable Location Services.');
-                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Start Live GPS Guardian';
+                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i>';
                     btn.classList.remove('active-gps');
                     document.getElementById('gpsAlertBanner').classList.remove('show');
                     if (userMarker) { mapInstance.removeLayer(userMarker); userMarker = null; }
@@ -3008,7 +3075,7 @@ HTML_TEMPLATE = """
                 'front_st':      { name: 'Front St (Scotiabank Arena)', rate: '$5.00 / hr (event: $20 flat)', hours: 'Mon–Sun 8am–Midnight', max: '4 hours', free: 'After Midnight', rush: '3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'Green P garages on Bremner Blvd are cheaper on event nights.' },
                 'king_west':     { name: 'King St W', rate: '$3.50 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '2 hours', free: 'Daily after 9:00 PM', rush: '3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'King St is a transit priority corridor — metered spots are limited.' },
                 'financial':     { name: 'Bay St / King St E', rate: '$4.50 / hr', hours: 'Mon–Fri 7am–6pm only', max: '2 hours', free: 'Weekends + after 6 PM weekdays', rush: '7–9 AM & 3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'Most spots disappear to rush-hour restrictions on weekday mornings.' },
-                'chinatown':     { name: 'Spadina Ave / Dundas St W', rate: '$2.50 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: '3:30–6:30 PM Mon–Fri', tip: 'D\'Arcy St has free residential parking for non-permit holders before 9am.' },
+                'chinatown':     { name: 'Spadina Ave / Dundas St W', rate: '$2.50 / hr', hours: 'Mon\u2013Sat 8am\u20139pm, Sun 1pm\u20139pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: '3:30\u20136:30 PM Mon\u2013Fri', tip: 'Side streets near Kensington have free residential spots before 9am.' },
                 'annex':         { name: 'Bloor St W / Bathurst Area', rate: '$2.00 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: 'None', tip: 'Residential side streets require area permits; check signs carefully.' },
                 'distillery':    { name: 'Distillery District', rate: '$4.00 / hr', hours: 'Mon–Sun 8am–Midnight', max: '4 hours', free: 'After Midnight', rush: 'None', tip: 'Cherry St Green P lot is ~30% cheaper than surface parking inside.' },
                 'little_italy':  { name: 'College St W (Little Italy)', rate: '$2.25 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: 'None', tip: 'Clinton St south of College has free on-street parking most evenings.' },
@@ -3503,7 +3570,7 @@ HTML_TEMPLATE = """
                 { lat: 43.6461, lng: -79.3798, name: 'Union Station Garage', addr: '65 Front St W', ports: 4, network: 'Flo', free: false },
                 { lat: 43.6617, lng: -79.3804, name: 'City Hall Garage', addr: '100 Queen St W', ports: 6, network: 'Flo', free: false },
                 { lat: 43.7245, lng: -79.3427, name: 'North York Civic Centre', addr: '5100 Yonge St', ports: 8, network: 'Flo', free: true },
-                { lat: 43.6531, lng: -79.4056, name: 'Exhibition Place', addr: '200 Princes\' Blvd', ports: 10, network: 'ChargePoint', free: false },
+                { lat: 43.6531, lng: -79.4056, name: 'Exhibition Place', addr: '200 Princes Blvd', ports: 10, network: 'ChargePoint', free: false },
                 { lat: 43.6441, lng: -79.3997, name: 'Metro Toronto Convention Ctr', addr: '255 Front St W', ports: 6, network: 'ChargePoint', free: false },
                 { lat: 43.7070, lng: -79.3980, name: 'Downsview Park', addr: '35 Carl Hall Rd', ports: 4, network: 'Flo', free: true },
                 { lat: 43.6480, lng: -79.4120, name: 'Liberty Village Parking', addr: '171 East Liberty St', ports: 4, network: 'ChargePoint', free: false },
@@ -3560,32 +3627,38 @@ HTML_TEMPLATE = """
 
         function loadParkingLayer() {
             parkingGroup = L.layerGroup();
-            var parkingIcon = L.divIcon({
-                className: '',
-                html: '<div style="width:22px;height:22px;border-radius:6px;background:#0A84FF;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(10,132,255,0.45);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:800;">P</div>',
-                iconSize: [22, 22],
-                iconAnchor: [11, 11]
-            });
             var spots = [
-                { lat: 43.6533, lng: -79.3832, name: 'Nathan Phillips Square', rate: '$3.50/hr', max: '3 hrs', hours: 'Mon-Sun 7am-10pm' },
-                { lat: 43.6485, lng: -79.3835, name: 'Harbour Square', rate: '$4.00/hr', max: '2 hrs', hours: 'Mon-Sun 8am-10pm' },
-                { lat: 43.6611, lng: -79.3805, name: 'Dundas Square P-Lot', rate: '$3.00/hr', max: '2 hrs', hours: 'Mon-Sat 8am-9pm' },
-                { lat: 43.6540, lng: -79.4055, name: 'Strachan Ave Green P', rate: '$2.50/hr', max: '4 hrs', hours: 'Mon-Sat 8am-9pm' },
-                { lat: 43.6438, lng: -79.3872, name: 'Front St W Green P', rate: '$3.50/hr', max: '2 hrs', hours: 'Mon-Sun 8am-midnight' },
-                { lat: 43.6620, lng: -79.3900, name: 'Gerrard St E Lot', rate: '$2.00/hr', max: '4 hrs', hours: 'Mon-Fri 8am-6pm' },
-                { lat: 43.6490, lng: -79.3978, name: 'Rees St Green P', rate: '$3.00/hr', max: '2 hrs', hours: 'Mon-Sun 7am-10pm' },
-                { lat: 43.6560, lng: -79.3740, name: 'George St Green P', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm' },
-                { lat: 43.6388, lng: -79.4010, name: 'Dufferin St Lot', rate: '$2.00/hr', max: '4 hrs', hours: 'Mon-Fri 7am-7pm' },
-                { lat: 43.6680, lng: -79.4100, name: 'Dufferin-Bloor Green P', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm' },
-                { lat: 43.6432, lng: -79.4000, name: 'Queen-Bathurst Lot', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm' },
-                { lat: 43.6700, lng: -79.3680, name: 'Sherbourne-Bloor', rate: '$2.00/hr', max: '3 hrs', hours: 'Mon-Sat 8am-8pm' },
-                { lat: 43.6580, lng: -79.4200, name: 'Dovercourt-College', rate: '$1.75/hr', max: 'No limit', hours: 'Mon-Sat 8am-8pm' },
-                { lat: 43.6348, lng: -79.3450, name: 'Riverside Green P', rate: '$1.50/hr', max: 'No limit', hours: 'Mon-Fri 8am-6pm' },
-                { lat: 43.6510, lng: -79.3600, name: 'Berkeley St Lot', rate: '$2.25/hr', max: '3 hrs', hours: 'Mon-Sat 8am-8pm' }
+                { lat: 43.6533, lng: -79.3832, name: 'Nathan Phillips Square', rate: '$3.50/hr', max: '3 hrs', hours: 'Mon-Sun 7am-10pm', count: 31, tier: 'orange' },
+                { lat: 43.6485, lng: -79.3835, name: 'Harbour Square', rate: '$4.00/hr', max: '2 hrs', hours: 'Mon-Sun 8am-10pm', count: 12, tier: 'orange' },
+                { lat: 43.6611, lng: -79.3805, name: 'Dundas Square P-Lot', rate: '$3.00/hr', max: '2 hrs', hours: 'Mon-Sat 8am-9pm', count: 0, tier: 'red' },
+                { lat: 43.6540, lng: -79.4055, name: 'Strachan Ave Green P', rate: '$2.50/hr', max: '4 hrs', hours: 'Mon-Sat 8am-9pm', count: 18, tier: 'green' },
+                { lat: 43.6438, lng: -79.3872, name: 'Front St W Green P', rate: '$3.50/hr', max: '2 hrs', hours: 'Mon-Sun 8am-midnight', count: 12, tier: 'orange' },
+                { lat: 43.6620, lng: -79.3900, name: 'Gerrard St E Lot', rate: '$2.00/hr', max: '4 hrs', hours: 'Mon-Fri 8am-6pm', count: 89, tier: 'green' },
+                { lat: 43.6490, lng: -79.3978, name: 'Rees St Green P', rate: '$3.00/hr', max: '2 hrs', hours: 'Mon-Sun 7am-10pm', count: 2, tier: 'orange' },
+                { lat: 43.6560, lng: -79.3740, name: 'George St Green P', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm', count: 45, tier: 'green' },
+                { lat: 43.6388, lng: -79.4010, name: 'Dufferin St Lot', rate: '$2.00/hr', max: '4 hrs', hours: 'Mon-Fri 7am-7pm', count: 28, tier: 'green' },
+                { lat: 43.6680, lng: -79.4100, name: 'Dufferin-Bloor Green P', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm', count: 7, tier: 'green' },
+                { lat: 43.6432, lng: -79.4000, name: 'Queen-Bathurst Lot', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm', count: 25, tier: 'green' },
+                { lat: 43.6700, lng: -79.3680, name: 'Sherbourne-Bloor', rate: '$2.00/hr', max: '3 hrs', hours: 'Mon-Sat 8am-8pm', count: 55, tier: 'green' },
+                { lat: 43.6580, lng: -79.4200, name: 'Dovercourt-College', rate: '$1.75/hr', max: 'No limit', hours: 'Mon-Sat 8am-8pm', count: 6, tier: 'green' },
+                { lat: 43.6348, lng: -79.3450, name: 'Riverside Green P', rate: '$1.50/hr', max: 'No limit', hours: 'Mon-Fri 8am-6pm', count: 3, tier: 'orange' },
+                { lat: 43.6510, lng: -79.3600, name: 'Berkeley St Lot', rate: '$2.25/hr', max: '3 hrs', hours: 'Mon-Sat 8am-8pm', count: 12, tier: 'orange' }
             ];
             spots.forEach(function(s) {
-                L.marker([s.lat, s.lng], { icon: parkingIcon })
-                 .bindPopup('<b style="color:#0A84FF;">P — ' + s.name + '</b><br><span style="color:#374151;font-size:12px;">' + s.hours + '</span><br>Rate: <b style="color:#0A84FF;">' + s.rate + '</b><br>Max stay: ' + s.max)
+                var bg = s.tier === 'green' ? '#16a34a' : s.tier === 'orange' ? '#d97706' : '#dc2626';
+                var size = s.count > 50 ? 42 : s.count > 10 ? 36 : 30;
+                var fontSize = s.count > 50 ? 14 : s.count > 10 ? 13 : 12;
+                var icon = L.divIcon({
+                    className: '',
+                    html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + bg + ';border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;font-size:' + fontSize + 'px;color:#fff;font-weight:800;font-family:-apple-system,sans-serif;">' + s.count + '</div>',
+                    iconSize: [size, size],
+                    iconAnchor: [size/2, size/2]
+                });
+                var availLabel = s.count === 0 ? '<span style="color:#dc2626;font-weight:600;">Full</span>' :
+                                 s.count < 5 ? '<span style="color:#d97706;font-weight:600;">Only ' + s.count + ' spots</span>' :
+                                 '<span style="color:#16a34a;font-weight:600;">' + s.count + ' spots available</span>';
+                L.marker([s.lat, s.lng], { icon: icon })
+                 .bindPopup('<b style="color:#1f2937;">' + s.name + '</b><br>' + availLabel + '<br><span style="color:#374151;font-size:12px;">' + s.hours + '</span><br>Rate: <b style="color:#0A84FF;">' + s.rate + '</b> &bull; Max: ' + s.max)
                  .addTo(parkingGroup);
             });
             if (parkingLayerOn) parkingGroup.addTo(mapInstance);
