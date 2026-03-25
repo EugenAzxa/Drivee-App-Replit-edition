@@ -415,6 +415,124 @@ HTML_TEMPLATE = """
             background: var(--green-subtle);
             color: var(--green);
         }
+        .cal-sync-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            border: none;
+            background: linear-gradient(135deg, #eaf3ff 0%, #d6eaff 100%);
+            color: var(--blue);
+            cursor: pointer;
+            transition: box-shadow 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .cal-sync-btn:active { transform: scale(0.96); }
+        .cal-sync-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+        .cal-sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 9000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .cal-sheet-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .cal-sheet {
+            background: #fff;
+            border-radius: 22px 22px 0 0;
+            width: 100%;
+            max-width: 480px;
+            padding: 20px 20px 36px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(.32,1,.22,1);
+        }
+        .cal-sheet-overlay.open .cal-sheet {
+            transform: translateY(0);
+        }
+        .cal-sheet-drag {
+            width: 40px; height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin: 0 auto 18px;
+        }
+        .cal-sheet-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .cal-sheet-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .cal-sheet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .cal-sheet-opt {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: #f5f7fa;
+            text-decoration: none;
+            transition: background 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .cal-sheet-opt:active { transform: scale(0.97); }
+        .cal-sheet-opt-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .cal-opt-phone .cal-sheet-opt-icon { background: #eaf3ff; }
+        .cal-opt-gcal .cal-sheet-opt-icon { background: #fff3ea; }
+        .cal-sheet-opt-sub {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+        .cal-sheet-cancel {
+            display: block;
+            width: 100%;
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            background: #f5f7fa;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         .empty {
             text-align: center;
@@ -2411,14 +2529,10 @@ HTML_TEMPLATE = """
                                 </form>
                             </div>
                             <div class="reminder-cal">
-                                <a href="{{ r.gcal_url }}" target="_blank" rel="noopener" class="cal-btn cal-btn-gcal">
+                                <button class="cal-sync-btn" onclick="openCalSheet('/calendar/ics/{{ loop.index0 }}','{{ r.gcal_url }}','{{ r.ticket_num }}','{{ r.due_date_display }}')">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                    Google Calendar
-                                </a>
-                                <a href="/calendar/ics/{{ loop.index0 }}" class="cal-btn cal-btn-ics" download>
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                    Download .ics
-                                </a>
+                                    Sync to Calendar
+                                </button>
                             </div>
                         </div>
                     {% endfor %}
@@ -4151,7 +4265,10 @@ HTML_TEMPLATE = """
 
         var params = new URLSearchParams(window.location.search);
         if (params.get('saved') === 'profile') showToast('Profile saved successfully');
-        if (params.get('saved') === 'reminder') showToast('Reminder added');
+        if (params.get('saved') === 'reminder') {
+            showToast('Reminder added');
+            setTimeout(function() { autoTriggerCalSync(); }, 500);
+        }
         if (params.get('deleted') === '1') showToast('Reminder deleted');
         if (params.get('reported') === '1') {
             showToast('Hazard reported! Pin added to map.');
@@ -4243,6 +4360,65 @@ HTML_TEMPLATE = """
                 sendBtn.disabled = false;
                 msgs.scrollTop = msgs.scrollHeight;
             });
+        }
+    </script>
+
+    <!-- Calendar Sync Bottom Sheet -->
+    <div class="cal-sheet-overlay" id="calSheetOverlay" onclick="closeCalSheet(event)">
+        <div class="cal-sheet">
+            <div class="cal-sheet-drag"></div>
+            <div class="cal-sheet-title">Sync to Calendar</div>
+            <div class="cal-sheet-sub" id="calSheetSub">Add this reminder to your calendar</div>
+            <div class="cal-sheet-options">
+                <button class="cal-sheet-opt cal-opt-phone" id="calSheetPhoneBtn" onclick="calSyncPhone()">
+                    <div class="cal-sheet-opt-icon">&#x1F4F1;</div>
+                    <div>
+                        <div>Phone Calendar</div>
+                        <div class="cal-sheet-opt-sub">iOS Calendar, Samsung Calendar &amp; more</div>
+                    </div>
+                </button>
+                <a class="cal-sheet-opt cal-opt-gcal" id="calSheetGcalBtn" href="#" target="_blank" rel="noopener" onclick="closeCalSheetNow()">
+                    <div class="cal-sheet-opt-icon">&#x1F4C5;</div>
+                    <div>
+                        <div>Google Calendar</div>
+                        <div class="cal-sheet-opt-sub">Opens in Google Calendar on the web</div>
+                    </div>
+                </a>
+            </div>
+            <button class="cal-sheet-cancel" onclick="closeCalSheetNow()">Not Now</button>
+        </div>
+    </div>
+    <script>
+        var _calIcsUrl = '';
+        var _calGcalUrl = '';
+        function openCalSheet(icsUrl, gcalUrl, ticketNum, dueDisplay) {
+            _calIcsUrl = icsUrl;
+            _calGcalUrl = gcalUrl;
+            var sub = document.getElementById('calSheetSub');
+            if (ticketNum && dueDisplay) {
+                sub.textContent = ticketNum + ' \u2014 Due ' + dueDisplay;
+            } else {
+                sub.textContent = 'Add this reminder to your calendar';
+            }
+            document.getElementById('calSheetGcalBtn').href = gcalUrl;
+            document.getElementById('calSheetOverlay').classList.add('open');
+        }
+        function closeCalSheetNow() {
+            document.getElementById('calSheetOverlay').classList.remove('open');
+        }
+        function closeCalSheet(e) {
+            if (e.target === document.getElementById('calSheetOverlay')) closeCalSheetNow();
+        }
+        function calSyncPhone() {
+            closeCalSheetNow();
+            window.location.href = _calIcsUrl;
+        }
+        function autoTriggerCalSync() {
+            var reminders = document.querySelectorAll('.reminder');
+            if (!reminders.length) return;
+            var last = reminders[reminders.length - 1];
+            var btn = last.querySelector('.cal-sync-btn');
+            if (btn) btn.click();
         }
     </script>
 </body>
@@ -4391,7 +4567,10 @@ def download_ics(index):
         return Response(
             ics_content,
             mimetype='text/calendar',
-            headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+            headers={
+                'Content-Disposition': f'inline; filename="{filename}"',
+                'Content-Type': 'text/calendar; charset=utf-8; method=PUBLISH'
+            }
         )
     return redirect('/')
 
