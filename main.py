@@ -38,12 +38,12 @@ HTML_TEMPLATE = """
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --bg-root: #EEF5EE;
+            --bg-root: #F0F4FF;
             --bg-surface: #FFFFFF;
             --bg-elevated: #F3F7F3;
             --bg-input: #F0F4F0;
             --border: rgba(0,0,0,0.08);
-            --border-focus: rgba(32,168,76,0.35);
+            --border-focus: rgba(10,132,255,0.35);
             --text-primary: #1A1A1A;
             --text-secondary: #6B7280;
             --text-tertiary: #9CA3AF;
@@ -63,10 +63,10 @@ HTML_TEMPLATE = """
             --amber: #D97706;
             --amber-subtle: rgba(217,119,6,0.12);
             --amber-glow: rgba(217,119,6,0.16);
-            --green: #20A84C;
-            --green-vivid: #27C95C;
-            --green-subtle: rgba(32,168,76,0.12);
-            --green-glow: rgba(32,168,76,0.18);
+            --green: #0A84FF;
+            --green-vivid: #3B9EFF;
+            --green-subtle: rgba(10,132,255,0.12);
+            --green-glow: rgba(10,132,255,0.18);
             --orange: #EA580C;
             --orange-subtle: rgba(234,88,12,0.12);
             --radius: 12px;
@@ -512,7 +512,7 @@ HTML_TEMPLATE = """
             background: var(--green);
             color: #fff;
             font-weight: 600;
-            box-shadow: 0 2px 10px rgba(32,168,76,0.35);
+            box-shadow: 0 2px 10px rgba(10,132,255,0.35);
         }
         .nav-btn i {
             font-size: 15px;
@@ -542,7 +542,7 @@ HTML_TEMPLATE = """
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            box-shadow: 0 4px 16px rgba(32,168,76,0.4);
+            box-shadow: 0 4px 16px rgba(10,132,255,0.4);
             transition: transform 0.18s ease, box-shadow 0.18s ease;
             flex-shrink: 0;
             pointer-events: all;
@@ -550,7 +550,7 @@ HTML_TEMPLATE = """
         }
         .nav-fab:active {
             transform: scale(0.93);
-            box-shadow: 0 2px 8px rgba(32,168,76,0.35);
+            box-shadow: 0 2px 8px rgba(10,132,255,0.35);
         }
 
         .tab { display: none; }
@@ -665,7 +665,7 @@ HTML_TEMPLATE = """
         .dot-high { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
         .dot-med { background: #84cc16; box-shadow: 0 0 6px rgba(132,204,22,0.4); }
         .dot-low { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
-        .leaflet-container { background: #e8f0e8 !important; }
+        .leaflet-container { background: #e8eeff !important; }
 
         .street-select {
             width: 100%;
@@ -690,7 +690,7 @@ HTML_TEMPLATE = """
             box-shadow: 0 0 0 2px var(--green);
         }
         .rate-box {
-            background: rgba(52,211,153,0.05);
+            background: rgba(10,132,255,0.05);
             border-left: 3px solid var(--green);
             padding: 14px 16px;
             margin-top: 14px;
@@ -1483,7 +1483,7 @@ HTML_TEMPLATE = """
         }
         .report-email-btn:active { opacity: 0.8; }
         .report-btn-311 { background: var(--blue); color: #fff; }
-        .report-btn-greenp { background: var(--green); color: #000; }
+        .report-btn-greenp { background: var(--green); color: #fff; }
         .report-btn-police { background: var(--rose); color: #fff; }
         .report-btn-cycling { background: var(--purple); color: #fff; }
         .report-pin-btn {
