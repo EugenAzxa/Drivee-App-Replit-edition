@@ -595,21 +595,33 @@ HTML_TEMPLATE = """
             opacity: 1;
         }
 
-        /* ── Full-screen hero map ── */
+        /* ── Embedded map with fullscreen option ── */
         #map {
-            height: calc(100svh - var(--safe-top) - var(--safe-bottom) - 162px);
-            min-height: 420px;
-            border-radius: 0;
+            height: 300px;
+            border-radius: 18px;
             border: none;
             z-index: 1;
             display: block;
         }
         .map-hero-section {
             position: relative;
-            margin: -4px -16px 16px;
+            margin: 0 0 16px;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.10);
         }
-        @media (max-width: 480px) {
-            .map-hero-section { margin: -4px -14px 14px; }
+        /* Fullscreen state */
+        .map-hero-section.map-is-fullscreen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 4000;
+            margin: 0;
+            border-radius: 0;
+            overflow: hidden;
+        }
+        .map-hero-section.map-is-fullscreen #map {
+            height: 100% !important;
+            border-radius: 0;
         }
         .map-float-controls {
             position: absolute;
@@ -665,16 +677,16 @@ HTML_TEMPLATE = """
         .map-gps-fab {
             position: absolute;
             top: 12px;
-            right: 12px;
+            left: 12px;
             z-index: 800;
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: rgba(255,255,255,0.95);
             border: none;
             box-shadow: 0 2px 12px rgba(0,0,0,0.18);
             color: var(--blue);
-            font-size: 17px;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -683,6 +695,27 @@ HTML_TEMPLATE = """
         }
         .map-gps-fab:active { transform: scale(0.92); }
         .map-gps-fab.active-gps { background: var(--blue); color: #fff; }
+        .map-expand-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 800;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            color: #374151;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .map-expand-btn:active { transform: scale(0.92); }
+        .map-is-fullscreen .map-expand-btn { color: var(--blue); }
         .map-caption {
             text-align: center;
             font-size: 12px;
@@ -2534,11 +2567,15 @@ HTML_TEMPLATE = """
                 <span id="gpsAlertText">WARNING!</span>
             </div>
 
-            <div class="map-hero-section">
+            <div class="map-hero-section" id="mapHeroSection">
                 <div id="map"></div>
 
                 <button class="map-gps-fab" onclick="startGPSGuardian()" id="gpsBtn" title="GPS Guardian">
                     <i class="fa-solid fa-satellite-dish"></i>
+                </button>
+
+                <button class="map-expand-btn" onclick="toggleMapFullscreen()" id="mapExpandBtn" title="Fullscreen map">
+                    <i class="fa-solid fa-expand" id="mapExpandIcon"></i>
                 </button>
 
                 <div id="mapLoadStatus" class="map-load-status"></div>
@@ -3067,6 +3104,15 @@ HTML_TEMPLATE = """
             );
         }
 
+        function toggleMapFullscreen() {
+            var section = document.getElementById('mapHeroSection');
+            var icon = document.getElementById('mapExpandIcon');
+            var isFs = section.classList.toggle('map-is-fullscreen');
+            icon.className = isFs ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+            document.body.style.overflow = isFs ? 'hidden' : '';
+            if (mapInstance) { setTimeout(function() { mapInstance.invalidateSize(); }, 80); }
+        }
+
         function showParkingDetail(key, el) {
             var db = {
                 'queen_west':    { name: 'Queen St W (Spadina–Bathurst)', rate: '$3.00 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: '3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'Side streets off Queen W often have free 1-hr spots in evenings.' },
@@ -3481,9 +3527,13 @@ HTML_TEMPLATE = """
                         style: function(feature) {
                             var p = feature.properties || {};
                             var type = (p.INFRA_HIGHORDER || '').toLowerCase();
-                            var color = (type.indexOf('protect') >= 0) ? '#059669' :
-                                        (type.indexOf('trail') >= 0 || type.indexOf('path') >= 0) ? '#7c3aed' : '#2563eb';
-                            return { color: color, weight: 2.5, opacity: 0.9 };
+                            if (type.indexOf('protect') >= 0) {
+                                return { color: '#16a34a', weight: 5, opacity: 0.85, dashArray: null };
+                            } else if (type.indexOf('trail') >= 0 || type.indexOf('path') >= 0) {
+                                return { color: '#d97706', weight: 3, opacity: 0.8, dashArray: '4 6' };
+                            } else {
+                                return { color: '#2563eb', weight: 3, opacity: 0.8, dashArray: '10 6' };
+                            }
                         },
                         onEachFeature: function(feature, layer) {
                             var p = feature.properties || {};
@@ -3522,10 +3572,20 @@ HTML_TEMPLATE = """
             ];
             var group = L.layerGroup();
             routes.forEach(function(route) {
-                var color = (route.type.toLowerCase().indexOf('protect') >= 0) ? '#059669' :
-                            (route.type.toLowerCase().indexOf('trail') >= 0) ? '#7c3aed' : '#2563eb';
-                L.polyline(route.coords, { color: color, weight: 3, opacity: 0.9 })
-                 .bindPopup('<b>\U0001F6B2 ' + route.name + '</b><br><span style="color:#059669;font-weight:600;">' + route.type + '</span><br><span style="color:#dc2626;font-weight:600">$200 Fine Zone</span>')
+                var t = route.type.toLowerCase();
+                var style;
+                if (t.indexOf('protect') >= 0) {
+                    style = { color: '#16a34a', weight: 5, opacity: 0.85, dashArray: null };
+                } else if (t.indexOf('trail') >= 0 || t.indexOf('path') >= 0) {
+                    style = { color: '#d97706', weight: 3, opacity: 0.80, dashArray: '4 6' };
+                } else {
+                    style = { color: '#2563eb', weight: 3, opacity: 0.80, dashArray: '10 6' };
+                }
+                var typeLabel = route.type === 'Protected Bike Lane' ? '<span style="background:#dcfce7;color:#15803d;padding:1px 6px;border-radius:6px;font-size:11px;font-weight:600;">PROTECTED</span>' :
+                                route.type === 'Multi-use Trail'     ? '<span style="background:#fef3c7;color:#b45309;padding:1px 6px;border-radius:6px;font-size:11px;font-weight:600;">TRAIL</span>' :
+                                                                       '<span style="background:#dbeafe;color:#1d4ed8;padding:1px 6px;border-radius:6px;font-size:11px;font-weight:600;">BIKE LANE</span>';
+                L.polyline(route.coords, style)
+                 .bindPopup('<b style="font-size:13px;">' + route.name + '</b><br>' + typeLabel + '<br><span style="color:#dc2626;font-weight:600;font-size:12px;">$200 Fine — No Stopping</span>')
                  .addTo(group);
             });
             return group;
@@ -3535,21 +3595,32 @@ HTML_TEMPLATE = """
             hydrantGroup = L.layerGroup();
             var hydrantIcon = L.divIcon({
                 className: '',
-                html: '<div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;border:2px solid #92400e;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>',
-                iconSize: [10, 10],
-                iconAnchor: [5, 5]
+                html: '<div style="width:14px;height:14px;border-radius:3px;background:#dc2626;border:2px solid #fff;box-shadow:0 1px 5px rgba(220,38,38,0.55);display:flex;align-items:center;justify-content:center;"><div style="width:4px;height:4px;border-radius:50%;background:#fff;opacity:0.85;"></div></div>',
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
             });
-            var step = 0.0030;
-            var latS = 43.637, latE = 43.678, lngS = -79.423, lngE = -79.351;
-            for (var lat = latS; lat < latE; lat += step) {
-                for (var lng = lngS; lng < lngE; lng += step * 1.4) {
-                    var rLat = lat + (Math.random() - 0.5) * step * 0.5;
-                    var rLng = lng + (Math.random() - 0.5) * step * 0.5;
-                    L.marker([rLat, rLng], { icon: hydrantIcon })
-                     .bindPopup('<b style="color:#92400e;">Fire Hydrant</b><br><span style="color:#6b7280;font-size:12px;">3 m no-parking clearance required</span><br><span style="color:#dc2626;font-weight:700;font-size:13px;">$100 Fine</span>')
-                     .addTo(hydrantGroup);
-                }
-            }
+            var corners = [
+                [43.6655,-79.4165],[43.6655,-79.4000],[43.6655,-79.3830],[43.6655,-79.3660],
+                [43.6615,-79.4050],[43.6615,-79.3880],[43.6615,-79.3720],[43.6615,-79.3560],
+                [43.6570,-79.4100],[43.6570,-79.3940],[43.6570,-79.3780],[43.6570,-79.3620],
+                [43.6530,-79.4080],[43.6530,-79.3920],[43.6530,-79.3760],[43.6530,-79.3600],
+                [43.6485,-79.4050],[43.6485,-79.3890],[43.6485,-79.3730],[43.6485,-79.3580],
+                [43.6450,-79.4090],[43.6450,-79.3930],[43.6450,-79.3770],[43.6450,-79.3620],
+                [43.6420,-79.4000],[43.6420,-79.3850],[43.6420,-79.3700],[43.6420,-79.3550],
+                [43.6390,-79.4090],[43.6390,-79.3940],[43.6390,-79.3780],[43.6390,-79.3630],
+                [43.6360,-79.4080],[43.6360,-79.3920],[43.6360,-79.3760],[43.6360,-79.3600],
+                [43.6700,-79.4020],[43.6700,-79.3860],[43.6700,-79.3700],[43.6700,-79.3540],
+                [43.6740,-79.4080],[43.6740,-79.3920],[43.6740,-79.3760],
+                [43.6540,-79.3885],[43.6540,-79.3730],[43.6540,-79.3580],
+                [43.6600,-79.3890],[43.6600,-79.3740],[43.6600,-79.3590]
+            ];
+            corners.forEach(function(c) {
+                var rLat = c[0] + (Math.random() - 0.5) * 0.0008;
+                var rLng = c[1] + (Math.random() - 0.5) * 0.0008;
+                L.marker([rLat, rLng], { icon: hydrantIcon })
+                 .bindPopup('<b style="color:#dc2626;">Fire Hydrant</b><br><span style="color:#6b7280;font-size:12px;">3 m no-parking clearance<br>on both sides required</span><br><span style="color:#dc2626;font-weight:700;font-size:13px;">$100 Fine</span>')
+                 .addTo(hydrantGroup);
+            });
             if (hydrantLayerOn) hydrantGroup.addTo(mapInstance);
         }
 
