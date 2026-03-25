@@ -1779,6 +1779,42 @@ HTML_TEMPLATE = """
         }
         .gps-alert.show { display: block; }
         .gps-alert i { font-size: 24px; display: block; margin-bottom: 6px; }
+        .gps-guardian-section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .gps-guardian-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .gps-guardian-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(10,132,255,0.10);
+            color: var(--blue);
+            font-size: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .gps-guardian-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .gps-guardian-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
 
         .btn-gps {
             display: flex;
@@ -2567,12 +2603,21 @@ HTML_TEMPLATE = """
                 <span id="gpsAlertText">WARNING!</span>
             </div>
 
+            <div class="gps-guardian-section">
+                <div class="gps-guardian-info">
+                    <div class="gps-guardian-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                    <div>
+                        <div class="gps-guardian-title">GPS Guardian</div>
+                        <div class="gps-guardian-desc">Tracks your real-time location and alerts you before you accidentally park in a restricted zone or too close to a fire hydrant — helping you avoid fines before they happen.</div>
+                    </div>
+                </div>
+                <button class="btn-gps" onclick="startGPSGuardian()" id="gpsBtn">
+                    <i class="fa-solid fa-satellite-dish"></i> Enable GPS Guardian
+                </button>
+            </div>
+
             <div class="map-hero-section" id="mapHeroSection">
                 <div id="map"></div>
-
-                <button class="map-gps-fab" onclick="startGPSGuardian()" id="gpsBtn" title="GPS Guardian">
-                    <i class="fa-solid fa-satellite-dish"></i>
-                </button>
 
                 <button class="map-expand-btn" onclick="toggleMapFullscreen()" id="mapExpandBtn" title="Fullscreen map">
                     <i class="fa-solid fa-expand" id="mapExpandIcon"></i>
@@ -2587,12 +2632,6 @@ HTML_TEMPLATE = """
                         </button>
                         <button class="layer-toggle active" id="toggleEV" onclick="toggleLayer('ev')" style="color:#8b5cf6;">
                             <span class="toggle-dot" style="background:#8b5cf6;"></span> EV Charging
-                        </button>
-                        <button class="layer-toggle active" id="toggleBike" onclick="toggleLayer('bike')" style="color:#10b981;">
-                            <span class="toggle-dot" style="background:#10b981;"></span> Bike Lanes
-                        </button>
-                        <button class="layer-toggle active" id="toggleHydrant" onclick="toggleLayer('hydrant')" style="color:#f59e0b;">
-                            <span class="toggle-dot" style="background:#f59e0b;"></span> Hydrants
                         </button>
                         <button class="layer-toggle active" id="toggleHeat" onclick="toggleLayer('heat')" style="color:#ef4444;">
                             <span class="toggle-dot" style="background:#ef4444;"></span> Hotspots
@@ -2913,8 +2952,6 @@ HTML_TEMPLATE = """
         var heatLayerRef = null;
         var evGroup = null;
         var parkingGroup = null;
-        var bikeLayerOn = true;
-        var hydrantLayerOn = true;
         var heatLayerOn = true;
         var evLayerOn = true;
         var parkingLayerOn = true;
@@ -2956,8 +2993,6 @@ HTML_TEMPLATE = """
                 gradient: { 0.2: '#bfdbfe', 0.4: '#93c5fd', 0.6: '#fde68a', 0.8: '#fb923c', 1.0: '#ef4444' }
             }).addTo(mapInstance);
 
-            loadBikeLanesLayer();
-            loadHydrantsLayer();
             loadEVStationsLayer();
             loadParkingLayer();
 
@@ -3036,9 +3071,8 @@ HTML_TEMPLATE = """
             if (gpsWatchId !== null) {
                 navigator.geolocation.clearWatch(gpsWatchId);
                 gpsWatchId = null;
-                btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i>';
+                btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Enable GPS Guardian';
                 btn.classList.remove('active-gps');
-                btn.title = 'Start GPS Guardian';
                 document.getElementById('gpsAlertBanner').classList.remove('show');
                 if (userMarker) { mapInstance.removeLayer(userMarker); userMarker = null; }
                 showToast('GPS Guardian stopped');
@@ -3051,13 +3085,12 @@ HTML_TEMPLATE = """
             }
 
             initMap();
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating\u2026';
             btn.classList.add('active-gps');
-            btn.title = 'Guardian Active — tap to stop';
 
             gpsWatchId = navigator.geolocation.watchPosition(
                 function(position) {
-                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i>';
+                    btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Guardian Active \u2014 Tap to Stop';
 
                     var lat = position.coords.latitude;
                     var lng = position.coords.longitude;
@@ -3094,7 +3127,7 @@ HTML_TEMPLATE = """
                 },
                 function(error) {
                     showToast('Location access denied. Please enable Location Services.');
-                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i>';
+                    btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Enable GPS Guardian';
                     btn.classList.remove('active-gps');
                     document.getElementById('gpsAlertBanner').classList.remove('show');
                     if (userMarker) { mapInstance.removeLayer(userMarker); userMarker = null; }
@@ -3736,21 +3769,7 @@ HTML_TEMPLATE = """
         }
 
         function toggleLayer(type) {
-            if (type === 'bike') {
-                bikeLayerOn = !bikeLayerOn;
-                if (bikeGeoLayer) {
-                    if (bikeLayerOn) bikeGeoLayer.addTo(mapInstance);
-                    else mapInstance.removeLayer(bikeGeoLayer);
-                }
-                document.getElementById('toggleBike').classList.toggle('active', bikeLayerOn);
-            } else if (type === 'hydrant') {
-                hydrantLayerOn = !hydrantLayerOn;
-                if (hydrantGroup) {
-                    if (hydrantLayerOn) hydrantGroup.addTo(mapInstance);
-                    else mapInstance.removeLayer(hydrantGroup);
-                }
-                document.getElementById('toggleHydrant').classList.toggle('active', hydrantLayerOn);
-            } else if (type === 'heat') {
+            if (type === 'heat') {
                 heatLayerOn = !heatLayerOn;
                 if (heatLayerRef) {
                     if (heatLayerOn) heatLayerRef.addTo(mapInstance);
