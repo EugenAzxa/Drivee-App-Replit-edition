@@ -1714,6 +1714,73 @@ HTML_TEMPLATE = """
             transition: opacity 0.15s;
         }
         .report-pin-btn:active { opacity: 0.8; }
+        /* Photo upload */
+        .report-photo-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0 6px;
+        }
+        .report-photo-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 9px;
+            border: 1.5px dashed rgba(10,132,255,0.4);
+            background: rgba(10,132,255,0.06);
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .report-photo-btn:active { opacity: 0.75; }
+        .report-photo-btn.has-photo {
+            border-style: solid;
+            background: rgba(10,132,255,0.10);
+        }
+        .report-photo-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+        .report-photo-status.analyzing { color: var(--blue); }
+        .report-photo-status.done { color: var(--green); }
+        .report-photo-preview {
+            position: relative;
+            display: none;
+            margin-bottom: 10px;
+        }
+        .report-photo-preview img {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1.5px solid rgba(0,0,0,0.08);
+        }
+        .report-photo-remove {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        /* Popup photo */
+        .report-popup-photo {
+            width: 100%;
+            max-width: 220px;
+            border-radius: 8px;
+            margin-top: 7px;
+            display: block;
+        }
         /* Avatar markers on map */
         .report-avatar {
             display: flex;
@@ -2670,6 +2737,21 @@ HTML_TEMPLATE = """
                         <span id="reportPanelTitle">AI Email Draft</span>
                     </div>
                     <input type="text" id="reporterName" class="report-name-input" placeholder="Your name (shown on map pin)">
+
+                    <input type="file" id="reportPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="onReportPhotoSelected(this)">
+                    <div class="report-photo-row">
+                        <button class="report-photo-btn" id="reportPhotoBtnLabel" type="button" onclick="document.getElementById('reportPhotoInput').click()">
+                            <i class="fa-solid fa-camera"></i> Add Photo
+                        </button>
+                        <span class="report-photo-status" id="reportPhotoStatus"></span>
+                    </div>
+                    <div class="report-photo-preview" id="reportPhotoPreview">
+                        <img id="reportPhotoThumb" src="" alt="Issue photo">
+                        <button class="report-photo-remove" onclick="clearReportPhoto()" title="Remove photo">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
                     <div class="report-ai-label"><i class="fa-solid fa-wand-magic-sparkles"></i> AI-drafted — edit freely before sending</div>
                     <textarea id="reportEmailBody" class="report-email-textarea"></textarea>
                     <div class="report-email-actions" id="reportEmailButtons"></div>
@@ -2684,6 +2766,7 @@ HTML_TEMPLATE = """
                     <input type="hidden" name="lng" id="lngInput">
                     <input type="hidden" name="reporter_name" id="reporterNameInput">
                     <input type="hidden" name="reporter_color" id="reporterColorInput">
+                    <input type="hidden" name="photo_data" id="photoDataInput">
                 </form>
             </div>
         </div>
@@ -3015,8 +3098,9 @@ HTML_TEMPLATE = """
                     iconSize: [32, 32],
                     iconAnchor: [16, 16]
                 });
+                var photoHtml = report.photo ? '<img src="' + report.photo + '" class="report-popup-photo">' : '';
                 var marker = L.marker([report.lat, report.lng], {icon: avIcon}).addTo(mapInstance);
-                marker.bindPopup('<b>' + name + '</b><br>' + report.type + '<br><span style="color:#8E8E93;font-size:12px;">' + report.status + '</span>');
+                marker.bindPopup('<b>' + name + '</b><br>' + report.type + '<br><span style="color:#8E8E93;font-size:12px;">' + report.status + '</span>' + photoHtml);
             });
         }
 
@@ -3390,11 +3474,15 @@ HTML_TEMPLATE = """
         var currentReportLng = null;
         var reportAvatarColors = ['#0A84FF','#30D158','#BF5AF2','#FF453A','#FFD60A','#FF9F0A','#5E5CE6'];
 
+        var reportPhotoBase64 = '';
+        var reportPhotoDescription = '';
+
         function openReportPanel(issueType) {
             currentReportType = issueType;
             document.getElementById('reportPanelTitle').textContent = issueType + ' — AI Email Draft';
             var savedName = localStorage.getItem('drivee_name') || '';
             document.getElementById('reporterName').value = savedName;
+            clearReportPhoto();
             buildEmailButtons(issueType);
             var panel = document.getElementById('reportEmailPanel');
             panel.classList.add('show');
@@ -3453,6 +3541,13 @@ HTML_TEMPLATE = """
                 'I am writing to report a ' + issueType + ' at ' + location + ', observed on ' + today + '.',
                 'Please arrange for inspection at your earliest convenience.'
             );
+            if (reportPhotoDescription) {
+                var photoNote = nl + 'Photo evidence: ' + reportPhotoDescription;
+                var lines = emailText.split(nl);
+                var insertAt = lines.length - 4;
+                lines.splice(insertAt < 0 ? 0 : insertAt, 0, photoNote);
+                emailText = lines.join(nl);
+            }
             document.getElementById('reportEmailBody').value = emailText;
         }
 
@@ -3481,6 +3576,79 @@ HTML_TEMPLATE = """
             }
         }
 
+        function clearReportPhoto() {
+            reportPhotoBase64 = '';
+            reportPhotoDescription = '';
+            document.getElementById('reportPhotoInput').value = '';
+            document.getElementById('reportPhotoThumb').src = '';
+            document.getElementById('reportPhotoPreview').style.display = 'none';
+            var btn = document.getElementById('reportPhotoBtnLabel');
+            btn.classList.remove('has-photo');
+            btn.innerHTML = '<i class="fa-solid fa-camera"></i> Add Photo';
+            var st = document.getElementById('reportPhotoStatus');
+            st.textContent = '';
+            st.className = 'report-photo-status';
+        }
+
+        function onReportPhotoSelected(input) {
+            var file = input.files && input.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var MAX = 640;
+                    var w = img.width, h = img.height;
+                    if (w > MAX || h > MAX) {
+                        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                        else { w = Math.round(w * MAX / h); h = MAX; }
+                    }
+                    var canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    var dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                    reportPhotoBase64 = dataUrl.split(',')[1];
+                    document.getElementById('reportPhotoThumb').src = dataUrl;
+                    document.getElementById('reportPhotoPreview').style.display = 'block';
+                    var btn = document.getElementById('reportPhotoBtnLabel');
+                    btn.classList.add('has-photo');
+                    btn.innerHTML = '<i class="fa-solid fa-camera-rotate"></i> Change Photo';
+                    analyzeReportPhoto(reportPhotoBase64);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function analyzeReportPhoto(base64) {
+            if (!base64 || !currentReportType) return;
+            var st = document.getElementById('reportPhotoStatus');
+            st.textContent = 'AI analyzing photo\u2026';
+            st.className = 'report-photo-status analyzing';
+            fetch('/api/analyze-photo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ photo: base64, issue_type: currentReportType })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.description) {
+                    reportPhotoDescription = data.description;
+                    st.textContent = 'Photo analyzed \u2714';
+                    st.className = 'report-photo-status done';
+                    var loc = currentReportLat ? currentReportLat.toFixed(5) + ', ' + currentReportLng.toFixed(5) : 'Toronto';
+                    generateReportEmail(currentReportType, loc);
+                } else {
+                    st.textContent = '';
+                    st.className = 'report-photo-status';
+                }
+            })
+            .catch(function() {
+                st.textContent = 'Could not analyze photo';
+                st.className = 'report-photo-status';
+            });
+        }
+
         function sendReportEmail(toEmail) {
             var nl = String.fromCharCode(10);
             var body = document.getElementById('reportEmailBody').value;
@@ -3496,12 +3664,14 @@ HTML_TEMPLATE = """
             var color = reportAvatarColors[(name.charCodeAt(0) || 65) % reportAvatarColors.length];
             var doSubmit = function(lat, lng) {
                 initMap();
-                addAvatarMarkerToMap(lat, lng, name, color, currentReportType);
+                var photoDataUrl = reportPhotoBase64 ? 'data:image/jpeg;base64,' + reportPhotoBase64 : '';
+                addAvatarMarkerToMap(lat, lng, name, color, currentReportType, photoDataUrl);
                 document.getElementById('issueTypeInput').value = currentReportType;
                 document.getElementById('latInput').value = lat;
                 document.getElementById('lngInput').value = lng;
                 document.getElementById('reporterNameInput').value = name;
                 document.getElementById('reporterColorInput').value = color;
+                document.getElementById('photoDataInput').value = reportPhotoBase64 ? 'data:image/jpeg;base64,' + reportPhotoBase64 : '';
                 document.getElementById('reportForm').submit();
             };
             if (currentReportLat && currentReportLng) {
@@ -3515,7 +3685,7 @@ HTML_TEMPLATE = """
             }
         }
 
-        function addAvatarMarkerToMap(lat, lng, name, color, issueType) {
+        function addAvatarMarkerToMap(lat, lng, name, color, issueType, photoDataUrl) {
             var initials = name.split(' ').filter(function(w){return w.length>0;}).map(function(w){return w[0].toUpperCase();}).join('').slice(0,2) || '?';
             var avIcon = L.divIcon({
                 className: '',
@@ -3523,8 +3693,9 @@ HTML_TEMPLATE = """
                 iconSize: [32, 32],
                 iconAnchor: [16, 16]
             });
+            var photoHtml = photoDataUrl ? '<img src="' + photoDataUrl + '" class="report-popup-photo">' : '';
             var marker = L.marker([lat, lng], {icon: avIcon}).addTo(mapInstance);
-            marker.bindPopup('<b>' + name + '</b><br>' + issueType + '<br><span style="color:#8E8E93;font-size:12px;">Just now</span>');
+            marker.bindPopup('<b>' + name + '</b><br>' + issueType + '<br><span style="color:#8E8E93;font-size:12px;">Just now</span>' + photoHtml);
         }
 
         function switchTab(tab, btn) {
@@ -4231,19 +4402,50 @@ def handle_311_report():
     lng = request.form.get('lng')
     reporter_name = (request.form.get('reporter_name', '') or 'Anonymous').strip()
     reporter_color = (request.form.get('reporter_color', '') or '#0A84FF').strip()
+    photo_data = request.form.get('photo_data', '').strip()
     if issue_type and lat and lng:
         try:
-            reports_data.append({
+            entry = {
                 "type": issue_type,
                 "lat": float(lat),
                 "lng": float(lng),
                 "status": "Community Report",
                 "name": reporter_name,
                 "color": reporter_color
-            })
+            }
+            if photo_data:
+                entry["photo"] = photo_data
+            reports_data.append(entry)
         except (ValueError, TypeError):
             pass
     return redirect('/?reported=1')
+
+@app.route('/api/analyze-photo', methods=['POST'])
+def analyze_photo():
+    try:
+        data = request.get_json(force=True) or {}
+        photo_b64 = data.get('photo', '')
+        issue_type = data.get('issue_type', 'street issue')
+        if not photo_b64:
+            return jsonify({'description': ''}), 400
+        response = _openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "This is a photo of a " + issue_type + " reported on a Toronto street. In 1-2 concise sentences, describe what you see in a way useful for a 311 report to the City of Toronto. Be specific about visible damage, obstruction, or hazard."},
+                    {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + photo_b64}}
+                ]
+            }],
+            max_completion_tokens=120
+        )
+        description = response.choices[0].message.content or ""
+        return jsonify({'description': description})
+    except Exception as e:
+        err = str(e)
+        if "FREE_CLOUD_BUDGET_EXCEEDED" in err:
+            return jsonify({'error': 'Budget exceeded'}), 429
+        return jsonify({'description': '', 'error': 'Photo analysis unavailable'}), 500
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
