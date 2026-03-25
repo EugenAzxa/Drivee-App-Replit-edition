@@ -3,6 +3,14 @@ from datetime import datetime, timedelta
 from urllib.parse import quote
 import os
 import json
+from openai import OpenAI
+
+# the newest OpenAI model is "gpt-5" which was released August 7, 2025.
+# do not change this unless explicitly requested by the user
+_openai_client = OpenAI(
+    api_key=os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY"),
+    base_url=os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL")
+)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SESSION_SECRET', 'dev-secret-key')
@@ -1614,6 +1622,261 @@ HTML_TEMPLATE = """
             .card { padding: 16px; }
             #map { height: 300px; }
         }
+
+        /* ── AI Chat Panel ── */
+        .chat-fab {
+            position: fixed;
+            bottom: calc(var(--safe-bottom) + 90px);
+            right: 18px;
+            z-index: 110;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 18px rgba(10,132,255,0.45);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .chat-fab:active { transform: scale(0.93); }
+        .chat-fab .chat-fab-dot {
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            width: 13px;
+            height: 13px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-fab .chat-fab-dot::after {
+            content: '';
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+        }
+        .chat-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(2px);
+        }
+        .chat-overlay.open { display: block; }
+        .chat-panel {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            z-index: 160;
+            width: min(460px, 100vw);
+            height: 75vh;
+            max-height: 620px;
+            background: #fff;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.38s cubic-bezier(0.22,1,0.36,1);
+            overflow: hidden;
+        }
+        .chat-panel.open {
+            transform: translateX(-50%) translateY(0);
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .chat-header-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--blue-subtle);
+            color: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .chat-header-text { flex: 1; min-width: 0; }
+        .chat-header-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+        .chat-header-sub {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 1px;
+        }
+        .chat-close {
+            background: var(--bg-elevated);
+            border: none;
+            color: var(--text-secondary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 16px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scroll-behavior: smooth;
+        }
+        .chat-msg {
+            display: flex;
+            gap: 8px;
+            animation: slideUp 0.2s ease;
+        }
+        .chat-msg.user { flex-direction: row-reverse; }
+        .chat-msg-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .chat-msg.bot .chat-msg-avatar { background: var(--blue-subtle); color: var(--blue); }
+        .chat-msg.user .chat-msg-avatar { background: var(--bg-elevated); color: var(--text-secondary); }
+        .chat-msg-bubble {
+            max-width: 82%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .chat-msg.bot .chat-msg-bubble {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+        .chat-msg.user .chat-msg-bubble {
+            background: var(--blue);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-typing {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 14px;
+            background: var(--bg-elevated);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            width: fit-content;
+        }
+        .chat-typing.show { display: flex; }
+        .chat-typing span {
+            width: 6px;
+            height: 6px;
+            background: var(--text-tertiary);
+            border-radius: 50%;
+            animation: typingBounce 1.2s infinite;
+        }
+        .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        .chat-suggestions {
+            display: flex;
+            gap: 6px;
+            padding: 0 16px 8px;
+            overflow-x: auto;
+            flex-shrink: 0;
+            scrollbar-width: none;
+        }
+        .chat-suggestions::-webkit-scrollbar { display: none; }
+        .chat-suggestion {
+            white-space: nowrap;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .chat-suggestion:hover, .chat-suggestion:active {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--blue-subtle);
+        }
+        .chat-input-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 12px 16px calc(var(--safe-bottom) + 14px);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--bg-elevated);
+            border: 1.5px solid var(--border);
+            border-radius: 22px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: var(--font);
+            outline: none;
+            resize: none;
+            max-height: 100px;
+            min-height: 40px;
+            line-height: 1.4;
+            transition: border-color 0.2s;
+        }
+        .chat-input:focus { border-color: var(--blue); }
+        .chat-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .chat-send:disabled { opacity: 0.45; cursor: not-allowed; }
+        .chat-send:not(:disabled):active { transform: scale(0.93); }
     </style>
 </head>
 <body>
@@ -2304,6 +2567,54 @@ HTML_TEMPLATE = """
             </a>
         </div>
     </nav>
+
+    <!-- AI Chat FAB -->
+    <button class="chat-fab" onclick="toggleChat()" title="Ask Drivee AI">
+        <i class="fa-solid fa-robot"></i>
+        <div class="chat-fab-dot"></div>
+    </button>
+
+    <!-- AI Chat Overlay -->
+    <div class="chat-overlay" id="chatOverlay" onclick="toggleChat()"></div>
+
+    <!-- AI Chat Panel -->
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+            <div class="chat-header-icon"><i class="fa-solid fa-robot"></i></div>
+            <div class="chat-header-text">
+                <div class="chat-header-title">Drivee AI</div>
+                <div class="chat-header-sub">Powered by ChatGPT &bull; Toronto traffic specialist</div>
+            </div>
+            <button class="chat-close" onclick="toggleChat()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot">
+                <div class="chat-msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="chat-msg-bubble">Hi! I am Drivee AI. Ask me anything about Toronto parking tickets, fines, disputes, or traffic law. How can I help you today?</div>
+            </div>
+            <div class="chat-msg bot" id="chatTypingRow" style="display:none;">
+                <div class="chat-msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="chat-typing show" id="chatTyping">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+        <div class="chat-suggestions" id="chatSuggestions">
+            <button class="chat-suggestion" onclick="sendSuggestion(this)">How do I dispute a parking ticket?</button>
+            <button class="chat-suggestion" onclick="sendSuggestion(this)">What happens if I miss the deadline?</button>
+            <button class="chat-suggestion" onclick="sendSuggestion(this)">Do I need a lawyer for stunt driving?</button>
+            <button class="chat-suggestion" onclick="sendSuggestion(this)">How much are late fees in Toronto?</button>
+            <button class="chat-suggestion" onclick="sendSuggestion(this)">Can I contest a red light camera fine?</button>
+        </div>
+        <div class="chat-input-row">
+            <textarea class="chat-input" id="chatInput" placeholder="Ask about tickets, fines, disputes..." rows="1"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"
+                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+            <button class="chat-send" id="chatSendBtn" onclick="sendChat()">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
@@ -3193,6 +3504,90 @@ HTML_TEMPLATE = """
         if (params.has('saved') || params.has('deleted') || params.has('reported')) {
             history.replaceState(null, '', '/');
         }
+
+        // ── Drivee AI Chat ──
+        var chatOpen = false;
+        var chatHistory = [];
+        var chatBusy = false;
+
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            document.getElementById('chatPanel').classList.toggle('open', chatOpen);
+            document.getElementById('chatOverlay').classList.toggle('open', chatOpen);
+            if (chatOpen) {
+                setTimeout(function() {
+                    document.getElementById('chatInput').focus();
+                }, 380);
+            }
+        }
+
+        function sendSuggestion(btn) {
+            var text = btn.textContent.trim();
+            document.getElementById('chatSuggestions').style.display = 'none';
+            sendChatMessage(text);
+        }
+
+        function sendChat() {
+            var input = document.getElementById('chatInput');
+            var text = input.value.trim();
+            if (!text || chatBusy) return;
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('chatSuggestions').style.display = 'none';
+            sendChatMessage(text);
+        }
+
+        function appendChatMsg(role, text) {
+            var msgs = document.getElementById('chatMessages');
+            var typingRow = document.getElementById('chatTypingRow');
+            var div = document.createElement('div');
+            div.className = 'chat-msg ' + role;
+            var icon = role === 'bot' ? 'fa-robot' : 'fa-user';
+            div.innerHTML = '<div class="chat-msg-avatar"><i class="fa-solid ' + icon + '"></i></div>'
+                + '<div class="chat-msg-bubble">' + text.replace(/\\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') + '</div>';
+            msgs.insertBefore(div, typingRow);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function sendChatMessage(text) {
+            if (chatBusy) return;
+            chatBusy = true;
+            appendChatMsg('user', text);
+            chatHistory.push({ role: 'user', content: text });
+
+            var typingRow = document.getElementById('chatTypingRow');
+            typingRow.style.display = 'flex';
+            var msgs = document.getElementById('chatMessages');
+            msgs.scrollTop = msgs.scrollHeight;
+
+            var sendBtn = document.getElementById('chatSendBtn');
+            sendBtn.disabled = true;
+
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: chatHistory })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                typingRow.style.display = 'none';
+                if (data.reply) {
+                    appendChatMsg('bot', data.reply);
+                    chatHistory.push({ role: 'assistant', content: data.reply });
+                } else {
+                    appendChatMsg('bot', data.error || 'Sorry, something went wrong. Please try again.');
+                }
+            })
+            .catch(function() {
+                typingRow.style.display = 'none';
+                appendChatMsg('bot', 'Connection error. Please check your internet and try again.');
+            })
+            .finally(function() {
+                chatBusy = false;
+                sendBtn.disabled = false;
+                msgs.scrollTop = msgs.scrollHeight;
+            });
+        }
     </script>
 </body>
 </html>
@@ -3360,6 +3755,42 @@ def handle_311_report():
         except (ValueError, TypeError):
             pass
     return redirect('/?reported=1')
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    try:
+        data = request.get_json(force=True) or {}
+        messages = data.get('messages', [])
+        if not messages:
+            return jsonify({'error': 'No messages'}), 400
+
+        system_prompt = (
+            "You are Drivee AI — a friendly, knowledgeable assistant specializing in Toronto "
+            "parking tickets, traffic fines, and driving violations in Ontario, Canada. "
+            "You help users understand their tickets, know their rights, dispute fines, "
+            "find payment options, understand late fees, and decide whether to contest or pay. "
+            "You know Toronto bylaws, the Highway Traffic Act (HTA), POA courts, Green P parking, "
+            "and can recommend when to hire a paralegal or traffic lawyer. "
+            "Keep answers concise, practical, and friendly. When uncertain, say so and suggest "
+            "the user consult a professional. Do not give legal advice for criminal charges."
+        )
+
+        full_messages = [{"role": "system", "content": system_prompt}] + messages
+
+        # the newest OpenAI model is "gpt-5" which was released August 7, 2025.
+        # do not change this unless explicitly requested by the user
+        response = _openai_client.chat.completions.create(
+            model="gpt-5",
+            messages=full_messages,
+            max_completion_tokens=800
+        )
+        reply = response.choices[0].message.content or ""
+        return jsonify({'reply': reply})
+    except Exception as e:
+        err = str(e)
+        if "FREE_CLOUD_BUDGET_EXCEEDED" in err:
+            return jsonify({'error': 'Cloud budget exceeded. Please check your Replit credits.'}), 429
+        return jsonify({'error': 'AI service unavailable. Please try again.'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
