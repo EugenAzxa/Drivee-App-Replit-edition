@@ -596,7 +596,7 @@ HTML_TEMPLATE = """
         }
 
         #map {
-            height: 250px;
+            height: 370px;
             border-radius: var(--radius);
             border: none;
             z-index: 1;
@@ -607,39 +607,6 @@ HTML_TEMPLATE = """
             color: var(--text-tertiary);
             margin-top: 10px;
             line-height: 1.5;
-        }
-        .map-layer-toggles {
-            display: flex;
-            gap: 7px;
-            flex-wrap: wrap;
-            margin: 10px 0 4px;
-        }
-        .layer-toggle {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 11px;
-            border-radius: 20px;
-            border: 1.5px solid var(--bg-elevated);
-            background: var(--bg-elevated);
-            color: var(--text-tertiary);
-            font-size: 12px;
-            font-weight: 600;
-            font-family: var(--font);
-            cursor: pointer;
-            transition: all 0.2s;
-            opacity: 0.55;
-        }
-        .layer-toggle.active {
-            border-color: currentColor;
-            opacity: 1;
-            color: var(--text-primary);
-        }
-        .toggle-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
         }
         .map-load-status {
             display: none;
@@ -672,7 +639,132 @@ HTML_TEMPLATE = """
         .dot-high { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
         .dot-med { background: #84cc16; box-shadow: 0 0 6px rgba(132,204,22,0.4); }
         .dot-low { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
-        .leaflet-container { background: #e8eeff !important; }
+        .leaflet-container { background: #f0f4ff !important; }
+        .map-layer-toggles {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 12px 0 6px;
+        }
+        .layer-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1.5px solid #e5e7eb;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .layer-toggle.active {
+            background: #fff;
+            border-color: currentColor;
+            color: inherit;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .toggle-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        /* Parking neighborhood grid */
+        .parking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .parking-card {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.18s;
+            position: relative;
+            overflow: hidden;
+        }
+        .parking-card:active { transform: scale(0.97); }
+        .parking-card.selected {
+            border-color: var(--blue);
+            background: rgba(10,132,255,0.04);
+            box-shadow: 0 0 0 3px rgba(10,132,255,0.12);
+        }
+        .parking-card-area {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 3px;
+        }
+        .parking-card-rate {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--blue);
+            font-family: var(--font-mono);
+            line-height: 1;
+        }
+        .parking-card-unit {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+        .parking-card-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 5px;
+            line-height: 1.3;
+        }
+        .parking-detail-panel {
+            background: rgba(10,132,255,0.04);
+            border: 1.5px solid rgba(10,132,255,0.15);
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 12px;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+        .parking-detail-panel.show { display: block; }
+        .parking-detail-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .parking-detail-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(10,132,255,0.08);
+            font-size: 13px;
+        }
+        .parking-detail-row:last-child { border-bottom: none; }
+        .parking-detail-label {
+            color: var(--text-tertiary);
+            font-weight: 500;
+            min-width: 60px;
+            flex-shrink: 0;
+        }
+        .parking-detail-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            flex: 1;
+        }
+        .parking-detail-value.warn { color: var(--rose); font-weight: 600; }
+        .parking-detail-value.free { color: #059669; font-weight: 600; }
+        .parking-detail-value.cost { color: var(--blue); font-weight: 700; font-family: var(--font-mono); }
 
         .street-select {
             width: 100%;
@@ -2188,24 +2280,111 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-green card-4">
-                <div class="card-label label-green"><i class="fa-solid fa-square-parking"></i> Street Parking Checker</div>
-                <p class="card-desc">Select a street to see rates, enforcement hours, and free parking times.</p>
-                <select id="streetSelect" class="street-select" onchange="checkStreet()">
-                    <option value="">Choose a Street / Area</option>
-                    <option value="queen_west">Queen St W (Spadina to Bathurst)</option>
-                    <option value="bloor_yorkville">Bloor St W (Yorkville Area)</option>
-                    <option value="kensington">Kensington Market</option>
-                    <option value="front_st">Front St (Near Scotiabank Arena)</option>
-                </select>
-                <div id="rateInfo" class="rate-box">
-                    <div class="rate-row"><span class="rate-row-icon">&#x1F4CD;</span> <span class="rate-row-label">Area</span> <span class="rate-row-value" id="streetName"></span></div>
-                    <div class="rate-row"><span class="rate-row-icon">&#x1F4B0;</span> <span class="rate-row-label">Rate</span> <span class="rate-row-value rate-cost" id="streetRate"></span></div>
-                    <div class="rate-row"><span class="rate-row-icon">&#x23F0;</span> <span class="rate-row-label">Hours</span> <span class="rate-row-value" id="streetHours"></span></div>
-                    <div class="rate-row"><span class="rate-row-icon">&#x1F7E2;</span> <span class="rate-row-label">Free</span> <span class="rate-row-value rate-free" id="streetFree"></span></div>
-                    <div class="rate-row"><span class="rate-row-icon">&#x26A0;</span> <span class="rate-row-label">Rush</span> <span class="rate-row-value rate-warn" id="streetRush"></span></div>
+                <div class="card-label label-green"><i class="fa-solid fa-square-parking"></i> Street Parking Rates</div>
+                <p class="card-desc">Tap any neighbourhood to see the hourly rate, enforcement hours, and tow warnings.</p>
+                <div class="parking-grid" id="parkingGrid">
+                    <div class="parking-card" onclick="showParkingDetail('queen_west', this)">
+                        <div class="parking-card-area">Downtown</div>
+                        <div class="parking-card-rate">$3.00</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Queen St W</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('bloor_yorkville', this)">
+                        <div class="parking-card-area">Yorkville</div>
+                        <div class="parking-card-rate">$4.00</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Bloor St W</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('kensington', this)">
+                        <div class="parking-card-area">West End</div>
+                        <div class="parking-card-rate">$2.25</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Kensington Market</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('front_st', this)">
+                        <div class="parking-card-area">Entertainment</div>
+                        <div class="parking-card-rate">$5.00</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Front St (Arena)</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('king_west', this)">
+                        <div class="parking-card-area">King West</div>
+                        <div class="parking-card-rate">$3.50</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">King St W</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('financial', this)">
+                        <div class="parking-card-area">Financial</div>
+                        <div class="parking-card-rate">$4.50</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Bay St / King St E</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('chinatown', this)">
+                        <div class="parking-card-area">Chinatown</div>
+                        <div class="parking-card-rate">$2.50</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Spadina / Dundas</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('annex', this)">
+                        <div class="parking-card-area">The Annex</div>
+                        <div class="parking-card-rate">$2.00</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Bloor W / Bathurst</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('distillery', this)">
+                        <div class="parking-card-area">Distillery</div>
+                        <div class="parking-card-rate">$4.00</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Distillery District</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('little_italy', this)">
+                        <div class="parking-card-area">Little Italy</div>
+                        <div class="parking-card-rate">$2.25</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">College St W</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('greektown', this)">
+                        <div class="parking-card-area">Greektown</div>
+                        <div class="parking-card-rate">$2.50</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Danforth Ave</div>
+                    </div>
+                    <div class="parking-card" onclick="showParkingDetail('leslieville', this)">
+                        <div class="parking-card-area">Leslieville</div>
+                        <div class="parking-card-rate">$2.00</div>
+                        <div class="parking-card-unit">/ hour</div>
+                        <div class="parking-card-name">Queen St E</div>
+                    </div>
                 </div>
-                <a href="https://apps.apple.com/ca/app/green-p-parking/id983111045" target="_blank" rel="noopener" class="green-p-link">
-                    <i class="fa-solid fa-mobile-screen"></i> OPEN GREEN P
+                <div class="parking-detail-panel" id="parkingDetailPanel">
+                    <div class="parking-detail-title"><i class="fa-solid fa-circle-info" style="color:var(--blue);"></i> <span id="pdName"></span></div>
+                    <div class="parking-detail-row">
+                        <span class="parking-detail-label">Rate</span>
+                        <span class="parking-detail-value cost" id="pdRate"></span>
+                    </div>
+                    <div class="parking-detail-row">
+                        <span class="parking-detail-label">Hours</span>
+                        <span class="parking-detail-value" id="pdHours"></span>
+                    </div>
+                    <div class="parking-detail-row">
+                        <span class="parking-detail-label">Max Stay</span>
+                        <span class="parking-detail-value" id="pdMax"></span>
+                    </div>
+                    <div class="parking-detail-row">
+                        <span class="parking-detail-label">Free After</span>
+                        <span class="parking-detail-value free" id="pdFree"></span>
+                    </div>
+                    <div class="parking-detail-row">
+                        <span class="parking-detail-label">Rush Hour</span>
+                        <span class="parking-detail-value warn" id="pdRush"></span>
+                    </div>
+                    <div class="parking-detail-row">
+                        <span class="parking-detail-label">Tip</span>
+                        <span class="parking-detail-value" id="pdTip" style="color:var(--text-secondary);font-size:12px;"></span>
+                    </div>
+                </div>
+                <a href="https://apps.apple.com/ca/app/green-p-parking/id983111045" target="_blank" rel="noopener" class="green-p-link" style="margin-top:14px;">
+                    <i class="fa-solid fa-mobile-screen"></i> Open Green P App
                 </a>
             </div>
 
@@ -2289,27 +2468,35 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card card-rose card-2">
-                <div class="card-label label-rose"><i class="fa-solid fa-map-location-dot"></i> Live Ticket Hotspots</div>
+                <div class="card-label label-rose"><i class="fa-solid fa-map-location-dot"></i> Toronto City Map</div>
                 <div id="map"></div>
                 <div class="map-layer-toggles">
                     <button class="layer-toggle active" id="toggleHeat" onclick="toggleLayer('heat')" style="color:#ef4444;">
                         <span class="toggle-dot" style="background:#ef4444;"></span> Hotspots
                     </button>
-                    <button class="layer-toggle active" id="toggleBike" onclick="toggleLayer('bike')" style="color:#30D158;">
-                        <span class="toggle-dot" style="background:#30D158;"></span> Bike Lanes
+                    <button class="layer-toggle active" id="toggleBike" onclick="toggleLayer('bike')" style="color:#10b981;">
+                        <span class="toggle-dot" style="background:#10b981;"></span> Bike Lanes
                     </button>
-                    <button class="layer-toggle active" id="toggleHydrant" onclick="toggleLayer('hydrant')" style="color:#FFD60A;">
-                        <span class="toggle-dot" style="background:#FFD60A;"></span> Hydrants
+                    <button class="layer-toggle active" id="toggleHydrant" onclick="toggleLayer('hydrant')" style="color:#f59e0b;">
+                        <span class="toggle-dot" style="background:#f59e0b;"></span> Hydrants
+                    </button>
+                    <button class="layer-toggle active" id="toggleEV" onclick="toggleLayer('ev')" style="color:#8b5cf6;">
+                        <span class="toggle-dot" style="background:#8b5cf6;"></span> EV Charging
+                    </button>
+                    <button class="layer-toggle active" id="toggleParking" onclick="toggleLayer('parking')" style="color:#0A84FF;">
+                        <span class="toggle-dot" style="background:#0A84FF;"></span> Parking
                     </button>
                 </div>
                 <div id="mapLoadStatus" class="map-load-status"></div>
                 <div class="legend">
-                    <div class="legend-item"><span class="legend-dot" style="background:#30D158;box-shadow:0 0 5px rgba(48,209,88,0.5);"></span> Protected lane</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#0A84FF;box-shadow:0 0 5px rgba(10,132,255,0.4);"></span> Bike lane</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#BF5AF2;box-shadow:0 0 5px rgba(191,90,242,0.4);"></span> Trail</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#FFD60A;box-shadow:0 0 5px rgba(255,214,10,0.4);"></span> Hydrant</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Protected lane</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span> Bike lane</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#a78bfa;"></span> Trail</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> Hydrant</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span> EV Station</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#0A84FF;"></span> Parking</div>
                 </div>
-                <p class="map-caption">Real Toronto cycling network from toronto.ca · Tap buttons to toggle layers</p>
+                <p class="map-caption">Toronto Open Data · Tap layer buttons to show/hide · Tap any pin for details</p>
             </div>
 
             <div class="card card-purple card-3">
@@ -2622,19 +2809,24 @@ HTML_TEMPLATE = """
         var bikeGeoLayer = null;
         var hydrantGroup = null;
         var heatLayerRef = null;
+        var evGroup = null;
+        var parkingGroup = null;
         var bikeLayerOn = true;
         var hydrantLayerOn = true;
         var heatLayerOn = true;
+        var evLayerOn = true;
+        var parkingLayerOn = true;
 
         function initMap() {
             if (mapInstance) {
                 mapInstance.invalidateSize();
                 return;
             }
-            mapInstance = L.map('map').setView([43.6532, -79.3832], 13);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap',
-                maxZoom: 18
+            mapInstance = L.map('map', { zoomControl: true }).setView([43.6532, -79.3832], 13);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+                maxZoom: 19,
+                subdomains: 'abcd'
             }).addTo(mapInstance);
 
             var hotspots = [
@@ -2656,14 +2848,16 @@ HTML_TEMPLATE = """
             ];
 
             heatLayerRef = L.heatLayer(hotspots, {
-                radius: 28,
-                blur: 18,
-                maxZoom: 15,
-                gradient: { 0.3: '#3b82f6', 0.5: '#06b6d4', 0.7: '#84cc16', 0.85: '#f59e0b', 1.0: '#ef4444' }
+                radius: 32,
+                blur: 22,
+                maxZoom: 16,
+                gradient: { 0.2: '#bfdbfe', 0.4: '#93c5fd', 0.6: '#fde68a', 0.8: '#fb923c', 1.0: '#ef4444' }
             }).addTo(mapInstance);
 
             loadBikeLanesLayer();
             loadHydrantsLayer();
+            loadEVStationsLayer();
+            loadParkingLayer();
 
             var hazardIcon = L.divIcon({
                 className: 'custom-icon',
@@ -2806,23 +3000,35 @@ HTML_TEMPLATE = """
             );
         }
 
-        function checkStreet() {
-            var street = document.getElementById('streetSelect').value;
-            var rateBox = document.getElementById('rateInfo');
-            if (!street) { rateBox.classList.remove('show'); return; }
-            rateBox.classList.add('show');
+        function showParkingDetail(key, el) {
             var db = {
-                'queen_west': { name: 'Queen St W', rate: '$3.00 / hour', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', free: 'Every day after 9:00 PM', rush: '3:30–6:30 PM (Mon–Fri) — WILL TOW' },
-                'bloor_yorkville': { name: 'Bloor St W (Yorkville)', rate: '$4.00 / hour', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', free: 'Every day after 9:00 PM', rush: '3:30–6:30 PM (Mon–Fri) — WILL TOW' },
-                'kensington': { name: 'Kensington Market', rate: '$2.25 / hour', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', free: 'Every day after 9:00 PM', rush: 'None' },
-                'front_st': { name: 'Front St (Arena Area)', rate: '$5.00 / hour (Event Rates)', hours: 'Mon–Sun 8am–Midnight', free: 'After Midnight', rush: '3:30–6:30 PM (Mon–Fri)' }
+                'queen_west':    { name: 'Queen St W (Spadina–Bathurst)', rate: '$3.00 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: '3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'Side streets off Queen W often have free 1-hr spots in evenings.' },
+                'bloor_yorkville':{ name: 'Bloor St W — Yorkville', rate: '$4.00 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '2 hours', free: 'Daily after 9:00 PM', rush: '3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'Green P on Bellair St is slightly cheaper than curbside.' },
+                'kensington':    { name: 'Kensington Market', rate: '$2.25 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: 'None', tip: 'Augusta Ave has free spots before 9am on weekdays.' },
+                'front_st':      { name: 'Front St (Scotiabank Arena)', rate: '$5.00 / hr (event: $20 flat)', hours: 'Mon–Sun 8am–Midnight', max: '4 hours', free: 'After Midnight', rush: '3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'Green P garages on Bremner Blvd are cheaper on event nights.' },
+                'king_west':     { name: 'King St W', rate: '$3.50 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '2 hours', free: 'Daily after 9:00 PM', rush: '3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'King St is a transit priority corridor — metered spots are limited.' },
+                'financial':     { name: 'Bay St / King St E', rate: '$4.50 / hr', hours: 'Mon–Fri 7am–6pm only', max: '2 hours', free: 'Weekends + after 6 PM weekdays', rush: '7–9 AM & 3:30–6:30 PM Mon–Fri — WILL TOW', tip: 'Most spots disappear to rush-hour restrictions on weekday mornings.' },
+                'chinatown':     { name: 'Spadina Ave / Dundas St W', rate: '$2.50 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: '3:30–6:30 PM Mon–Fri', tip: 'D\'Arcy St has free residential parking for non-permit holders before 9am.' },
+                'annex':         { name: 'Bloor St W / Bathurst Area', rate: '$2.00 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: 'None', tip: 'Residential side streets require area permits; check signs carefully.' },
+                'distillery':    { name: 'Distillery District', rate: '$4.00 / hr', hours: 'Mon–Sun 8am–Midnight', max: '4 hours', free: 'After Midnight', rush: 'None', tip: 'Cherry St Green P lot is ~30% cheaper than surface parking inside.' },
+                'little_italy':  { name: 'College St W (Little Italy)', rate: '$2.25 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: 'None', tip: 'Clinton St south of College has free on-street parking most evenings.' },
+                'greektown':     { name: 'Danforth Ave (Greektown)', rate: '$2.50 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: 'None', tip: 'Side streets like Gough Ave have free 3-hr parking with no permit needed.' },
+                'leslieville':   { name: 'Queen St E (Leslieville)', rate: '$2.00 / hr', hours: 'Mon–Sat 8am–9pm, Sun 1pm–9pm', max: '3 hours', free: 'Daily after 9:00 PM', rush: 'None', tip: 'Broadview Ave has free 2-hour parking on the east side in the evenings.' }
             };
-            var d = db[street];
-            document.getElementById('streetName').textContent = d.name;
-            document.getElementById('streetRate').textContent = d.rate;
-            document.getElementById('streetHours').textContent = d.hours;
-            document.getElementById('streetFree').textContent = d.free;
-            document.getElementById('streetRush').textContent = d.rush;
+            var d = db[key];
+            if (!d) return;
+            document.querySelectorAll('.parking-card').forEach(function(c) { c.classList.remove('selected'); });
+            el.classList.add('selected');
+            document.getElementById('pdName').textContent = d.name;
+            document.getElementById('pdRate').textContent = d.rate;
+            document.getElementById('pdHours').textContent = d.hours;
+            document.getElementById('pdMax').textContent = d.max;
+            document.getElementById('pdFree').textContent = d.free;
+            document.getElementById('pdRush').textContent = d.rush;
+            document.getElementById('pdTip').textContent = d.tip;
+            var panel = document.getElementById('parkingDetailPanel');
+            panel.classList.add('show');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function generateScript() {
@@ -3208,9 +3414,9 @@ HTML_TEMPLATE = """
                         style: function(feature) {
                             var p = feature.properties || {};
                             var type = (p.INFRA_HIGHORDER || '').toLowerCase();
-                            var color = (type.indexOf('protect') >= 0) ? '#30D158' :
-                                        (type.indexOf('trail') >= 0 || type.indexOf('path') >= 0) ? '#BF5AF2' : '#0A84FF';
-                            return { color: color, weight: 2, opacity: 0.85 };
+                            var color = (type.indexOf('protect') >= 0) ? '#059669' :
+                                        (type.indexOf('trail') >= 0 || type.indexOf('path') >= 0) ? '#7c3aed' : '#2563eb';
+                            return { color: color, weight: 2.5, opacity: 0.9 };
                         },
                         onEachFeature: function(feature, layer) {
                             var p = feature.properties || {};
@@ -3249,10 +3455,10 @@ HTML_TEMPLATE = """
             ];
             var group = L.layerGroup();
             routes.forEach(function(route) {
-                var color = (route.type.toLowerCase().indexOf('protect') >= 0) ? '#30D158' :
-                            (route.type.toLowerCase().indexOf('trail') >= 0) ? '#BF5AF2' : '#0A84FF';
-                L.polyline(route.coords, { color: color, weight: 2.5, opacity: 0.85 })
-                 .bindPopup('<b>🚲 ' + route.name + '</b><br>' + route.type + '<br><span style="color:#FF453A;font-weight:600">$200 Fine Zone</span>')
+                var color = (route.type.toLowerCase().indexOf('protect') >= 0) ? '#059669' :
+                            (route.type.toLowerCase().indexOf('trail') >= 0) ? '#7c3aed' : '#2563eb';
+                L.polyline(route.coords, { color: color, weight: 3, opacity: 0.9 })
+                 .bindPopup('<b>\U0001F6B2 ' + route.name + '</b><br><span style="color:#059669;font-weight:600;">' + route.type + '</span><br><span style="color:#dc2626;font-weight:600">$200 Fine Zone</span>')
                  .addTo(group);
             });
             return group;
@@ -3262,22 +3468,127 @@ HTML_TEMPLATE = """
             hydrantGroup = L.layerGroup();
             var hydrantIcon = L.divIcon({
                 className: '',
-                html: '<div style="width:7px;height:7px;border-radius:50%;background:#FFD60A;border:1.5px solid #B7870A;opacity:0.9;"></div>',
-                iconSize: [7, 7],
-                iconAnchor: [3, 3]
+                html: '<div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;border:2px solid #92400e;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>',
+                iconSize: [10, 10],
+                iconAnchor: [5, 5]
             });
-            var step = 0.0025;
+            var step = 0.0030;
             var latS = 43.637, latE = 43.678, lngS = -79.423, lngE = -79.351;
             for (var lat = latS; lat < latE; lat += step) {
                 for (var lng = lngS; lng < lngE; lng += step * 1.4) {
-                    var rLat = lat + (Math.random() - 0.5) * step * 0.4;
-                    var rLng = lng + (Math.random() - 0.5) * step * 0.4;
+                    var rLat = lat + (Math.random() - 0.5) * step * 0.5;
+                    var rLng = lng + (Math.random() - 0.5) * step * 0.5;
                     L.marker([rLat, rLng], { icon: hydrantIcon })
-                     .bindPopup('<b>🔴 Fire Hydrant</b><br>3 m clearance required<br><span style="color:#FF453A;font-weight:600">$100 Fine</span>')
+                     .bindPopup('<b style="color:#92400e;">Fire Hydrant</b><br><span style="color:#6b7280;font-size:12px;">3 m no-parking clearance required</span><br><span style="color:#dc2626;font-weight:700;font-size:13px;">$100 Fine</span>')
                      .addTo(hydrantGroup);
                 }
             }
             if (hydrantLayerOn) hydrantGroup.addTo(mapInstance);
+        }
+
+        async function loadEVStationsLayer() {
+            evGroup = L.layerGroup();
+            var evIcon = L.divIcon({
+                className: '',
+                html: '<div style="width:22px;height:22px;border-radius:50%;background:#8b5cf6;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(139,92,246,0.5);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:800;">EV</div>',
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
+            });
+
+            var evStations = [
+                { lat: 43.6482, lng: -79.3992, name: 'CF Sherway Gardens', addr: '25 The West Mall', ports: 8, network: 'ChargePoint', free: false },
+                { lat: 43.6426, lng: -79.3866, name: 'Scotiabank Arena Garage', addr: '40 Bay St', ports: 6, network: 'Tesla', free: false },
+                { lat: 43.6677, lng: -79.4000, name: 'Yorkdale Mall', addr: '3401 Dufferin St', ports: 12, network: 'Tesla Supercharger', free: false },
+                { lat: 43.7730, lng: -79.3383, name: 'Fairview Mall', addr: '1800 Sheppard Ave E', ports: 4, network: 'ChargePoint', free: false },
+                { lat: 43.6461, lng: -79.3798, name: 'Union Station Garage', addr: '65 Front St W', ports: 4, network: 'Flo', free: false },
+                { lat: 43.6617, lng: -79.3804, name: 'City Hall Garage', addr: '100 Queen St W', ports: 6, network: 'Flo', free: false },
+                { lat: 43.7245, lng: -79.3427, name: 'North York Civic Centre', addr: '5100 Yonge St', ports: 8, network: 'Flo', free: true },
+                { lat: 43.6531, lng: -79.4056, name: 'Exhibition Place', addr: '200 Princes\' Blvd', ports: 10, network: 'ChargePoint', free: false },
+                { lat: 43.6441, lng: -79.3997, name: 'Metro Toronto Convention Ctr', addr: '255 Front St W', ports: 6, network: 'ChargePoint', free: false },
+                { lat: 43.7070, lng: -79.3980, name: 'Downsview Park', addr: '35 Carl Hall Rd', ports: 4, network: 'Flo', free: true },
+                { lat: 43.6480, lng: -79.4120, name: 'Liberty Village Parking', addr: '171 East Liberty St', ports: 4, network: 'ChargePoint', free: false },
+                { lat: 43.6590, lng: -79.3450, name: 'Corktown Common', addr: '155 Bayview Ave', ports: 3, network: 'Flo', free: true },
+                { lat: 43.6720, lng: -79.3880, name: 'Ryerson University', addr: '350 Victoria St', ports: 5, network: 'ChargePoint', free: false },
+                { lat: 43.6980, lng: -79.4230, name: 'Humber College North', addr: '205 Humber College Blvd', ports: 6, network: 'Flo', free: false },
+                { lat: 43.7630, lng: -79.5240, name: 'Etobicoke Civic Centre', addr: '399 The West Mall', ports: 4, network: 'Flo', free: true },
+                { lat: 43.6800, lng: -79.5580, name: 'Mimico GO Station', addr: '55 Superior Ave', ports: 3, network: 'Petro-Canada RECHARGE', free: false },
+                { lat: 43.7190, lng: -79.2720, name: 'Scarborough Town Centre', addr: '300 Borough Dr', ports: 8, network: 'Tesla', free: false },
+                { lat: 43.7714, lng: -79.2510, name: 'Agincourt GO', addr: '4100 Sheppard Ave E', ports: 4, network: 'Petro-Canada RECHARGE', free: false },
+                { lat: 43.6350, lng: -79.3500, name: 'Leslieville Charging Hub', addr: '905 Queen St E', ports: 4, network: 'Flo', free: false },
+                { lat: 43.6553, lng: -79.4645, name: 'High Park P-Lot', addr: '1873 Bloor St W', ports: 3, network: 'Flo', free: true }
+            ];
+
+            try {
+                var pkgResp = await fetch('https://ckan0.cf.opendata.inter.toronto.ca/api/3/action/package_show?id=electric-vehicle-charging-stations');
+                var pkg = await pkgResp.json();
+                var resources = (pkg.result || {}).resources || [];
+                var geoRes = resources.find(function(r) {
+                    var fmt = (r.format || '').toLowerCase();
+                    return fmt === 'geojson' || fmt === 'json' || (r.url || '').toLowerCase().indexOf('geojson') >= 0;
+                });
+                if (geoRes) {
+                    var geoResp = await fetch(geoRes.url);
+                    var geoData = await geoResp.json();
+                    var features = geoData.features || [];
+                    if (features.length > 0) {
+                        features.forEach(function(f) {
+                            var coords = (f.geometry || {}).coordinates || [];
+                            if (coords.length < 2) return;
+                            var p = f.properties || {};
+                            var name = p.STATION_NAME || p.NAME || p.name || 'EV Charging Station';
+                            var addr = p.ADDRESS || p.address || '';
+                            var ports = p.EV_LEVEL2_EVSE_NUM || p.EVSE_COUNT || p.ports || '?';
+                            var network = p.EV_NETWORK || p.NETWORK || 'City of Toronto';
+                            L.marker([coords[1], coords[0]], { icon: evIcon })
+                             .bindPopup('<b style="color:#7c3aed;">\u26A1 ' + name + '</b><br><span style="color:#374151;font-size:12px;">' + addr + '</span><br>Ports: <b>' + ports + '</b> &bull; ' + network)
+                             .addTo(evGroup);
+                        });
+                        if (evLayerOn) evGroup.addTo(mapInstance);
+                        return;
+                    }
+                }
+            } catch(e) {}
+
+            evStations.forEach(function(s) {
+                var freeLabel = s.free ? '<span style="color:#059669;font-weight:600;">Free to use</span>' : '<span style="color:#374151;">Paid / App required</span>';
+                L.marker([s.lat, s.lng], { icon: evIcon })
+                 .bindPopup('<b style="color:#7c3aed;">\u26A1 ' + s.name + '</b><br><span style="color:#6b7280;font-size:12px;">' + s.addr + '</span><br>Ports: <b>' + s.ports + '</b><br>Network: ' + s.network + '<br>' + freeLabel)
+                 .addTo(evGroup);
+            });
+            if (evLayerOn) evGroup.addTo(mapInstance);
+        }
+
+        function loadParkingLayer() {
+            parkingGroup = L.layerGroup();
+            var parkingIcon = L.divIcon({
+                className: '',
+                html: '<div style="width:22px;height:22px;border-radius:6px;background:#0A84FF;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(10,132,255,0.45);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:800;">P</div>',
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
+            });
+            var spots = [
+                { lat: 43.6533, lng: -79.3832, name: 'Nathan Phillips Square', rate: '$3.50/hr', max: '3 hrs', hours: 'Mon-Sun 7am-10pm' },
+                { lat: 43.6485, lng: -79.3835, name: 'Harbour Square', rate: '$4.00/hr', max: '2 hrs', hours: 'Mon-Sun 8am-10pm' },
+                { lat: 43.6611, lng: -79.3805, name: 'Dundas Square P-Lot', rate: '$3.00/hr', max: '2 hrs', hours: 'Mon-Sat 8am-9pm' },
+                { lat: 43.6540, lng: -79.4055, name: 'Strachan Ave Green P', rate: '$2.50/hr', max: '4 hrs', hours: 'Mon-Sat 8am-9pm' },
+                { lat: 43.6438, lng: -79.3872, name: 'Front St W Green P', rate: '$3.50/hr', max: '2 hrs', hours: 'Mon-Sun 8am-midnight' },
+                { lat: 43.6620, lng: -79.3900, name: 'Gerrard St E Lot', rate: '$2.00/hr', max: '4 hrs', hours: 'Mon-Fri 8am-6pm' },
+                { lat: 43.6490, lng: -79.3978, name: 'Rees St Green P', rate: '$3.00/hr', max: '2 hrs', hours: 'Mon-Sun 7am-10pm' },
+                { lat: 43.6560, lng: -79.3740, name: 'George St Green P', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm' },
+                { lat: 43.6388, lng: -79.4010, name: 'Dufferin St Lot', rate: '$2.00/hr', max: '4 hrs', hours: 'Mon-Fri 7am-7pm' },
+                { lat: 43.6680, lng: -79.4100, name: 'Dufferin-Bloor Green P', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm' },
+                { lat: 43.6432, lng: -79.4000, name: 'Queen-Bathurst Lot', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm' },
+                { lat: 43.6700, lng: -79.3680, name: 'Sherbourne-Bloor', rate: '$2.00/hr', max: '3 hrs', hours: 'Mon-Sat 8am-8pm' },
+                { lat: 43.6580, lng: -79.4200, name: 'Dovercourt-College', rate: '$1.75/hr', max: 'No limit', hours: 'Mon-Sat 8am-8pm' },
+                { lat: 43.6348, lng: -79.3450, name: 'Riverside Green P', rate: '$1.50/hr', max: 'No limit', hours: 'Mon-Fri 8am-6pm' },
+                { lat: 43.6510, lng: -79.3600, name: 'Berkeley St Lot', rate: '$2.25/hr', max: '3 hrs', hours: 'Mon-Sat 8am-8pm' }
+            ];
+            spots.forEach(function(s) {
+                L.marker([s.lat, s.lng], { icon: parkingIcon })
+                 .bindPopup('<b style="color:#0A84FF;">P — ' + s.name + '</b><br><span style="color:#374151;font-size:12px;">' + s.hours + '</span><br>Rate: <b style="color:#0A84FF;">' + s.rate + '</b><br>Max stay: ' + s.max)
+                 .addTo(parkingGroup);
+            });
+            if (parkingLayerOn) parkingGroup.addTo(mapInstance);
         }
 
         function toggleLayer(type) {
@@ -3287,24 +3598,35 @@ HTML_TEMPLATE = """
                     if (bikeLayerOn) bikeGeoLayer.addTo(mapInstance);
                     else mapInstance.removeLayer(bikeGeoLayer);
                 }
-                var btn = document.getElementById('toggleBike');
-                if (btn) btn.classList.toggle('active', bikeLayerOn);
+                document.getElementById('toggleBike').classList.toggle('active', bikeLayerOn);
             } else if (type === 'hydrant') {
                 hydrantLayerOn = !hydrantLayerOn;
                 if (hydrantGroup) {
                     if (hydrantLayerOn) hydrantGroup.addTo(mapInstance);
                     else mapInstance.removeLayer(hydrantGroup);
                 }
-                var btn = document.getElementById('toggleHydrant');
-                if (btn) btn.classList.toggle('active', hydrantLayerOn);
+                document.getElementById('toggleHydrant').classList.toggle('active', hydrantLayerOn);
             } else if (type === 'heat') {
                 heatLayerOn = !heatLayerOn;
                 if (heatLayerRef) {
                     if (heatLayerOn) heatLayerRef.addTo(mapInstance);
                     else mapInstance.removeLayer(heatLayerRef);
                 }
-                var btn = document.getElementById('toggleHeat');
-                if (btn) btn.classList.toggle('active', heatLayerOn);
+                document.getElementById('toggleHeat').classList.toggle('active', heatLayerOn);
+            } else if (type === 'ev') {
+                evLayerOn = !evLayerOn;
+                if (evGroup) {
+                    if (evLayerOn) evGroup.addTo(mapInstance);
+                    else mapInstance.removeLayer(evGroup);
+                }
+                document.getElementById('toggleEV').classList.toggle('active', evLayerOn);
+            } else if (type === 'parking') {
+                parkingLayerOn = !parkingLayerOn;
+                if (parkingGroup) {
+                    if (parkingLayerOn) parkingGroup.addTo(mapInstance);
+                    else mapInstance.removeLayer(parkingGroup);
+                }
+                document.getElementById('toggleParking').classList.toggle('active', parkingLayerOn);
             }
         }
 
