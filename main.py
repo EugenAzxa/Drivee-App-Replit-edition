@@ -2387,7 +2387,7 @@ HTML_TEMPLATE = """
                     <div class="guide-num guide-num-7">7</div>
                     <div class="guide-content">
                         <div class="guide-title">Find Free Drop-off Spots</div>
-                        <div class="guide-desc">The Map tab shows 25 free 20-minute drop-off locations across downtown Toronto — hospitals, transit hubs, and commercial streets. Tap any pin for address, hours, and notes.</div>
+                        <div class="guide-desc">The Map tab shows 25 real free street parking spots across Toronto — from Cabbagetown to Leslieville, Roncesvalles to the Danforth. Tap any pin to see the address, schedule, max stay, and parking rules.</div>
                         <span class="guide-tab-ref guide-tab-hot">Map</span>
                     </div>
                 </div>
@@ -2790,7 +2790,7 @@ HTML_TEMPLATE = """
                     <div class="gps-guardian-icon"><i class="fa-solid fa-satellite-dish"></i></div>
                     <div>
                         <div class="gps-guardian-title">GPS Guardian</div>
-                        <div class="gps-guardian-desc">Tracks your real-time location and highlights the nearest free 20-min drop-off spots on the map — so you can pull in, drop off, and leave without a fine.</div>
+                        <div class="gps-guardian-desc">Tracks your real-time location and highlights the nearest free street parking spots on the map — so you can find real free parking near you without circling the block.</div>
                     </div>
                 </div>
                 <button class="btn-gps" onclick="startGPSGuardian()" id="gpsBtn">
@@ -2811,12 +2811,12 @@ HTML_TEMPLATE = """
                     <div class="map-float-layers" style="pointer-events:none;gap:8px;padding:8px 14px;">
                         <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#15803d;">
                             <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#16a34a;flex-shrink:0;"></span>
-                            Free 20-min
+                            Free Street Parking
                         </span>
                         <span style="color:#d1d5db;font-size:10px;">|</span>
-                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#0060df;">
-                            <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#0A84FF;flex-shrink:0;"></span>
-                            Drop-off Zone
+                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#b45309;">
+                            <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#b45309;flex-shrink:0;"></span>
+                            Time Limit
                         </span>
                         <span style="color:#d1d5db;font-size:10px;">|</span>
                         <span id="spotCountBadge" style="background:#f3f4f6;color:#374151;border-radius:8px;padding:1px 7px;font-size:10px;font-weight:700;">25 spots</span>
@@ -3789,160 +3789,73 @@ HTML_TEMPLATE = """
         function loadFreeDropoffLayer() {
             freeDropoffGroup = L.layerGroup();
             var spots = [
-                { lat: 43.6592, lng: -79.3877, name: 'Toronto General Hospital', addr: '200 Elizabeth St', zone: 'Hospital Drop-off', hours: 'Any time', notes: 'Patient & visitor drop-off' },
-                { lat: 43.6571, lng: -79.3891, name: 'Mount Sinai Hospital', addr: '600 University Ave', zone: 'Hospital Drop-off', hours: 'Any time', notes: 'Emergency & outpatient drop-off' },
-                { lat: 43.6574, lng: -79.3884, name: 'SickKids Hospital', addr: '555 University Ave', zone: 'Hospital Drop-off', hours: 'Any time', notes: 'Pediatric drop-off lane' },
-                { lat: 43.6524, lng: -79.4143, name: 'Toronto Western Hospital', addr: '399 Bathurst St', zone: 'Hospital Drop-off', hours: 'Any time', notes: 'Main entrance drop-off' },
-                { lat: 43.6453, lng: -79.3808, name: 'Union Station (Bay St)', addr: '65 Front St W', zone: 'Transit Drop-off', hours: 'Any time', notes: 'Taxi & rideshare lane' },
-                { lat: 43.6450, lng: -79.3782, name: 'Union Station (York St)', addr: '1 York St', zone: 'Transit Drop-off', hours: 'Any time', notes: 'West entrance drop-off' },
-                { lat: 43.6702, lng: -79.3868, name: 'Bloor–Yonge TTC', addr: '2 Bloor St W', zone: 'Transit Drop-off', hours: 'Any time', notes: 'North entrance drop-off' },
-                { lat: 43.6657, lng: -79.4003, name: 'Spadina TTC Station', addr: '360 Bloor St W', zone: 'Transit Drop-off', hours: 'Any time', notes: 'Rideshare pick-up zone' },
-                { lat: 43.6544, lng: -79.3817, name: 'Eaton Centre (Queen St)', addr: '220 Yonge St', zone: 'Free 20-Min Parking', hours: 'Mon–Sat 8am–9pm', notes: 'Queen St short-term bay' },
-                { lat: 43.6528, lng: -79.3836, name: 'City Hall (Queen St W)', addr: '100 Queen St W', zone: 'Free 20-Min Parking', hours: 'Mon–Fri 8am–6pm', notes: 'Short-term civic drop-off' },
-                { lat: 43.6536, lng: -79.3928, name: 'Art Gallery of Ontario', addr: '317 Dundas St W', zone: 'Free 20-Min Parking', hours: 'Mon–Sun 10am–10pm', notes: 'McCaul St front entrance' },
-                { lat: 43.6488, lng: -79.3714, name: 'St. Lawrence Market', addr: '93 Front St E', zone: 'Free 20-Min Parking', hours: 'Tue–Sat 8am–6pm', notes: 'Front St E loading zone' },
-                { lat: 43.6430, lng: -79.3785, name: 'Scotiabank Arena (Bay)', addr: '40 Bay St', zone: 'Free 20-Min Parking', hours: 'Event days', notes: 'Quick drop-off, no waiting' },
-                { lat: 43.6414, lng: -79.3893, name: 'Rogers Centre Drop-off', addr: '1 Blue Jays Way', zone: 'Free 20-Min Parking', hours: 'Event days', notes: 'Rees St designated zone' },
-                { lat: 43.6460, lng: -79.3874, name: 'Roy Thomson Hall', addr: '60 Simcoe St', zone: 'Free 20-Min Parking', hours: 'Performance evenings', notes: 'Wellington St marked bay' },
-                { lat: 43.6482, lng: -79.3802, name: 'Bay–King (Financial)', addr: '100 King St W', zone: 'Free 20-Min Parking', hours: 'Mon–Fri 8am–6pm', notes: 'King St metered short-term' },
-                { lat: 43.6488, lng: -79.3812, name: 'Wellington St W', addr: '200 Wellington St W', zone: 'Free 20-Min Parking', hours: 'Mon–Fri 8am–6pm', notes: 'Loading zone, 20-min limit' },
-                { lat: 43.6672, lng: -79.3875, name: 'Yonge–Bloor (Midtown)', addr: '2 Bloor St E', zone: 'Free 20-Min Parking', hours: 'Mon–Sat 8am–9pm', notes: 'Bloor St E short-term bay' },
-                { lat: 43.6614, lng: -79.3824, name: 'Maple Leaf Square', addr: '15 York St', zone: 'Free 20-Min Parking', hours: 'Any time', notes: 'Arena district drop-off' },
-                { lat: 43.6591, lng: -79.3856, name: 'College Park', addr: '444 Yonge St', zone: 'Free 20-Min Parking', hours: 'Mon–Sat 9am–9pm', notes: 'Yonge St 20-min zone' },
-                { lat: 43.6512, lng: -79.3934, name: 'Alexandra Park (CAMH)', addr: '250 Dundas St W', zone: 'Free 20-Min Parking', hours: 'Any time', notes: 'Dundas W loading zone' },
-                { lat: 43.6615, lng: -79.3732, name: 'Jarvis–Carlton', addr: '200 Jarvis St', zone: 'Free 20-Min Parking', hours: 'Mon–Sat 8am–9pm', notes: 'Carlton St marked bay' },
-                { lat: 43.6456, lng: -79.3985, name: 'Harbourfront Centre', addr: '235 Queens Quay W', zone: 'Free 20-Min Parking', hours: 'Any time', notes: 'Queens Quay W drop-off' },
-                { lat: 43.6500, lng: -79.4056, name: 'Exhibition Place', addr: '200 Princes Blvd', zone: 'Free 20-Min Parking', hours: 'Event days', notes: 'Gate 1 designated zone' },
-                { lat: 43.6558, lng: -79.4015, name: 'Liberty Village Drop-off', addr: '171 East Liberty St', zone: 'Free 20-Min Parking', hours: 'Any time', notes: 'East Liberty St zone' }
+                {lat:43.6581,lng:-79.3644,addr:'321 Shuter St',area:'Cabbagetown',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'3 hrs',rules:'3 hour maximum parking rule applies'},
+                {lat:43.6619,lng:-79.3688,addr:'Spruce St at Oak St',area:'Cabbagetown',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6609,lng:-79.3664,addr:'Sackville St at Winchester St',area:'Cabbagetown',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6634,lng:-79.3668,addr:'Amelia St at Ontario St',area:'Cabbagetown',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6532,lng:-79.3618,addr:'First Ave at King St E',area:'Corktown',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'3 hrs',rules:'3 hour maximum parking rule applies'},
+                {lat:43.6514,lng:-79.3590,addr:'Bright St at Queen St E',area:'Corktown',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6606,lng:-79.3336,addr:'Booth Ave at Queen St E',area:'Leslieville',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6603,lng:-79.3304,addr:'Munro St at Queen St E',area:'Leslieville',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6614,lng:-79.3272,addr:'Victor Ave at Queen St E',area:'Leslieville',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6626,lng:-79.3322,addr:'Larchmount Ave, Leslieville',area:'Leslieville',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'3 hrs',rules:'3 hour maximum parking rule applies'},
+                {lat:43.6596,lng:-79.3354,addr:'Coady Ave, South Riverdale',area:'South Riverdale',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6662,lng:-79.3530,addr:'Browning Ave, Riverdale',area:'Riverdale',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'3 hrs',rules:'3 hour maximum parking rule applies'},
+                {lat:43.6476,lng:-79.4316,addr:'Fern Ave, Roncesvalles',area:'Roncesvalles',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6447,lng:-79.4355,addr:'Marion St at Howard Park',area:'Roncesvalles',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6441,lng:-79.4332,addr:'Garden Ave, Parkdale',area:'Parkdale',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6461,lng:-79.4334,addr:'Marmaduke St, Parkdale',area:'Parkdale',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6449,lng:-79.4288,addr:'Brock Ave at Queen W',area:'Parkdale',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'1 hr',rules:'1 hour maximum parking rule applies'},
+                {lat:43.6428,lng:-79.4280,addr:'Close Ave, Parkdale',area:'Parkdale',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6489,lng:-79.4183,addr:'Manning Ave at Dundas W',area:'Trinity-Bellwoods',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'3 hrs',rules:'3 hour maximum parking rule applies'},
+                {lat:43.6519,lng:-79.4162,addr:'Clinton St at College St',area:'Little Italy',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'2 hrs',rules:'2 hour maximum parking rule applies'},
+                {lat:43.6503,lng:-79.4146,addr:'Crawford St at Bloor W',area:'Little Italy',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6512,lng:-79.4148,addr:'Beatrice St, Trinity-Bellwoods',area:'Trinity-Bellwoods',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6768,lng:-79.3534,addr:'Forman Ave at Danforth Ave',area:'Danforth',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6681,lng:-79.3483,addr:'Standish Ave, Riverdale',area:'Riverdale',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'No limit',rules:'Residential street, free of charge'},
+                {lat:43.6773,lng:-79.2988,addr:'Kenilworth Ave at Kingston Rd',area:'Upper Beach',schedule:'Mon \u2013 Sun',hours:'All day',maxStay:'3 hrs',rules:'3 hour maximum parking rule applies'}
             ];
             spots.forEach(function(s) {
-                var isMed = (s.zone === 'Hospital Drop-off');
-                var isTTC = (s.zone === 'Transit Drop-off');
-                var bg1 = isMed ? '#0A84FF' : (isTTC ? '#5856D6' : '#16a34a');
-                var bg2 = isMed ? '#0060df' : (isTTC ? '#4040c0' : '#15803d');
-                var lbl = isMed ? '+' : (isTTC ? 'TTC' : 'P');
+                var isLimited = (s.maxStay !== 'No limit');
+                var bg = isLimited ? '#16a34a' : '#15803d';
+                var timeLabel = isLimited ? s.maxStay.replace(' hrs','H').replace(' hr','H') : '\u221e';
                 var icon = L.divIcon({
                     className: '',
-                    html: '<div style="width:40px;height:48px;background:linear-gradient(180deg,' + bg1 + ' 0%,' + bg2 + ' 100%);border-radius:10px;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;">'
-                        + '<div style="font-size:' + (isTTC ? '9px' : '17px') + ';font-weight:900;color:#fff;line-height:1;font-family:-apple-system,sans-serif;">' + lbl + '</div>'
-                        + '<div style="font-size:7px;font-weight:700;color:rgba(255,255,255,0.88);line-height:1;font-family:-apple-system,sans-serif;letter-spacing:0.5px;">20 MIN</div>'
-                        + '<div style="position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid ' + bg2 + ';"></div>'
+                    html: '<div style="position:relative;width:38px;height:50px;">'
+                        + '<div style="width:36px;height:36px;border-radius:50%;background:' + bg + ';border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,0.28);display:flex;align-items:center;justify-content:center;">'
+                        + '<span style="color:#fff;font-size:18px;font-weight:900;font-family:-apple-system,sans-serif;line-height:1;">P</span>'
+                        + '</div>'
+                        + '<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);background:' + bg + ';color:#fff;font-size:8px;font-weight:800;font-family:-apple-system,sans-serif;border-radius:3px;padding:1px 5px;white-space:nowrap;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);">'
+                        + timeLabel + ' FREE'
+                        + '</div>'
                         + '</div>',
-                    iconSize: [40, 57],
-                    iconAnchor: [20, 57]
+                    iconSize: [38, 50],
+                    iconAnchor: [19, 50]
                 });
-                var zoneColor = isMed ? '#0A84FF' : (isTTC ? '#5856D6' : '#16a34a');
-                var zoneIcon = isMed ? '&#x1F3E5;' : (isTTC ? '&#x1F687;' : '&#x1F17F;');
-                var popup = '<div style="font-family:-apple-system,sans-serif;min-width:210px;padding:2px;">'
-                    + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
-                    + '<div style="background:' + zoneColor + ';color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;flex-shrink:0;">FREE &bull; 20 MIN</div>'
-                    + '<div style="color:#6b7280;font-size:11px;">' + zoneIcon + ' ' + s.zone + '</div>'
+                var popup = '<div style="font-family:-apple-system,sans-serif;min-width:220px;padding:4px 2px;">'
+                    + '<div style="display:inline-flex;align-items:center;gap:5px;background:#dcfce7;border-radius:6px;padding:4px 10px;margin-bottom:10px;">'
+                    + '<span style="width:8px;height:8px;border-radius:50%;background:#16a34a;display:inline-block;flex-shrink:0;"></span>'
+                    + '<span style="font-size:12px;font-weight:700;color:#15803d;">Free of charge</span>'
                     + '</div>'
-                    + '<div style="font-size:14px;font-weight:700;color:#111827;">' + s.name + '</div>'
-                    + '<div style="color:#6b7280;font-size:12px;margin-top:2px;">' + s.addr + '</div>'
-                    + '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f3f4f6;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">'
-                    + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.4px;">Max Stay</div><div style="font-size:12px;font-weight:700;color:#111827;margin-top:1px;">20 min</div></div>'
-                    + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.4px;">Cost</div><div style="font-size:12px;font-weight:700;color:#16a34a;margin-top:1px;">FREE</div></div>'
-                    + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.4px;">Hours</div><div style="font-size:12px;font-weight:700;color:#111827;margin-top:1px;">' + s.hours + '</div></div>'
+                    + '<div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:2px;">' + s.addr + '</div>'
+                    + '<div style="font-size:12px;color:#6b7280;margin-bottom:10px;">' + s.area + ', Toronto</div>'
+                    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;background:#f9fafb;border-radius:8px;margin-bottom:8px;">'
+                    + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.5px;margin-bottom:2px;">Schedule</div>'
+                    + '<div style="font-size:12px;font-weight:700;color:#111827;">' + s.schedule + '</div>'
+                    + '<div style="font-size:11px;color:#6b7280;">' + s.hours + '</div></div>'
+                    + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.5px;margin-bottom:2px;">Max Stay</div>'
+                    + '<div style="font-size:12px;font-weight:700;color:' + (isLimited ? '#b45309' : '#15803d') + ';">' + s.maxStay + '</div></div>'
                     + '</div>'
-                    + '<div style="margin-top:8px;padding:6px 8px;background:#f9fafb;border-radius:6px;font-size:11px;color:#6b7280;">' + s.notes + '</div>'
+                    + '<div style="font-size:11px;color:#6b7280;padding:0 2px;">' + s.rules + '</div>'
                     + '</div>';
                 L.marker([s.lat, s.lng], { icon: icon })
-                 .bindPopup(popup, { maxWidth: 250 })
+                 .bindPopup(popup, { maxWidth: 260 })
                  .addTo(freeDropoffGroup);
             });
             freeDropoffGroup.addTo(mapInstance);
             var countEl = document.getElementById('spotCountBadge');
             if (countEl) countEl.textContent = spots.length + ' spots';
         }
-
-        /* ─────────────────────────────────────────────────────── */
-
-        async function performLegalScan(event) {
-            var file = event.target.files[0];
-            if (!file) return;
-            var statusEl = document.getElementById('legalScanStatus');
-            var verdictEl = document.getElementById('legalVerdict');
-            statusEl.className = 'scan-status loading';
-            statusEl.textContent = 'AI is reading your ticket\u2026';
-            verdictEl.className = 'legal-verdict';
-
-            try {
-                var dataUrl = await fileToDataURL(file);
-                var result = await Tesseract.recognize(dataUrl, 'eng');
-                var rawText = result.data.text || '';
-                var textUpper = rawText.toUpperCase();
-
-                var fineMatch = rawText.match(/\$\s*(\d+(?:\.\d{2})?)/);
-                var fineAmount = fineMatch ? parseFloat(fineMatch[1]) : 0;
-
-                var urgent = /STUNT|IMPAIRED|DUI|CRIMINAL CODE|DANGEROUS DRIVING|FAIL TO REMAIN|HIT.?AND.?RUN|RACING|STREET RACING/.test(textUpper);
-                var serious = /CARELESS|SCHOOL ZONE|CONSTRUCTION ZONE|RED LIGHT CAMERA|CELL PHONE|HANDHELD|BIKE LANE|PHOTO RADAR|PLATE DENIED|FOLLOW TOO CLOSE|SEATBELT|SEAT BELT|NO INSURANCE|INSURANCE/.test(textUpper) || fineAmount >= 200;
-
-                var badge, headline, detail, cssClass, showCTA;
-
-                if (urgent) {
-                    badge = 'Get a Lawyer — Serious Consequences';
-                    headline = 'Do NOT pay this ticket';
-                    detail = 'This charge may result in criminal charges, licence suspension, vehicle impoundment, or a permanent record. Paying is an admission of guilt. Contact a traffic lawyer today — free consultation with any firm below.';
-                    cssClass = 'verdict-lawyer';
-                    showCTA = true;
-                } else if (serious) {
-                    badge = 'Get a Paralegal — Worth Fighting';
-                    headline = 'This ticket is worth contesting';
-                    detail = 'This charge carries demerit points or a significant fine that could raise your insurance premium for 3+ years. A licensed paralegal can often get it reduced or withdrawn. Free consultation — see firms below.';
-                    cssClass = 'verdict-paralegal';
-                    showCTA = true;
-                } else if (fineAmount >= 100) {
-                    badge = 'Consider a Paralegal';
-                    headline = 'High fine — may be worth fighting';
-                    detail = 'A fine this size is worth a free 15-minute paralegal consult. They can often reduce or dismiss it, saving you more than their fee. See the firms listed below.';
-                    cssClass = 'verdict-paralegal';
-                    showCTA = true;
-                } else if (fineAmount > 0 && fineAmount < 100) {
-                    badge = 'Pay It — Not Worth Fighting';
-                    headline = 'Small fine, easiest to pay';
-                    detail = 'This is a low-value infraction with minimal impact on your record. Legal fees would likely exceed the ticket amount. Pay online at toronto.ca to close it out quickly.';
-                    cssClass = 'verdict-pay';
-                    showCTA = false;
-                } else {
-                    badge = 'Contest It Yourself';
-                    headline = 'You can fight this without a lawyer';
-                    detail = 'Request a trial by mail at your local courthouse within 15 days of receiving the ticket. Use the Dispute Script Builder on the Services tab to write your case. No lawyer needed.';
-                    cssClass = 'verdict-contest';
-                    showCTA = false;
-                }
-
-                statusEl.className = 'scan-status done';
-                statusEl.textContent = 'Ticket analysed!';
-
-                document.getElementById('legalVerdictBadge').textContent = badge;
-                document.getElementById('legalVerdictHeadline').textContent = headline;
-                document.getElementById('legalVerdictDetail').textContent = detail;
-
-                var fineEl = document.getElementById('legalVerdictFine');
-                if (fineAmount > 0) {
-                    fineEl.textContent = 'Detected fine: $' + fineAmount.toFixed(2);
-                    fineEl.style.display = 'inline-block';
-                } else {
-                    fineEl.style.display = 'none';
-                }
-
-                var ctaEl = document.getElementById('legalVerdictCTA');
-                ctaEl.style.display = showCTA ? 'flex' : 'none';
-
-                verdictEl.className = 'legal-verdict show ' + cssClass;
-
-                if (document.getElementById('advisorInput')) {
-                    document.getElementById('advisorInput').value = rawText;
-                }
-            } catch (err) {
-                statusEl.className = 'scan-status error';
-                statusEl.textContent = 'Scan failed. Try a clearer, well-lit photo.';
-            }
-            event.target.value = '';
-        }
-
         function scrollToFirms() {
             var firstFirm = document.querySelector('.firm-card');
             if (firstFirm) firstFirm.scrollIntoView({ behavior: 'smooth', block: 'start' });
