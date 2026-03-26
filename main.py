@@ -716,7 +716,7 @@ HTML_TEMPLATE = """
 
         /* ── Embedded map with fullscreen option ── */
         #map {
-            height: 300px;
+            height: 420px;
             border-radius: 18px;
             border: none;
             z-index: 1;
@@ -2386,9 +2386,9 @@ HTML_TEMPLATE = """
                 <div class="guide-step">
                     <div class="guide-num guide-num-7">7</div>
                     <div class="guide-content">
-                        <div class="guide-title">View Enforcement Hotspots</div>
-                        <div class="guide-desc">The Hotspots tab shows an interactive heatmap of Toronto areas with heavy parking enforcement. Check it before you park to avoid high-risk zones.</div>
-                        <span class="guide-tab-ref guide-tab-hot">Hotspots</span>
+                        <div class="guide-title">Find Free Drop-off Spots</div>
+                        <div class="guide-desc">The Map tab shows 25 free 20-minute drop-off locations across downtown Toronto — hospitals, transit hubs, and commercial streets. Tap any pin for address, hours, and notes.</div>
+                        <span class="guide-tab-ref guide-tab-hot">Map</span>
                     </div>
                 </div>
 
@@ -2790,7 +2790,7 @@ HTML_TEMPLATE = """
                     <div class="gps-guardian-icon"><i class="fa-solid fa-satellite-dish"></i></div>
                     <div>
                         <div class="gps-guardian-title">GPS Guardian</div>
-                        <div class="gps-guardian-desc">Tracks your real-time location and alerts you before you accidentally park in a restricted zone or too close to a fire hydrant — helping you avoid fines before they happen.</div>
+                        <div class="gps-guardian-desc">Tracks your real-time location and highlights the nearest free 20-min drop-off spots on the map — so you can pull in, drop off, and leave without a fine.</div>
                     </div>
                 </div>
                 <button class="btn-gps" onclick="startGPSGuardian()" id="gpsBtn">
@@ -2808,16 +2808,18 @@ HTML_TEMPLATE = """
                 <div id="mapLoadStatus" class="map-load-status"></div>
 
                 <div class="map-float-controls">
-                    <div class="map-float-layers">
-                        <button class="layer-toggle active" id="toggleParking" onclick="toggleLayer('parking')" style="color:#16a34a;">
-                            <span class="toggle-dot" style="background:#16a34a;"></span> Parking
-                        </button>
-                        <button class="layer-toggle active" id="toggleEV" onclick="toggleLayer('ev')" style="color:#8b5cf6;">
-                            <span class="toggle-dot" style="background:#8b5cf6;"></span> EV Charging
-                        </button>
-                        <button class="layer-toggle active" id="toggleHeat" onclick="toggleLayer('heat')" style="color:#ef4444;">
-                            <span class="toggle-dot" style="background:#ef4444;"></span> Hotspots
-                        </button>
+                    <div class="map-float-layers" style="pointer-events:none;gap:8px;padding:8px 14px;">
+                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#15803d;">
+                            <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#16a34a;flex-shrink:0;"></span>
+                            Free 20-min
+                        </span>
+                        <span style="color:#d1d5db;font-size:10px;">|</span>
+                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#0060df;">
+                            <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#0A84FF;flex-shrink:0;"></span>
+                            Drop-off Zone
+                        </span>
+                        <span style="color:#d1d5db;font-size:10px;">|</span>
+                        <span id="spotCountBadge" style="background:#f3f4f6;color:#374151;border-radius:8px;padding:1px 7px;font-size:10px;font-weight:700;">25 spots</span>
                     </div>
                 </div>
             </div>
@@ -3142,64 +3144,23 @@ HTML_TEMPLATE = """
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
     <script>
         var mapInstance = null;
-        var bikeGeoLayer = null;
-        var hydrantGroup = null;
-        var heatLayerRef = null;
-        var evGroup = null;
-        var parkingGroup = null;
-        var heatLayerOn = true;
-        var evLayerOn = true;
-        var parkingLayerOn = true;
+        var freeDropoffGroup = null;
 
         function initMap() {
             if (mapInstance) {
                 mapInstance.invalidateSize();
                 return;
             }
-            mapInstance = L.map('map', { zoomControl: true }).setView([43.6532, -79.3832], 13);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            mapInstance = L.map('map', { zoomControl: true }).setView([43.6532, -79.3832], 14);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
                 maxZoom: 19,
                 subdomains: 'abcd'
             }).addTo(mapInstance);
 
-            var hotspots = [
-                [43.6545, -79.3807, 1.0],
-                [43.6489, -79.3850, 0.9],
-                [43.6592, -79.3627, 0.95],
-                [43.6426, -79.3871, 0.85],
-                [43.6488, -79.3802, 0.7],
-                [43.6677, -79.3948, 0.6],
-                [43.6510, -79.3470, 0.5],
-                [43.6613, -79.3955, 0.75],
-                [43.6380, -79.3812, 0.65],
-                [43.6710, -79.3865, 0.55],
-                [43.6560, -79.3740, 0.80],
-                [43.6455, -79.3920, 0.70],
-                [43.6630, -79.3780, 0.60],
-                [43.6350, -79.3750, 0.50],
-                [43.6520, -79.4010, 0.45]
-            ];
-
-            heatLayerRef = L.heatLayer(hotspots, {
-                radius: 32,
-                blur: 22,
-                maxZoom: 16,
-                gradient: { 0.2: '#bfdbfe', 0.4: '#93c5fd', 0.6: '#fde68a', 0.8: '#fb923c', 1.0: '#ef4444' }
-            }).addTo(mapInstance);
-
-            loadEVStationsLayer();
-            loadParkingLayer();
-
-            var hazardIcon = L.divIcon({
-                className: 'custom-icon',
-                html: '<i class="fa-solid fa-location-dot" style="color: #0A84FF; font-size: 32px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));"></i>',
-                iconSize: [32, 32],
-                iconAnchor: [16, 32]
-            });
+            loadFreeDropoffLayer();
 
             var liveReports = {{ reports_json|safe }};
             liveReports.forEach(function(report) {
@@ -3823,260 +3784,76 @@ HTML_TEMPLATE = """
             }
         }
 
-        /* ── Map layer loaders ─────────────────────────────────── */
+        /* ── Free 20-min drop-off spots ─────────────────────────── */
 
-        async function loadBikeLanesLayer() {
-            var statusEl = document.getElementById('mapLoadStatus');
-            if (statusEl) { statusEl.textContent = 'Loading cycling network from toronto.ca\u2026'; statusEl.style.display = 'block'; }
-            try {
-                var pkgResp = await fetch('https://ckan0.cf.opendata.inter.toronto.ca/api/3/action/package_show?id=cycling-network');
-                var pkg = await pkgResp.json();
-                var resources = (pkg.result || {}).resources || [];
-                var geoRes = resources.find(function(r) {
-                    var fmt = (r.format || '').toLowerCase();
-                    var nm = (r.name || '').toLowerCase();
-                    var url = (r.url || '').toLowerCase();
-                    return fmt === 'geojson' || nm.indexOf('4326') >= 0 || url.indexOf('geojson') >= 0;
-                });
-                if (geoRes) {
-                    if (statusEl) statusEl.textContent = 'Fetching ' + (geoRes.name || 'bike lanes') + '\u2026';
-                    var geoResp = await fetch(geoRes.url);
-                    var geoData = await geoResp.json();
-                    bikeGeoLayer = L.geoJSON(geoData, {
-                        style: function(feature) {
-                            var p = feature.properties || {};
-                            var type = (p.INFRA_HIGHORDER || '').toLowerCase();
-                            if (type.indexOf('protect') >= 0) {
-                                return { color: '#16a34a', weight: 5, opacity: 0.85, dashArray: null };
-                            } else if (type.indexOf('trail') >= 0 || type.indexOf('path') >= 0) {
-                                return { color: '#d97706', weight: 3, opacity: 0.8, dashArray: '4 6' };
-                            } else {
-                                return { color: '#2563eb', weight: 3, opacity: 0.8, dashArray: '10 6' };
-                            }
-                        },
-                        onEachFeature: function(feature, layer) {
-                            var p = feature.properties || {};
-                            var name = p.STREETNAME || 'Cycling Route';
-                            var type = p.INFRA_HIGHORDER || 'Bike Lane';
-                            layer.bindPopup('<b>🚲 ' + name + '</b><br>' + type + '<br><span style="color:#FF453A;font-weight:600">$200 Fine Zone</span>');
-                        }
-                    });
-                    if (bikeLayerOn) bikeGeoLayer.addTo(mapInstance);
-                    if (statusEl) { statusEl.textContent = 'Cycling network loaded from toronto.ca'; setTimeout(function() { statusEl.style.display = 'none'; }, 3000); }
-                    return;
-                }
-            } catch(e) {
-                console.warn('Toronto Open Data bike lanes failed, using fallback:', e);
-            }
-            bikeGeoLayer = drawFallbackBikeLanes();
-            if (bikeLayerOn) bikeGeoLayer.addTo(mapInstance);
-            if (statusEl) { statusEl.textContent = 'Cycling routes loaded (offline data)'; setTimeout(function() { statusEl.style.display = 'none'; }, 2000); }
-        }
-
-        function drawFallbackBikeLanes() {
-            var routes = [
-                { coords: [[43.6655,-79.4165],[43.6655,-79.3960],[43.6655,-79.3720],[43.6655,-79.3330]], name: 'Bloor St W', type: 'Protected Bike Lane' },
-                { coords: [[43.6615,-79.4050],[43.6615,-79.3800],[43.6615,-79.3620]], name: 'Harbord St', type: 'Bike Lane' },
-                { coords: [[43.6510,-79.4080],[43.6510,-79.3850],[43.6510,-79.3600]], name: 'College St', type: 'Bike Lane' },
-                { coords: [[43.6485,-79.4050],[43.6485,-79.3840],[43.6485,-79.3600]], name: 'Wellesley St', type: 'Protected Bike Lane' },
-                { coords: [[43.6390,-79.4090],[43.6390,-79.3880],[43.6390,-79.3680]], name: 'Queen St W', type: 'Bike Lane' },
-                { coords: [[43.6360,-79.4080],[43.6360,-79.3880],[43.6360,-79.3700]], name: 'Richmond St', type: 'Protected Bike Lane' },
-                { coords: [[43.6345,-79.4060],[43.6345,-79.3860],[43.6345,-79.3700]], name: 'Adelaide St', type: 'Protected Bike Lane' },
-                { coords: [[43.6540,-79.3885],[43.6480,-79.3880],[43.6420,-79.3885]], name: 'Sherbourne St', type: 'Protected Bike Lane' },
-                { coords: [[43.6600,-79.3890],[43.6540,-79.3890],[43.6480,-79.3890]], name: 'Jarvis St', type: 'Bike Lane' },
-                { coords: [[43.6720,-79.4050],[43.6650,-79.4010],[43.6590,-79.3970]], name: 'Davenport Rd', type: 'Multi-use Trail' },
-                { coords: [[43.6380,-79.3800],[43.6280,-79.3810],[43.6200,-79.3820]], name: 'Lakeshore Trail', type: 'Multi-use Trail' },
-                { coords: [[43.6600,-79.4250],[43.6540,-79.4250],[43.6480,-79.4250]], name: 'Shaw St', type: 'Bike Lane' },
-                { coords: [[43.6428,-79.4000],[43.6428,-79.3800],[43.6428,-79.3600]], name: 'Dundas St W', type: 'Bike Lane' },
-            ];
-            var group = L.layerGroup();
-            routes.forEach(function(route) {
-                var t = route.type.toLowerCase();
-                var style;
-                if (t.indexOf('protect') >= 0) {
-                    style = { color: '#16a34a', weight: 5, opacity: 0.85, dashArray: null };
-                } else if (t.indexOf('trail') >= 0 || t.indexOf('path') >= 0) {
-                    style = { color: '#d97706', weight: 3, opacity: 0.80, dashArray: '4 6' };
-                } else {
-                    style = { color: '#2563eb', weight: 3, opacity: 0.80, dashArray: '10 6' };
-                }
-                var typeLabel = route.type === 'Protected Bike Lane' ? '<span style="background:#dcfce7;color:#15803d;padding:1px 6px;border-radius:6px;font-size:11px;font-weight:600;">PROTECTED</span>' :
-                                route.type === 'Multi-use Trail'     ? '<span style="background:#fef3c7;color:#b45309;padding:1px 6px;border-radius:6px;font-size:11px;font-weight:600;">TRAIL</span>' :
-                                                                       '<span style="background:#dbeafe;color:#1d4ed8;padding:1px 6px;border-radius:6px;font-size:11px;font-weight:600;">BIKE LANE</span>';
-                L.polyline(route.coords, style)
-                 .bindPopup('<b style="font-size:13px;">' + route.name + '</b><br>' + typeLabel + '<br><span style="color:#dc2626;font-weight:600;font-size:12px;">$200 Fine — No Stopping</span>')
-                 .addTo(group);
-            });
-            return group;
-        }
-
-        function loadHydrantsLayer() {
-            hydrantGroup = L.layerGroup();
-            var hydrantIcon = L.divIcon({
-                className: '',
-                html: '<div style="width:14px;height:14px;border-radius:3px;background:#dc2626;border:2px solid #fff;box-shadow:0 1px 5px rgba(220,38,38,0.55);display:flex;align-items:center;justify-content:center;"><div style="width:4px;height:4px;border-radius:50%;background:#fff;opacity:0.85;"></div></div>',
-                iconSize: [14, 14],
-                iconAnchor: [7, 7]
-            });
-            var corners = [
-                [43.6655,-79.4165],[43.6655,-79.4000],[43.6655,-79.3830],[43.6655,-79.3660],
-                [43.6615,-79.4050],[43.6615,-79.3880],[43.6615,-79.3720],[43.6615,-79.3560],
-                [43.6570,-79.4100],[43.6570,-79.3940],[43.6570,-79.3780],[43.6570,-79.3620],
-                [43.6530,-79.4080],[43.6530,-79.3920],[43.6530,-79.3760],[43.6530,-79.3600],
-                [43.6485,-79.4050],[43.6485,-79.3890],[43.6485,-79.3730],[43.6485,-79.3580],
-                [43.6450,-79.4090],[43.6450,-79.3930],[43.6450,-79.3770],[43.6450,-79.3620],
-                [43.6420,-79.4000],[43.6420,-79.3850],[43.6420,-79.3700],[43.6420,-79.3550],
-                [43.6390,-79.4090],[43.6390,-79.3940],[43.6390,-79.3780],[43.6390,-79.3630],
-                [43.6360,-79.4080],[43.6360,-79.3920],[43.6360,-79.3760],[43.6360,-79.3600],
-                [43.6700,-79.4020],[43.6700,-79.3860],[43.6700,-79.3700],[43.6700,-79.3540],
-                [43.6740,-79.4080],[43.6740,-79.3920],[43.6740,-79.3760],
-                [43.6540,-79.3885],[43.6540,-79.3730],[43.6540,-79.3580],
-                [43.6600,-79.3890],[43.6600,-79.3740],[43.6600,-79.3590]
-            ];
-            corners.forEach(function(c) {
-                var rLat = c[0] + (Math.random() - 0.5) * 0.0008;
-                var rLng = c[1] + (Math.random() - 0.5) * 0.0008;
-                L.marker([rLat, rLng], { icon: hydrantIcon })
-                 .bindPopup('<b style="color:#dc2626;">Fire Hydrant</b><br><span style="color:#6b7280;font-size:12px;">3 m no-parking clearance<br>on both sides required</span><br><span style="color:#dc2626;font-weight:700;font-size:13px;">$100 Fine</span>')
-                 .addTo(hydrantGroup);
-            });
-            if (hydrantLayerOn) hydrantGroup.addTo(mapInstance);
-        }
-
-        async function loadEVStationsLayer() {
-            evGroup = L.layerGroup();
-            var evIcon = L.divIcon({
-                className: '',
-                html: '<div style="width:22px;height:22px;border-radius:50%;background:#8b5cf6;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(139,92,246,0.5);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:800;">EV</div>',
-                iconSize: [22, 22],
-                iconAnchor: [11, 11]
-            });
-
-            var evStations = [
-                { lat: 43.6482, lng: -79.3992, name: 'CF Sherway Gardens', addr: '25 The West Mall', ports: 8, network: 'ChargePoint', free: false },
-                { lat: 43.6426, lng: -79.3866, name: 'Scotiabank Arena Garage', addr: '40 Bay St', ports: 6, network: 'Tesla', free: false },
-                { lat: 43.6677, lng: -79.4000, name: 'Yorkdale Mall', addr: '3401 Dufferin St', ports: 12, network: 'Tesla Supercharger', free: false },
-                { lat: 43.7730, lng: -79.3383, name: 'Fairview Mall', addr: '1800 Sheppard Ave E', ports: 4, network: 'ChargePoint', free: false },
-                { lat: 43.6461, lng: -79.3798, name: 'Union Station Garage', addr: '65 Front St W', ports: 4, network: 'Flo', free: false },
-                { lat: 43.6617, lng: -79.3804, name: 'City Hall Garage', addr: '100 Queen St W', ports: 6, network: 'Flo', free: false },
-                { lat: 43.7245, lng: -79.3427, name: 'North York Civic Centre', addr: '5100 Yonge St', ports: 8, network: 'Flo', free: true },
-                { lat: 43.6531, lng: -79.4056, name: 'Exhibition Place', addr: '200 Princes Blvd', ports: 10, network: 'ChargePoint', free: false },
-                { lat: 43.6441, lng: -79.3997, name: 'Metro Toronto Convention Ctr', addr: '255 Front St W', ports: 6, network: 'ChargePoint', free: false },
-                { lat: 43.7070, lng: -79.3980, name: 'Downsview Park', addr: '35 Carl Hall Rd', ports: 4, network: 'Flo', free: true },
-                { lat: 43.6480, lng: -79.4120, name: 'Liberty Village Parking', addr: '171 East Liberty St', ports: 4, network: 'ChargePoint', free: false },
-                { lat: 43.6590, lng: -79.3450, name: 'Corktown Common', addr: '155 Bayview Ave', ports: 3, network: 'Flo', free: true },
-                { lat: 43.6720, lng: -79.3880, name: 'Ryerson University', addr: '350 Victoria St', ports: 5, network: 'ChargePoint', free: false },
-                { lat: 43.6980, lng: -79.4230, name: 'Humber College North', addr: '205 Humber College Blvd', ports: 6, network: 'Flo', free: false },
-                { lat: 43.7630, lng: -79.5240, name: 'Etobicoke Civic Centre', addr: '399 The West Mall', ports: 4, network: 'Flo', free: true },
-                { lat: 43.6800, lng: -79.5580, name: 'Mimico GO Station', addr: '55 Superior Ave', ports: 3, network: 'Petro-Canada RECHARGE', free: false },
-                { lat: 43.7190, lng: -79.2720, name: 'Scarborough Town Centre', addr: '300 Borough Dr', ports: 8, network: 'Tesla', free: false },
-                { lat: 43.7714, lng: -79.2510, name: 'Agincourt GO', addr: '4100 Sheppard Ave E', ports: 4, network: 'Petro-Canada RECHARGE', free: false },
-                { lat: 43.6350, lng: -79.3500, name: 'Leslieville Charging Hub', addr: '905 Queen St E', ports: 4, network: 'Flo', free: false },
-                { lat: 43.6553, lng: -79.4645, name: 'High Park P-Lot', addr: '1873 Bloor St W', ports: 3, network: 'Flo', free: true }
-            ];
-
-            try {
-                var pkgResp = await fetch('https://ckan0.cf.opendata.inter.toronto.ca/api/3/action/package_show?id=electric-vehicle-charging-stations');
-                var pkg = await pkgResp.json();
-                var resources = (pkg.result || {}).resources || [];
-                var geoRes = resources.find(function(r) {
-                    var fmt = (r.format || '').toLowerCase();
-                    return fmt === 'geojson' || fmt === 'json' || (r.url || '').toLowerCase().indexOf('geojson') >= 0;
-                });
-                if (geoRes) {
-                    var geoResp = await fetch(geoRes.url);
-                    var geoData = await geoResp.json();
-                    var features = geoData.features || [];
-                    if (features.length > 0) {
-                        features.forEach(function(f) {
-                            var coords = (f.geometry || {}).coordinates || [];
-                            if (coords.length < 2) return;
-                            var p = f.properties || {};
-                            var name = p.STATION_NAME || p.NAME || p.name || 'EV Charging Station';
-                            var addr = p.ADDRESS || p.address || '';
-                            var ports = p.EV_LEVEL2_EVSE_NUM || p.EVSE_COUNT || p.ports || '?';
-                            var network = p.EV_NETWORK || p.NETWORK || 'City of Toronto';
-                            L.marker([coords[1], coords[0]], { icon: evIcon })
-                             .bindPopup('<b style="color:#7c3aed;">\u26A1 ' + name + '</b><br><span style="color:#374151;font-size:12px;">' + addr + '</span><br>Ports: <b>' + ports + '</b> &bull; ' + network)
-                             .addTo(evGroup);
-                        });
-                        if (evLayerOn) evGroup.addTo(mapInstance);
-                        return;
-                    }
-                }
-            } catch(e) {}
-
-            evStations.forEach(function(s) {
-                var freeLabel = s.free ? '<span style="color:#059669;font-weight:600;">Free to use</span>' : '<span style="color:#374151;">Paid / App required</span>';
-                L.marker([s.lat, s.lng], { icon: evIcon })
-                 .bindPopup('<b style="color:#7c3aed;">\u26A1 ' + s.name + '</b><br><span style="color:#6b7280;font-size:12px;">' + s.addr + '</span><br>Ports: <b>' + s.ports + '</b><br>Network: ' + s.network + '<br>' + freeLabel)
-                 .addTo(evGroup);
-            });
-            if (evLayerOn) evGroup.addTo(mapInstance);
-        }
-
-        function loadParkingLayer() {
-            parkingGroup = L.layerGroup();
+        function loadFreeDropoffLayer() {
+            freeDropoffGroup = L.layerGroup();
             var spots = [
-                { lat: 43.6533, lng: -79.3832, name: 'Nathan Phillips Square', rate: '$3.50/hr', max: '3 hrs', hours: 'Mon-Sun 7am-10pm', count: 31, tier: 'orange' },
-                { lat: 43.6485, lng: -79.3835, name: 'Harbour Square', rate: '$4.00/hr', max: '2 hrs', hours: 'Mon-Sun 8am-10pm', count: 12, tier: 'orange' },
-                { lat: 43.6611, lng: -79.3805, name: 'Dundas Square P-Lot', rate: '$3.00/hr', max: '2 hrs', hours: 'Mon-Sat 8am-9pm', count: 0, tier: 'red' },
-                { lat: 43.6540, lng: -79.4055, name: 'Strachan Ave Green P', rate: '$2.50/hr', max: '4 hrs', hours: 'Mon-Sat 8am-9pm', count: 18, tier: 'green' },
-                { lat: 43.6438, lng: -79.3872, name: 'Front St W Green P', rate: '$3.50/hr', max: '2 hrs', hours: 'Mon-Sun 8am-midnight', count: 12, tier: 'orange' },
-                { lat: 43.6620, lng: -79.3900, name: 'Gerrard St E Lot', rate: '$2.00/hr', max: '4 hrs', hours: 'Mon-Fri 8am-6pm', count: 89, tier: 'green' },
-                { lat: 43.6490, lng: -79.3978, name: 'Rees St Green P', rate: '$3.00/hr', max: '2 hrs', hours: 'Mon-Sun 7am-10pm', count: 2, tier: 'orange' },
-                { lat: 43.6560, lng: -79.3740, name: 'George St Green P', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm', count: 45, tier: 'green' },
-                { lat: 43.6388, lng: -79.4010, name: 'Dufferin St Lot', rate: '$2.00/hr', max: '4 hrs', hours: 'Mon-Fri 7am-7pm', count: 28, tier: 'green' },
-                { lat: 43.6680, lng: -79.4100, name: 'Dufferin-Bloor Green P', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm', count: 7, tier: 'green' },
-                { lat: 43.6432, lng: -79.4000, name: 'Queen-Bathurst Lot', rate: '$2.50/hr', max: '3 hrs', hours: 'Mon-Sat 8am-9pm', count: 25, tier: 'green' },
-                { lat: 43.6700, lng: -79.3680, name: 'Sherbourne-Bloor', rate: '$2.00/hr', max: '3 hrs', hours: 'Mon-Sat 8am-8pm', count: 55, tier: 'green' },
-                { lat: 43.6580, lng: -79.4200, name: 'Dovercourt-College', rate: '$1.75/hr', max: 'No limit', hours: 'Mon-Sat 8am-8pm', count: 6, tier: 'green' },
-                { lat: 43.6348, lng: -79.3450, name: 'Riverside Green P', rate: '$1.50/hr', max: 'No limit', hours: 'Mon-Fri 8am-6pm', count: 3, tier: 'orange' },
-                { lat: 43.6510, lng: -79.3600, name: 'Berkeley St Lot', rate: '$2.25/hr', max: '3 hrs', hours: 'Mon-Sat 8am-8pm', count: 12, tier: 'orange' }
+                { lat: 43.6592, lng: -79.3877, name: 'Toronto General Hospital', addr: '200 Elizabeth St', zone: 'Hospital Drop-off', hours: 'Any time', notes: 'Patient & visitor drop-off' },
+                { lat: 43.6571, lng: -79.3891, name: 'Mount Sinai Hospital', addr: '600 University Ave', zone: 'Hospital Drop-off', hours: 'Any time', notes: 'Emergency & outpatient drop-off' },
+                { lat: 43.6574, lng: -79.3884, name: 'SickKids Hospital', addr: '555 University Ave', zone: 'Hospital Drop-off', hours: 'Any time', notes: 'Pediatric drop-off lane' },
+                { lat: 43.6524, lng: -79.4143, name: 'Toronto Western Hospital', addr: '399 Bathurst St', zone: 'Hospital Drop-off', hours: 'Any time', notes: 'Main entrance drop-off' },
+                { lat: 43.6453, lng: -79.3808, name: 'Union Station (Bay St)', addr: '65 Front St W', zone: 'Transit Drop-off', hours: 'Any time', notes: 'Taxi & rideshare lane' },
+                { lat: 43.6450, lng: -79.3782, name: 'Union Station (York St)', addr: '1 York St', zone: 'Transit Drop-off', hours: 'Any time', notes: 'West entrance drop-off' },
+                { lat: 43.6702, lng: -79.3868, name: 'Bloor–Yonge TTC', addr: '2 Bloor St W', zone: 'Transit Drop-off', hours: 'Any time', notes: 'North entrance drop-off' },
+                { lat: 43.6657, lng: -79.4003, name: 'Spadina TTC Station', addr: '360 Bloor St W', zone: 'Transit Drop-off', hours: 'Any time', notes: 'Rideshare pick-up zone' },
+                { lat: 43.6544, lng: -79.3817, name: 'Eaton Centre (Queen St)', addr: '220 Yonge St', zone: 'Free 20-Min Parking', hours: 'Mon–Sat 8am–9pm', notes: 'Queen St short-term bay' },
+                { lat: 43.6528, lng: -79.3836, name: 'City Hall (Queen St W)', addr: '100 Queen St W', zone: 'Free 20-Min Parking', hours: 'Mon–Fri 8am–6pm', notes: 'Short-term civic drop-off' },
+                { lat: 43.6536, lng: -79.3928, name: 'Art Gallery of Ontario', addr: '317 Dundas St W', zone: 'Free 20-Min Parking', hours: 'Mon–Sun 10am–10pm', notes: 'McCaul St front entrance' },
+                { lat: 43.6488, lng: -79.3714, name: 'St. Lawrence Market', addr: '93 Front St E', zone: 'Free 20-Min Parking', hours: 'Tue–Sat 8am–6pm', notes: 'Front St E loading zone' },
+                { lat: 43.6430, lng: -79.3785, name: 'Scotiabank Arena (Bay)', addr: '40 Bay St', zone: 'Free 20-Min Parking', hours: 'Event days', notes: 'Quick drop-off, no waiting' },
+                { lat: 43.6414, lng: -79.3893, name: 'Rogers Centre Drop-off', addr: '1 Blue Jays Way', zone: 'Free 20-Min Parking', hours: 'Event days', notes: 'Rees St designated zone' },
+                { lat: 43.6460, lng: -79.3874, name: 'Roy Thomson Hall', addr: '60 Simcoe St', zone: 'Free 20-Min Parking', hours: 'Performance evenings', notes: 'Wellington St marked bay' },
+                { lat: 43.6482, lng: -79.3802, name: 'Bay–King (Financial)', addr: '100 King St W', zone: 'Free 20-Min Parking', hours: 'Mon–Fri 8am–6pm', notes: 'King St metered short-term' },
+                { lat: 43.6488, lng: -79.3812, name: 'Wellington St W', addr: '200 Wellington St W', zone: 'Free 20-Min Parking', hours: 'Mon–Fri 8am–6pm', notes: 'Loading zone, 20-min limit' },
+                { lat: 43.6672, lng: -79.3875, name: 'Yonge–Bloor (Midtown)', addr: '2 Bloor St E', zone: 'Free 20-Min Parking', hours: 'Mon–Sat 8am–9pm', notes: 'Bloor St E short-term bay' },
+                { lat: 43.6614, lng: -79.3824, name: 'Maple Leaf Square', addr: '15 York St', zone: 'Free 20-Min Parking', hours: 'Any time', notes: 'Arena district drop-off' },
+                { lat: 43.6591, lng: -79.3856, name: 'College Park', addr: '444 Yonge St', zone: 'Free 20-Min Parking', hours: 'Mon–Sat 9am–9pm', notes: 'Yonge St 20-min zone' },
+                { lat: 43.6512, lng: -79.3934, name: 'Alexandra Park (CAMH)', addr: '250 Dundas St W', zone: 'Free 20-Min Parking', hours: 'Any time', notes: 'Dundas W loading zone' },
+                { lat: 43.6615, lng: -79.3732, name: 'Jarvis–Carlton', addr: '200 Jarvis St', zone: 'Free 20-Min Parking', hours: 'Mon–Sat 8am–9pm', notes: 'Carlton St marked bay' },
+                { lat: 43.6456, lng: -79.3985, name: 'Harbourfront Centre', addr: '235 Queens Quay W', zone: 'Free 20-Min Parking', hours: 'Any time', notes: 'Queens Quay W drop-off' },
+                { lat: 43.6500, lng: -79.4056, name: 'Exhibition Place', addr: '200 Princes Blvd', zone: 'Free 20-Min Parking', hours: 'Event days', notes: 'Gate 1 designated zone' },
+                { lat: 43.6558, lng: -79.4015, name: 'Liberty Village Drop-off', addr: '171 East Liberty St', zone: 'Free 20-Min Parking', hours: 'Any time', notes: 'East Liberty St zone' }
             ];
             spots.forEach(function(s) {
-                var bg = s.tier === 'green' ? '#16a34a' : s.tier === 'orange' ? '#d97706' : '#dc2626';
-                var size = s.count > 50 ? 42 : s.count > 10 ? 36 : 30;
-                var fontSize = s.count > 50 ? 14 : s.count > 10 ? 13 : 12;
+                var isMed = (s.zone === 'Hospital Drop-off');
+                var isTTC = (s.zone === 'Transit Drop-off');
+                var bg1 = isMed ? '#0A84FF' : (isTTC ? '#5856D6' : '#16a34a');
+                var bg2 = isMed ? '#0060df' : (isTTC ? '#4040c0' : '#15803d');
+                var lbl = isMed ? '+' : (isTTC ? 'TTC' : 'P');
                 var icon = L.divIcon({
                     className: '',
-                    html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + bg + ';border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;font-size:' + fontSize + 'px;color:#fff;font-weight:800;font-family:-apple-system,sans-serif;">' + s.count + '</div>',
-                    iconSize: [size, size],
-                    iconAnchor: [size/2, size/2]
+                    html: '<div style="width:40px;height:48px;background:linear-gradient(180deg,' + bg1 + ' 0%,' + bg2 + ' 100%);border-radius:10px;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;">'
+                        + '<div style="font-size:' + (isTTC ? '9px' : '17px') + ';font-weight:900;color:#fff;line-height:1;font-family:-apple-system,sans-serif;">' + lbl + '</div>'
+                        + '<div style="font-size:7px;font-weight:700;color:rgba(255,255,255,0.88);line-height:1;font-family:-apple-system,sans-serif;letter-spacing:0.5px;">20 MIN</div>'
+                        + '<div style="position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid ' + bg2 + ';"></div>'
+                        + '</div>',
+                    iconSize: [40, 57],
+                    iconAnchor: [20, 57]
                 });
-                var availLabel = s.count === 0 ? '<span style="color:#dc2626;font-weight:600;">Full</span>' :
-                                 s.count < 5 ? '<span style="color:#d97706;font-weight:600;">Only ' + s.count + ' spots</span>' :
-                                 '<span style="color:#16a34a;font-weight:600;">' + s.count + ' spots available</span>';
+                var zoneColor = isMed ? '#0A84FF' : (isTTC ? '#5856D6' : '#16a34a');
+                var zoneIcon = isMed ? '&#x1F3E5;' : (isTTC ? '&#x1F687;' : '&#x1F17F;');
+                var popup = '<div style="font-family:-apple-system,sans-serif;min-width:210px;padding:2px;">'
+                    + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
+                    + '<div style="background:' + zoneColor + ';color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;flex-shrink:0;">FREE &bull; 20 MIN</div>'
+                    + '<div style="color:#6b7280;font-size:11px;">' + zoneIcon + ' ' + s.zone + '</div>'
+                    + '</div>'
+                    + '<div style="font-size:14px;font-weight:700;color:#111827;">' + s.name + '</div>'
+                    + '<div style="color:#6b7280;font-size:12px;margin-top:2px;">' + s.addr + '</div>'
+                    + '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f3f4f6;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">'
+                    + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.4px;">Max Stay</div><div style="font-size:12px;font-weight:700;color:#111827;margin-top:1px;">20 min</div></div>'
+                    + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.4px;">Cost</div><div style="font-size:12px;font-weight:700;color:#16a34a;margin-top:1px;">FREE</div></div>'
+                    + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.4px;">Hours</div><div style="font-size:12px;font-weight:700;color:#111827;margin-top:1px;">' + s.hours + '</div></div>'
+                    + '</div>'
+                    + '<div style="margin-top:8px;padding:6px 8px;background:#f9fafb;border-radius:6px;font-size:11px;color:#6b7280;">' + s.notes + '</div>'
+                    + '</div>';
                 L.marker([s.lat, s.lng], { icon: icon })
-                 .bindPopup('<b style="color:#1f2937;">' + s.name + '</b><br>' + availLabel + '<br><span style="color:#374151;font-size:12px;">' + s.hours + '</span><br>Rate: <b style="color:#0A84FF;">' + s.rate + '</b> &bull; Max: ' + s.max)
-                 .addTo(parkingGroup);
+                 .bindPopup(popup, { maxWidth: 250 })
+                 .addTo(freeDropoffGroup);
             });
-            if (parkingLayerOn) parkingGroup.addTo(mapInstance);
-        }
-
-        function toggleLayer(type) {
-            if (type === 'heat') {
-                heatLayerOn = !heatLayerOn;
-                if (heatLayerRef) {
-                    if (heatLayerOn) heatLayerRef.addTo(mapInstance);
-                    else mapInstance.removeLayer(heatLayerRef);
-                }
-                document.getElementById('toggleHeat').classList.toggle('active', heatLayerOn);
-            } else if (type === 'ev') {
-                evLayerOn = !evLayerOn;
-                if (evGroup) {
-                    if (evLayerOn) evGroup.addTo(mapInstance);
-                    else mapInstance.removeLayer(evGroup);
-                }
-                document.getElementById('toggleEV').classList.toggle('active', evLayerOn);
-            } else if (type === 'parking') {
-                parkingLayerOn = !parkingLayerOn;
-                if (parkingGroup) {
-                    if (parkingLayerOn) parkingGroup.addTo(mapInstance);
-                    else mapInstance.removeLayer(parkingGroup);
-                }
-                document.getElementById('toggleParking').classList.toggle('active', parkingLayerOn);
-            }
+            freeDropoffGroup.addTo(mapInstance);
+            var countEl = document.getElementById('spotCountBadge');
+            if (countEl) countEl.textContent = spots.length + ' spots';
         }
 
         /* ─────────────────────────────────────────────────────── */
