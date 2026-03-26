@@ -4391,7 +4391,8 @@ HTML_TEMPLATE = """
             if (localStorage.getItem('drivee_install_dismissed')) return;
 
             var ua = navigator.userAgent || '';
-            var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            var isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             var isAndroid = /Android/.test(ua);
             if (!isIOS && !isAndroid) return;
 
