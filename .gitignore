@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.upm/
+.pythonlibs/
+.cache/
+.agents/
+.local/
+attached_assets/
+uv.lock
