@@ -33,7 +33,7 @@ HTML_TEMPLATE = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#0A84FF">
     <title>Drivee | Professional</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2299,9 +2299,255 @@ HTML_TEMPLATE = """
         }
         .chat-send:disabled { opacity: 0.45; cursor: not-allowed; }
         .chat-send:not(:disabled):active { transform: scale(0.93); }
+    
+        /* ── Splash Screen ── */
+        #splashScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #0A84FF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: all;
+            animation: splashExit 0.5s ease 2.4s forwards;
+        }
+        #splashScreen.hidden { display: none; }
+        .splash-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: splashContentIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+        }
+        .splash-car-wrap {
+            width: 88px;
+            height: 88px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        }
+        .splash-car-icon {
+            font-size: 48px;
+            line-height: 1;
+        }
+        .splash-wordmark {
+            font-size: 46px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -1.5px;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .splash-tagline {
+            font-size: 15px;
+            color: rgba(255,255,255,0.78);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            font-family: -apple-system, sans-serif;
+            animation: splashTagIn 0.5s ease 0.55s both;
+        }
+        .splash-dots {
+            display: flex;
+            gap: 7px;
+            margin-top: 52px;
+            animation: splashTagIn 0.5s ease 0.8s both;
+        }
+        .splash-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            animation: dotPulse 1.1s ease infinite;
+        }
+        .splash-dot:nth-child(2) { animation-delay: 0.18s; }
+        .splash-dot:nth-child(3) { animation-delay: 0.36s; }
+        @keyframes splashExit {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.04); pointer-events: none; }
+        }
+        @keyframes splashContentIn {
+            from { opacity: 0; transform: translateY(28px) scale(0.88); }
+            to   { opacity: 1; transform: translateY(0)   scale(1); }
+        }
+        @keyframes splashTagIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0.4; transform: scale(0.85); }
+            50%       { opacity: 1;   transform: scale(1.15); }
+        }
+
+        /* ── Install Guide Sheet ── */
+        #installSheetOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99998;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s ease;
+        }
+        #installSheetOverlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        #installSheet {
+            background: #fff;
+            border-radius: 26px 26px 0 0;
+            width: 100%;
+            max-width: 480px;
+            padding: 12px 24px calc(28px + env(safe-area-inset-bottom, 0px));
+            transform: translateY(100%);
+            transition: transform 0.38s cubic-bezier(0.32, 1, 0.22, 1);
+        }
+        #installSheetOverlay.open #installSheet {
+            transform: translateY(0);
+        }
+        .install-drag {
+            width: 44px; height: 5px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 0 auto 20px;
+        }
+        .install-app-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .install-app-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 14px;
+            background: #0A84FF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(10,132,255,0.3);
+        }
+        .install-app-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: #111;
+            letter-spacing: -0.4px;
+        }
+        .install-app-sub {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+        .install-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .install-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-radius: 14px;
+        }
+        .install-step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #0A84FF;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .install-step-text {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+            line-height: 1.35;
+        }
+        .install-step-text strong {
+            color: #111;
+            font-weight: 700;
+        }
+        .install-got-it {
+            width: 100%;
+            padding: 16px;
+            background: #0A84FF;
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: -apple-system, sans-serif;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .install-got-it:active { opacity: 0.85; }
+        .install-later {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 4px;
+            -webkit-tap-highlight-color: transparent;
+        }
     </style>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-title" content="Drivee">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230A84FF'/><text x='50' y='68' font-size='52' text-anchor='middle' font-family='-apple-system,sans-serif' font-weight='900' fill='white'>D</text></svg>">
 </head>
 <body>
+    <div id="splashScreen">
+        <div class="splash-inner">
+            <div class="splash-car-wrap">
+                <span class="splash-car-icon">🚗</span>
+            </div>
+            <div class="splash-wordmark">Drivee</div>
+            <div class="splash-tagline">Toronto Parking &amp; Fines Manager</div>
+            <div class="splash-dots">
+                <div class="splash-dot"></div>
+                <div class="splash-dot"></div>
+                <div class="splash-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="installSheetOverlay">
+        <div id="installSheet">
+            <div class="install-drag"></div>
+            <div class="install-app-row">
+                <div class="install-app-icon">🚗</div>
+                <div>
+                    <div class="install-app-name">Drivee</div>
+                    <div class="install-app-sub">Add to your Home Screen</div>
+                </div>
+            </div>
+            <div class="install-steps" id="installSteps"></div>
+            <button class="install-got-it" onclick="dismissInstall()">Got it — Thanks!</button>
+            <span class="install-later" onclick="dismissInstall()">Maybe later</span>
+        </div>
+    </div>
+
     <div id="loadingOverlay" class="loading-overlay">
         <i class="fa-solid fa-satellite-dish fa-spin"></i>
         <span>Grabbing GPS Coordinates...</span>
@@ -4116,6 +4362,58 @@ HTML_TEMPLATE = """
             var btn = last.querySelector('.cal-sync-btn');
             if (btn) btn.click();
         }
+
+        // ── Splash Screen + Install Guide ────────────────────────────
+        (function() {
+            var splash = document.getElementById('splashScreen');
+            if (!splash) return;
+
+            // After animation completes, remove from DOM and check install
+            splash.addEventListener('animationend', function(e) {
+                if (e.animationName === 'splashExit') {
+                    splash.style.display = 'none';
+                    checkInstallPrompt();
+                }
+            });
+        })();
+
+        function checkInstallPrompt() {
+            var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || !!navigator.standalone;
+            if (isStandalone) return;
+            if (localStorage.getItem('drivee_install_dismissed')) return;
+
+            var ua = navigator.userAgent || '';
+            var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            var isAndroid = /Android/.test(ua);
+            if (!isIOS && !isAndroid) return;
+
+            var stepsEl = document.getElementById('installSteps');
+            if (!stepsEl) return;
+
+            if (isIOS) {
+                stepsEl.innerHTML =
+                    '<div class="install-step"><div class="install-step-num">1</div><div class="install-step-text">Open this page in <strong>Safari</strong> (not Chrome or other browsers)</div></div>' +
+                    '<div class="install-step"><div class="install-step-num">2</div><div class="install-step-text">Tap the <strong>Share</strong> button &#9633;&#8593; at the bottom of the screen</div></div>' +
+                    '<div class="install-step"><div class="install-step-num">3</div><div class="install-step-text">Scroll down and tap <strong>Add to Home Screen</strong></div></div>' +
+                    '<div class="install-step"><div class="install-step-num">4</div><div class="install-step-text">Tap <strong>Add</strong> — Drivee will appear on your home screen like a real app!</div></div>';
+            } else {
+                stepsEl.innerHTML =
+                    '<div class="install-step"><div class="install-step-num">1</div><div class="install-step-text">Tap the <strong>three dots</strong> &#8942; menu in Chrome (top right)</div></div>' +
+                    '<div class="install-step"><div class="install-step-num">2</div><div class="install-step-text">Tap <strong>Add to Home screen</strong> or <strong>Install App</strong></div></div>' +
+                    '<div class="install-step"><div class="install-step-num">3</div><div class="install-step-text">Tap <strong>Install</strong> — Drivee will appear on your home screen!</div></div>';
+            }
+
+            var overlay = document.getElementById('installSheetOverlay');
+            if (overlay) {
+                setTimeout(function() { overlay.classList.add('open'); }, 350);
+            }
+        }
+
+        function dismissInstall() {
+            localStorage.setItem('drivee_install_dismissed', '1');
+            var overlay = document.getElementById('installSheetOverlay');
+            if (overlay) overlay.classList.remove('open');
+        }
     </script>
 </body>
 </html>
@@ -4197,6 +4495,30 @@ def format_date_display(due_date_str):
         return due.strftime('%b %d, %Y')
     except ValueError:
         return due_date_str
+
+@app.route('/manifest.json')
+def manifest():
+    data = {
+        "name": "Drivee",
+        "short_name": "Drivee",
+        "description": "Toronto parking & traffic fine manager",
+        "start_url": "/",
+        "display": "standalone",
+        "orientation": "portrait-primary",
+        "theme_color": "#0A84FF",
+        "background_color": "#F0F4FF",
+        "icons": [
+            {
+                "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%230A84FF'/><text x='256' y='360' font-size='280' text-anchor='middle' font-family='-apple-system,sans-serif' font-weight='900' fill='white'>D</text></svg>",
+                "sizes": "any",
+                "type": "image/svg+xml",
+                "purpose": "any maskable"
+            }
+        ]
+    }
+    return Response(json.dumps(data), mimetype='application/manifest+json',
+                    headers={'Cache-Control': 'public, max-age=86400'})
+
 
 @app.route('/favicon.ico')
 def favicon():
