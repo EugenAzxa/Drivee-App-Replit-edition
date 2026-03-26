@@ -2311,7 +2311,7 @@ HTML_TEMPLATE = """
             align-items: center;
             justify-content: center;
             pointer-events: all;
-            animation: splashExit 0.5s ease 2.4s forwards;
+            animation: splashExit 0.5s ease 2.0s forwards;
         }
         #splashScreen.hidden { display: none; }
         .splash-inner {
@@ -2532,7 +2532,7 @@ HTML_TEMPLATE = """
         </div>
     </div>
 
-    <div id="installSheetOverlay">
+    <div id="installSheetOverlay" onclick="handleInstallOverlayClick(event)">
         <div id="installSheet">
             <div class="install-drag"></div>
             <div class="install-app-row">
@@ -4413,6 +4413,12 @@ HTML_TEMPLATE = """
             localStorage.setItem('drivee_install_dismissed', '1');
             var overlay = document.getElementById('installSheetOverlay');
             if (overlay) overlay.classList.remove('open');
+        }
+
+        function handleInstallOverlayClick(e) {
+            if (e.target === document.getElementById('installSheetOverlay')) {
+                dismissInstall();
+            }
         }
     </script>
 </body>
