@@ -3802,7 +3802,7 @@ HTML_TEMPLATE = """
                 <span class="support-bullet-icon">&#x1F30D;</span>
                 <div><strong>Expand beyond Toronto</strong> &mdash; bring Drivee to Ottawa, Vancouver, Calgary, and across Canada.</div>
             </div>
-            <a href="https://www.gofundme.com" target="_blank" rel="noopener" class="support-gofundme-btn" onclick="closeSupportSheet()">
+            <a href="https://gofund.me/2eda3f6bf" target="_blank" rel="noopener" class="support-gofundme-btn" onclick="closeSupportSheet()">
                 <i class="fa-solid fa-heart"></i> Donate on GoFundMe
             </a>
             <span class="support-close-link" onclick="closeSupportSheet()">Maybe later</span>
