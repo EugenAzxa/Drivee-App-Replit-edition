@@ -2511,6 +2511,345 @@ HTML_TEMPLATE = """
             padding: 4px;
             -webkit-tap-highlight-color: transparent;
         }
+    
+        /* ── AI Search Bar ── */
+        .top-search-bar {
+            gap: 8px;
+        }
+        .ai-search-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            min-width: 0;
+        }
+        .ai-search-row {
+            display: flex;
+            align-items: center;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
+            border-radius: 50px;
+            padding: 0 6px 0 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .ai-search-row:focus-within {
+            border-color: #0A84FF;
+            box-shadow: 0 0 0 3px rgba(10,132,255,0.12), 0 2px 10px rgba(0,0,0,0.07);
+        }
+        .ai-search-icon {
+            color: #0A84FF;
+            font-size: 13px;
+            flex-shrink: 0;
+            margin-right: 8px;
+        }
+        .ai-search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: var(--font);
+            font-weight: 400;
+            outline: none;
+            padding: 12px 0;
+            min-width: 0;
+        }
+        .ai-search-input::placeholder { color: var(--text-tertiary); }
+        .ai-search-send {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #0A84FF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            transition: opacity 0.15s, transform 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ai-search-send:active { opacity: 0.8; transform: scale(0.93); }
+        .ai-chip-row {
+            display: flex;
+            gap: 7px;
+            margin-top: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            scrollbar-width: none;
+        }
+        .ai-chip-row::-webkit-scrollbar { display: none; }
+        .ai-chip {
+            flex-shrink: 0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(10,132,255,0.10);
+            color: #0A84FF;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ai-chip:active { background: rgba(10,132,255,0.2); transform: scale(0.96); }
+
+        /* ── Support Sheet ── */
+        .support-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9900;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s ease;
+        }
+        .support-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .support-sheet {
+            background: #fff;
+            border-radius: 26px 26px 0 0;
+            width: 100%;
+            max-width: 480px;
+            padding: 12px 24px calc(32px + env(safe-area-inset-bottom, 0px));
+            transform: translateY(100%);
+            transition: transform 0.38s cubic-bezier(0.32, 1, 0.22, 1);
+        }
+        .support-overlay.open .support-sheet {
+            transform: translateY(0);
+        }
+        .support-drag {
+            width: 44px; height: 5px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 0 auto 20px;
+        }
+        .support-heart-anim {
+            text-align: center;
+            font-size: 52px;
+            margin-bottom: 12px;
+            animation: heartBeat 1.2s ease-in-out infinite;
+        }
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            14%       { transform: scale(1.15); }
+            28%       { transform: scale(1); }
+            42%       { transform: scale(1.1); }
+            70%       { transform: scale(1); }
+        }
+        .support-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #111;
+            text-align: center;
+            letter-spacing: -0.4px;
+            margin-bottom: 8px;
+        }
+        .support-desc {
+            font-size: 14px;
+            color: #6b7280;
+            text-align: center;
+            line-height: 1.55;
+            margin-bottom: 18px;
+        }
+        .support-bullet {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.4;
+        }
+        .support-bullet:last-of-type { border-bottom: none; }
+        .support-bullet-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .support-gofundme-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            margin-top: 18px;
+            background: linear-gradient(135deg, #00b964 0%, #009d52 100%);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: var(--font);
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .support-gofundme-btn:active { opacity: 0.9; transform: scale(0.98); }
+        .support-close-link {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 4px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ── Dispute AI Email ── */
+        .dispute-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0 12px;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .dispute-divider::before,
+        .dispute-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .dispute-ai-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dispute-send-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .dispute-send-btn {
+            flex: 1;
+            min-width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 8px;
+            background: #f8fafc;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.15s, background 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dispute-send-btn i { font-size: 18px; color: #0A84FF; }
+        .dispute-send-btn:active { background: rgba(10,132,255,0.06); border-color: #0A84FF; }
+        .dispute-copy-email-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background: var(--green-subtle);
+            color: var(--green);
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            margin-top: 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dispute-ai-building {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ── Guide Contact Banner ── */
+        .guide-contact-card {
+            background: linear-gradient(135deg, #0A84FF 0%, #1E6FDB 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+            color: #fff;
+        }
+        .guide-contact-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+        .guide-contact-sub {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-bottom: 14px;
+        }
+        .guide-contact-email-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 20px;
+            background: rgba(255,255,255,0.22);
+            border: 1.5px solid rgba(255,255,255,0.45);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .guide-contact-email-btn:active { background: rgba(255,255,255,0.35); }
+
+        /* ── AI Nav Suggestion Chips in Chat ── */
+        .chat-nav-chip-row {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            padding: 0 44px;
+        }
+        .chat-nav-chip {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(10,132,255,0.1);
+            color: #0A84FF;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .chat-nav-chip:active { background: rgba(10,132,255,0.2); }
     </style>
     <link rel="manifest" href="/manifest.json">
     <meta name="apple-mobile-web-app-title" content="Drivee">
@@ -2557,16 +2896,29 @@ HTML_TEMPLATE = """
 
     <div class="app">
         <div class="top-search-bar">
-            <div class="search-input-wrap">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" class="search-input" placeholder="Find parking near..." readonly onclick="switchTab('hotspots', document.querySelectorAll('.nav-btn')[3])">
+            <div class="ai-search-wrap">
+                <div class="ai-search-row">
+                    <i class="fa-solid fa-sparkles ai-search-icon"></i>
+                    <input type="text" id="aiSearchInput" class="ai-search-input"
+                           placeholder="Ask Drivee AI anything..."
+                           oninput="onAiSearchInput(this.value)"
+                           onkeydown="if(event.key==='Enter'&&this.value.trim()){sendAiSearch();event.preventDefault()}">
+                    <button class="ai-search-send" id="aiSearchSendBtn" onclick="sendAiSearch()" style="opacity:0;pointer-events:none">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="ai-chip-row">
+                    <button class="ai-chip" onclick="aiChipAction('ticket')">&#x1F3AB; Got a ticket?</button>
+                    <button class="ai-chip" onclick="aiChipAction('parking')">&#x1F17F; Free parking</button>
+                    <button class="ai-chip" onclick="aiChipAction('pay')">&#x1F4B3; Pay a fine</button>
+                    <button class="ai-chip" onclick="aiChipAction('dispute')">&#x2696; Dispute it</button>
+                    <button class="ai-chip" onclick="aiChipAction('towed')">&#x1F697; Car towed?</button>
+                    <button class="ai-chip" onclick="aiChipAction('report')">&#x2709; Report a problem</button>
+                </div>
             </div>
             <button class="search-bell" onclick="switchTab('dashboard', document.querySelectorAll('.nav-btn')[1])" title="Reminders">
                 <i class="fa-solid fa-bell"></i>
                 {% if reminders %}<span class="bell-badge">{{ reminders|length }}</span>{% endif %}
-            </button>
-            <button class="search-profile" onclick="switchTab('dashboard', document.querySelectorAll('.nav-btn')[1])" title="Profile">
-                <i class="fa-solid fa-user"></i>
             </button>
         </div>
 
@@ -2668,6 +3020,14 @@ HTML_TEMPLATE = """
                         <div class="guide-desc">If your car was towed, use the "Vehicle Towed?" link on the Services tab to find which impound lot has it.</div>
                     </div>
                 </div>
+            </div>
+
+            <div class="guide-contact-card">
+                <div class="guide-contact-title">&#x1F4AC; Questions or Problems?</div>
+                <div class="guide-contact-sub">We are here to help. Reach out to the Drivee team directly for support, feedback, or bug reports.</div>
+                <a href="mailto:drivee.canada@gmail.com" class="guide-contact-email-btn">
+                    <i class="fa-solid fa-envelope"></i> drivee.canada@gmail.com
+                </a>
             </div>
 
             <button class="guide-start-btn" onclick="switchTab('dashboard', document.querySelectorAll('.nav-btn')[1])">Get Started</button>
@@ -2839,16 +3199,12 @@ HTML_TEMPLATE = """
                         <span class="svc-text">Court Services & Provincial Offences</span>
                         <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.ontario.ca/page/traffic-ticket" target="_blank" rel="noopener" class="service-link svc-amber">
+                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/pay-your-provincial-offence/" target="_blank" rel="noopener" class="service-link svc-amber">
                         <div class="svc-icon">&#x1F6A8;</div>
                         <span class="svc-text">Speed Violation — Pay or Dispute</span>
                         <span class="svc-arrow">&#x203A;</span>
                     </a>
-                    <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/courts/pay-a-fine-at-court/" target="_blank" rel="noopener" class="service-link svc-teal">
-                        <div class="svc-icon">&#x1F4B8;</div>
-                        <span class="svc-text">Pay a Fine at Court</span>
-                        <span class="svc-arrow">&#x203A;</span>
-                    </a>
+
                 </div>
             </div>
 
@@ -2956,7 +3312,7 @@ HTML_TEMPLATE = """
                         <span class="parking-detail-value" id="pdTip" style="color:var(--text-secondary);font-size:12px;"></span>
                     </div>
                 </div>
-                <a href="https://apps.apple.com/ca/app/green-p-parking/id983111045" target="_blank" rel="noopener" class="green-p-link" style="margin-top:14px;">
+                <a href="https://apps.apple.com/ca/app/green-p/id429679356" target="_blank" rel="noopener" class="green-p-link" style="margin-top:14px;">
                     <i class="fa-solid fa-mobile-screen"></i> Open Green P App
                 </a>
             </div>
@@ -2984,13 +3340,49 @@ HTML_TEMPLATE = """
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
                     Copy Script
                 </button>
+
+                <div class="dispute-divider"><span>or write your own</span></div>
+
+                <div class="dispute-ai-label"><i class="fa-solid fa-pen-to-square"></i> Describe Your Situation</div>
+                <textarea id="disputeOwnIssue" class="dispute-textarea" placeholder="e.g. I got a ticket on King St but there was no visible sign. The sign was covered by a tree branch. I have photos..." style="min-height:90px"></textarea>
+
+                <button class="btn btn-blue" onclick="buildDisputeEmailAI()" style="margin-top:10px;font-size:15px;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Build Email with AI
+                </button>
+
+                <div id="disputeEmailSection" style="display:none; margin-top:16px;">
+                    <div class="dispute-ai-label"><i class="fa-solid fa-envelope-open-text"></i> Your AI-Generated Dispute Email</div>
+                    <textarea id="disputeEmailText" class="dispute-textarea" style="min-height:220px; font-size:13px;"></textarea>
+                    <button class="dispute-copy-email-btn" onclick="copyDisputeEmail()">
+                        <i class="fa-solid fa-copy"></i> Copy Email
+                    </button>
+                    <div class="dispute-ai-label" style="margin-top:14px;"><i class="fa-solid fa-paper-plane"></i> Send this email to:</div>
+                    <div class="dispute-send-row">
+                        <a class="dispute-send-btn" id="dspBtnParking" href="mailto:parkingoperations@toronto.ca" target="_blank">
+                            <i class="fa-solid fa-square-parking"></i>
+                            <span>Parking Office</span>
+                        </a>
+                        <a class="dispute-send-btn" id="dspBtnCourt" href="mailto:courtservices@toronto.ca" target="_blank">
+                            <i class="fa-solid fa-gavel"></i>
+                            <span>POA Court</span>
+                        </a>
+                        <a class="dispute-send-btn" id="dspBtnPolice" href="mailto:traffic.services@tps.ca" target="_blank">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Police</span>
+                        </a>
+                        <a class="dispute-send-btn" id="dspBtnGreenP" href="mailto:customerservice@greenp.com" target="_blank">
+                            <i class="fa-solid fa-charging-station"></i>
+                            <span>Green P</span>
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <div class="card card-blue card-7">
                 <div class="card-label label-blue"><i class="fa-solid fa-flag-usa"></i> Got a Ticket in the USA?</div>
                 <p class="card-desc">Quick links to pay or dispute US parking tickets and toll violations from any state.</p>
                 <div class="service-list">
-                    <a href="https://www.dmv.org/traffic-tickets/" target="_blank" rel="noopener" class="service-link svc-blue">
+                    <a href="https://www.cvb.uscourts.gov/pay-ticket/online-payment-federal-tickets" target="_blank" rel="noopener" class="service-link svc-blue">
                         <div class="svc-icon">&#x1F17F;</div>
                         <span class="svc-text">Pay US Parking Ticket (All States)</span>
                         <span class="svc-arrow">&#x203A;</span>
@@ -3335,11 +3727,37 @@ HTML_TEMPLATE = """
                     <span class="nav-label">Legal</span>
                 </button>
             </div>
-            <a href="https://www.toronto.ca/services-payments/tickets-fines-penalties/parking-violations/" target="_blank" rel="noopener" class="nav-fab" title="Pay Ticket">
-                <i class="fa-solid fa-receipt"></i>
-            </a>
+            <button class="nav-fab" onclick="openSupportSheet()" title="Support Drivee">
+                <i class="fa-solid fa-handshake-angle"></i>
+            </button>
         </div>
     </nav>
+
+    <!-- Support Sheet -->
+    <div class="support-overlay" id="supportOverlay" onclick="handleSupportOverlayClick(event)">
+        <div class="support-sheet">
+            <div class="support-drag"></div>
+            <div class="support-heart-anim">&#x1F917;</div>
+            <div class="support-title">Support Drivee</div>
+            <div class="support-desc">Drivee is a community-driven project built to help Toronto drivers navigate fines, parking, and traffic law. Your support keeps us running and growing.</div>
+            <div class="support-bullet">
+                <span class="support-bullet-icon">&#x1F697;</span>
+                <div><strong>Smarter parking tools</strong> &mdash; better maps, real-time alerts, and AI-powered guidance for every driver.</div>
+            </div>
+            <div class="support-bullet">
+                <span class="support-bullet-icon">&#x2696;</span>
+                <div><strong>Legal resource expansion</strong> &mdash; partnerships with paralegals to offer free dispute consultations for drivers who can&rsquo;t afford one.</div>
+            </div>
+            <div class="support-bullet">
+                <span class="support-bullet-icon">&#x1F30D;</span>
+                <div><strong>Expand beyond Toronto</strong> &mdash; bring Drivee to Ottawa, Vancouver, Calgary, and across Canada.</div>
+            </div>
+            <a href="https://www.gofundme.com" target="_blank" rel="noopener" class="support-gofundme-btn" onclick="closeSupportSheet()">
+                <i class="fa-solid fa-heart"></i> Donate on GoFundMe
+            </a>
+            <span class="support-close-link" onclick="closeSupportSheet()">Maybe later</span>
+        </div>
+    </div>
 
     <!-- AI Chat FAB -->
     <button class="chat-fab" onclick="toggleChat()" title="Ask Drivee AI">
@@ -3363,7 +3781,7 @@ HTML_TEMPLATE = """
         <div class="chat-messages" id="chatMessages">
             <div class="chat-msg bot">
                 <div class="chat-msg-avatar"><i class="fa-solid fa-robot"></i></div>
-                <div class="chat-msg-bubble">Hi! I am Drivee AI. Ask me anything about Toronto parking tickets, fines, disputes, or traffic law. How can I help you today?</div>
+                <div class="chat-msg-bubble">Hi! I am Drivee AI &#x2728; Ask me anything about Toronto parking tickets, fines, disputes, or traffic law &mdash; or use the chips above to jump straight to what you need. How can I help today?</div>
             </div>
             <div class="chat-msg bot" id="chatTypingRow" style="display:none;">
                 <div class="chat-msg-avatar"><i class="fa-solid fa-robot"></i></div>
@@ -3376,6 +3794,7 @@ HTML_TEMPLATE = """
             <button class="chat-suggestion" onclick="sendSuggestion(this)">How do I dispute a parking ticket?</button>
             <button class="chat-suggestion" onclick="sendSuggestion(this)">What happens if I miss the deadline?</button>
             <button class="chat-suggestion" onclick="sendSuggestion(this)">Do I need a lawyer for stunt driving?</button>
+            <button class="chat-suggestion" onclick="sendSuggestion(this)">I want to report a problem with the app</button>
             <button class="chat-suggestion" onclick="sendSuggestion(this)">How much are late fees in Toronto?</button>
             <button class="chat-suggestion" onclick="sendSuggestion(this)">Can I contest a red light camera fine?</button>
         </div>
@@ -4288,6 +4707,7 @@ HTML_TEMPLATE = """
                 typingRow.style.display = 'none';
                 if (data.reply) {
                     appendChatMsg('bot', data.reply);
+                    addChatNavChips(data.reply);
                     chatHistory.push({ role: 'assistant', content: data.reply });
                 } else {
                     appendChatMsg('bot', data.error || 'Sorry, something went wrong. Please try again.');
@@ -4431,6 +4851,188 @@ HTML_TEMPLATE = """
         function handleInstallOverlayClick(e) {
             if (e.target === document.getElementById('installSheetOverlay')) {
                 closeInstallSheet();
+            }
+        }
+
+        // ── AI Search Bar ─────────────────────────────────────────────
+        function onAiSearchInput(val) {
+            var btn = document.getElementById('aiSearchSendBtn');
+            if (val && val.trim()) {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            } else {
+                btn.style.opacity = '0';
+                btn.style.pointerEvents = 'none';
+            }
+        }
+
+        function sendAiSearch() {
+            var input = document.getElementById('aiSearchInput');
+            var text = (input.value || '').trim();
+            if (!text) return;
+            input.value = '';
+            onAiSearchInput('');
+            input.blur();
+            if (!chatOpen) toggleChat();
+            setTimeout(function() {
+                document.getElementById('chatSuggestions').style.display = 'none';
+                sendChatMessage(text);
+            }, chatOpen ? 0 : 420);
+        }
+
+        var aiChipMessages = {
+            'ticket': 'I just got a parking ticket in Toronto. What should I do? What are my options?',
+            'parking': 'Where can I find free street parking in Toronto right now?',
+            'pay': 'How do I pay my parking fine or camera violation in Toronto?',
+            'dispute': 'How do I dispute a parking ticket or camera fine in Toronto? What is the process?',
+            'towed': 'My car was towed in Toronto. How do I find it and what are the fees?',
+            'report': 'I want to report a problem or send feedback about the Drivee app. My email is drivee.canada@gmail.com'
+        };
+
+        var aiChipNavActions = {
+            'parking': function() { switchTab('hotspots', document.querySelectorAll('.nav-btn')[3]); },
+            'pay': function() { switchTab('services', document.querySelectorAll('.nav-btn')[2]); },
+            'dispute': function() { switchTab('services', document.querySelectorAll('.nav-btn')[2]); }
+        };
+
+        function aiChipAction(type) {
+            if (aiChipNavActions[type] && !chatOpen) {
+                aiChipNavActions[type]();
+                if (type !== 'parking') {
+                    setTimeout(function() {
+                        if (!chatOpen) toggleChat();
+                        setTimeout(function() {
+                            document.getElementById('chatSuggestions').style.display = 'none';
+                            sendChatMessage(aiChipMessages[type]);
+                        }, 420);
+                    }, 300);
+                }
+            } else {
+                if (!chatOpen) toggleChat();
+                setTimeout(function() {
+                    document.getElementById('chatSuggestions').style.display = 'none';
+                    sendChatMessage(aiChipMessages[type] || type);
+                }, chatOpen ? 0 : 420);
+            }
+        }
+
+        // ── Chat nav chips from AI response ───────────────────────────
+        var navKeywords = [
+            { words: ['services tab', 'services section', 'pay fine', 'pay your fine', 'payment portal', 'dispute script'],
+              label: 'Go to Services →', tab: 'services', idx: 2 },
+            { words: ['map tab', 'parking map', 'free parking', 'street parking', 'hotspot'],
+              label: 'Open Map →', tab: 'hotspots', idx: 3 },
+            { words: ['dashboard', 'add reminder', 'set reminder', 'scan ticket'],
+              label: 'Go to Dashboard →', tab: 'dashboard', idx: 1 },
+            { words: ['legal tab', 'find a lawyer', 'paralegal', 'traffic lawyer', 'defence firm'],
+              label: 'Find Legal Help →', tab: 'legal', idx: 4 }
+        ];
+
+        function addChatNavChips(text) {
+            var lower = text.toLowerCase();
+            var chips = [];
+            navKeywords.forEach(function(kw) {
+                if (kw.words.some(function(w) { return lower.indexOf(w) !== -1; })) {
+                    chips.push(kw);
+                }
+            });
+            if (!chips.length) return;
+            var msgs = document.getElementById('chatMessages');
+            var typingRow = document.getElementById('chatTypingRow');
+            var row = document.createElement('div');
+            row.className = 'chat-nav-chip-row';
+            chips.forEach(function(kw) {
+                var btn = document.createElement('button');
+                btn.className = 'chat-nav-chip';
+                btn.textContent = kw.label;
+                btn.onclick = function() {
+                    if (!chatOpen) toggleChat();
+                    else toggleChat();
+                    setTimeout(function() {
+                        switchTab(kw.tab, document.querySelectorAll('.nav-btn')[kw.idx]);
+                    }, 100);
+                };
+                row.appendChild(btn);
+            });
+            msgs.insertBefore(row, typingRow);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        // ── Support Sheet ──────────────────────────────────────────────
+        function openSupportSheet() {
+            document.getElementById('supportOverlay').classList.add('open');
+        }
+        function closeSupportSheet() {
+            document.getElementById('supportOverlay').classList.remove('open');
+        }
+        function handleSupportOverlayClick(e) {
+            if (e.target === document.getElementById('supportOverlay')) closeSupportSheet();
+        }
+
+        // ── Dispute AI Email Builder ───────────────────────────────────
+        function buildDisputeEmailAI() {
+            var issue = (document.getElementById('disputeOwnIssue').value || '').trim();
+            if (!issue) { showToast('Please describe your situation first'); return; }
+
+            var emailSection = document.getElementById('disputeEmailSection');
+            var emailText = document.getElementById('disputeEmailText');
+            emailSection.style.display = 'block';
+            emailText.value = 'Building your email with AI...';
+            emailText.style.color = '#9ca3af';
+            updateDisputeMailtoLinks('Building email...');
+
+            fetch('/api/dispute-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ issue: issue })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.email) {
+                    emailText.value = data.email;
+                    emailText.style.color = '';
+                    updateDisputeMailtoLinks(data.email);
+                    emailSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    showToast('Email built! Copy or tap to send.');
+                } else {
+                    emailText.value = data.error || 'Unable to build email. Please try again.';
+                    emailText.style.color = '#dc2626';
+                }
+            })
+            .catch(function() {
+                emailText.value = 'Network error. Please check your connection.';
+                emailText.style.color = '#dc2626';
+            });
+        }
+
+        function updateDisputeMailtoLinks(body) {
+            var subject = encodeURIComponent('Parking Infraction Dispute');
+            var bodyEnc = encodeURIComponent(body);
+            var emails = {
+                'dspBtnParking': 'parkingoperations@toronto.ca',
+                'dspBtnCourt':   'courtservices@toronto.ca',
+                'dspBtnPolice':  'traffic.services@tps.ca',
+                'dspBtnGreenP':  'customerservice@greenp.com'
+            };
+            Object.keys(emails).forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.href = 'mailto:' + emails[id] + '?subject=' + subject + '&body=' + bodyEnc;
+            });
+        }
+
+        function copyDisputeEmail() {
+            var ta = document.getElementById('disputeEmailText');
+            if (!ta || !ta.value || ta.value.indexOf('Building') === 0) {
+                showToast('Email not ready yet'); return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(ta.value).then(function() {
+                    showToast('Email copied to clipboard');
+                });
+            } else {
+                ta.select();
+                document.execCommand('copy');
+                showToast('Email copied to clipboard');
             }
         }
     </script>
@@ -4636,6 +5238,42 @@ def handle_311_report():
             pass
     return redirect('/?reported=1')
 
+
+@app.route('/api/dispute-email', methods=['POST'])
+def dispute_email():
+    try:
+        data = request.get_json(force=True) or {}
+        issue = (data.get('issue') or '').strip()
+        if not issue:
+            return jsonify({'error': 'No issue description provided'}), 400
+
+        prompt = (
+            "You are a professional legal letter writer helping a Toronto driver dispute a parking or traffic infraction. "
+            "Write a formal, polite dispute email based on the following situation described by the driver:\n\n"
+            + issue + "\n\n"
+            "The email should:\n"
+            "- Start with 'To the Screening Officer,' or 'To Whom It May Concern,'\n"
+            "- Clearly state they are requesting cancellation of the infraction notice\n"
+            "- Explain the grounds for dispute based on the driver's description\n"
+            "- Mention any evidence they may have (photos, permit, witnesses)\n"
+            "- Be professional, concise (3-5 paragraphs), and factual\n"
+            "- End with 'Respectfully,' and leave a blank for their name and date\n"
+            "Do not include placeholders like [YOUR NAME] in the body — just leave 'Respectfully,' at the end."
+        )
+
+        response = _openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            max_completion_tokens=600
+        )
+        email_text = response.choices[0].message.content or ""
+        return jsonify({'email': email_text})
+    except Exception as e:
+        err = str(e)
+        if "FREE_CLOUD_BUDGET_EXCEEDED" in err:
+            return jsonify({'error': 'Cloud budget exceeded. Please try again later.'}), 429
+        return jsonify({'error': 'AI service unavailable. Please try again.'}), 500
+
 @app.route('/api/analyze-photo', methods=['POST'])
 def analyze_photo():
     try:
@@ -4678,8 +5316,13 @@ def chat():
             "find payment options, understand late fees, and decide whether to contest or pay. "
             "You know Toronto bylaws, the Highway Traffic Act (HTA), POA courts, Green P parking, "
             "and can recommend when to hire a paralegal or traffic lawyer. "
+            "The Drivee app has these tabs: Dashboard (profile, ticket scanner, reminders, deadline calculator), "
+            "Services (pay/dispute parking tickets, camera fines, court services, Green P parking rates, dispute script builder), "
+            "Map (free street parking spots across Toronto), and Legal (traffic lawyers and paralegals). "
+            "When relevant, mention which tab or section can help the user. "
             "Keep answers concise, practical, and friendly. When uncertain, say so and suggest "
-            "the user consult a professional. Do not give legal advice for criminal charges."
+            "the user consult a professional. Do not give legal advice for criminal charges. "
+            "If a user wants to report a problem with the app or give feedback, tell them to email drivee.canada@gmail.com."
         )
 
         full_messages = [{"role": "system", "content": system_prompt}] + messages
