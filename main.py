@@ -3153,7 +3153,7 @@ HTML_TEMPLATE = """
                 mapInstance.invalidateSize();
                 return;
             }
-            mapInstance = L.map('map', { zoomControl: true }).setView([43.6532, -79.3832], 14);
+            mapInstance = L.map('map', { zoomControl: true }).setView([43.6532, -79.3832], 15);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
                 maxZoom: 19,
@@ -3846,11 +3846,17 @@ HTML_TEMPLATE = """
                     + '<div><div style="font-size:9px;text-transform:uppercase;color:#9ca3af;font-weight:600;letter-spacing:0.5px;margin-bottom:2px;">Max Stay</div>'
                     + '<div style="font-size:12px;font-weight:700;color:' + (isLimited ? '#b45309' : '#15803d') + ';">' + s.maxStay + '</div></div>'
                     + '</div>'
-                    + '<div style="font-size:11px;color:#6b7280;padding:0 2px;">' + s.rules + '</div>'
+                    + '<div style="font-size:11px;color:#6b7280;padding:0 2px;margin-bottom:8px;">' + s.rules + '</div>'
+                    + '<a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.addr + ', Toronto, ON') + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:5px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;padding:7px;font-size:12px;font-weight:600;color:#0369a1;text-decoration:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>View on Google Maps</a>'
                     + '</div>';
-                L.marker([s.lat, s.lng], { icon: icon })
-                 .bindPopup(popup, { maxWidth: 260 })
-                 .addTo(freeDropoffGroup);
+                (function(spot) {
+                    var marker = L.marker([spot.lat, spot.lng], { icon: icon });
+                    marker.bindPopup(popup, { maxWidth: 260 });
+                    marker.on('click', function() {
+                        mapInstance.flyTo([spot.lat, spot.lng], 18, { animate: true, duration: 0.6 });
+                    });
+                    marker.addTo(freeDropoffGroup);
+                })(s);
             });
             freeDropoffGroup.addTo(mapInstance);
             var countEl = document.getElementById('spotCountBadge');
