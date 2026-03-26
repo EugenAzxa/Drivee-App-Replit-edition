@@ -2544,7 +2544,7 @@ HTML_TEMPLATE = """
             </div>
             <div class="install-steps" id="installSteps"></div>
             <button class="install-got-it" onclick="dismissInstall()">Got it — Thanks!</button>
-            <span class="install-later" onclick="dismissInstall()">Maybe later</span>
+            <span class="install-later" onclick="closeInstallSheet()">Maybe later</span>
         </div>
     </div>
 
@@ -4368,13 +4368,21 @@ HTML_TEMPLATE = """
             var splash = document.getElementById('splashScreen');
             if (!splash) return;
 
-            // After animation completes, remove from DOM and check install
+            var splashDone = false;
+            function onSplashDone() {
+                if (splashDone) return;
+                splashDone = true;
+                splash.style.display = 'none';
+                checkInstallPrompt();
+            }
+
+            // Primary: CSS animationend
             splash.addEventListener('animationend', function(e) {
-                if (e.animationName === 'splashExit') {
-                    splash.style.display = 'none';
-                    checkInstallPrompt();
-                }
+                if (e.animationName === 'splashExit') onSplashDone();
             });
+
+            // Fallback: in case animationend never fires (e.g. reduced-motion, old browser)
+            setTimeout(onSplashDone, 3200);
         })();
 
         function checkInstallPrompt() {
@@ -4409,15 +4417,19 @@ HTML_TEMPLATE = """
             }
         }
 
-        function dismissInstall() {
-            localStorage.setItem('drivee_install_dismissed', '1');
+        function closeInstallSheet() {
             var overlay = document.getElementById('installSheetOverlay');
             if (overlay) overlay.classList.remove('open');
         }
 
+        function dismissInstall() {
+            localStorage.setItem('drivee_install_dismissed', '1');
+            closeInstallSheet();
+        }
+
         function handleInstallOverlayClick(e) {
             if (e.target === document.getElementById('installSheetOverlay')) {
-                dismissInstall();
+                closeInstallSheet();
             }
         }
     </script>
