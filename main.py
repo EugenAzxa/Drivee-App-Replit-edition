@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from urllib.parse import quote
 import os
 import json
+import re
 from openai import OpenAI
 
 # do not change this unless explicitly requested by the user
@@ -2850,7 +2851,56 @@ HTML_TEMPLATE = """
             -webkit-tap-highlight-color: transparent;
         }
         .chat-nav-chip:active { background: rgba(10,132,255,0.2); }
-    </style>
+    
+        /* ---- Chat photo button ---- */
+        .chat-photo-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f0f4ff;
+            color: #0A84FF;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            transition: background 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .chat-photo-btn:active { background: rgba(10,132,255,0.18); }
+        .chat-photo-preview-wrap {
+            padding: 6px 12px 0;
+            display: flex;
+            gap: 8px;
+        }
+        .chat-photo-thumb {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1.5px solid var(--border);
+        }
+        .chat-photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .chat-photo-thumb-remove {
+            position: absolute; top: 2px; right: 2px;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.65);
+            color: #fff; border: none;
+            font-size: 10px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .chat-msg-photo {
+            max-width: 200px;
+            border-radius: 10px;
+            margin-bottom: 4px;
+            display: block;
+        }
+</style>
     <link rel="manifest" href="/manifest.json">
     <meta name="apple-mobile-web-app-title" content="Drivee">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230A84FF'/><text x='50' y='68' font-size='52' text-anchor='middle' font-family='-apple-system,sans-serif' font-weight='900' fill='white'>D</text></svg>">
@@ -3798,8 +3848,13 @@ HTML_TEMPLATE = """
             <button class="chat-suggestion" onclick="sendSuggestion(this)">How much are late fees in Toronto?</button>
             <button class="chat-suggestion" onclick="sendSuggestion(this)">Can I contest a red light camera fine?</button>
         </div>
+        <div id="chatPhotoPreviewWrap" class="chat-photo-preview-wrap" style="display:none"></div>
         <div class="chat-input-row">
-            <textarea class="chat-input" id="chatInput" placeholder="Ask about tickets, fines, disputes..." rows="1"
+            <button class="chat-photo-btn" onclick="document.getElementById('chatPhotoInput').click()" title="Send a photo">
+                <i class="fa-solid fa-camera"></i>
+            </button>
+            <input type="file" id="chatPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="onChatPhotoSelected(event)">
+            <textarea class="chat-input" id="chatInput" placeholder="Ask about your ticket or send a photo..." rows="1"
                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"
                 oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
             <button class="chat-send" id="chatSendBtn" onclick="sendChat()">
@@ -4664,7 +4719,20 @@ HTML_TEMPLATE = """
         function sendChat() {
             var input = document.getElementById('chatInput');
             var text = input.value.trim();
-            if (!text || chatBusy) return;
+            if (chatBusy) return;
+            if (chatPendingPhoto) {
+                var photo = chatPendingPhoto;
+                chatPendingPhoto = null;
+                var wrap = document.getElementById('chatPhotoPreviewWrap');
+                if (wrap) { wrap.innerHTML = ''; wrap.style.display = 'none'; }
+                input.value = '';
+                input.style.height = 'auto';
+                input.placeholder = 'Ask about your ticket or send a photo...';
+                document.getElementById('chatSuggestions').style.display = 'none';
+                sendChatWithPhoto(text, photo);
+                return;
+            }
+            if (!text) return;
             input.value = '';
             input.style.height = 'auto';
             document.getElementById('chatSuggestions').style.display = 'none';
@@ -5035,6 +5103,114 @@ HTML_TEMPLATE = """
                 showToast('Email copied to clipboard');
             }
         }
+
+        // ---- Legal tab: AI photo scan --------------------------------
+        async function performLegalScan(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            var statusEl = document.getElementById('legalScanStatus');
+            var verdictEl = document.getElementById('legalVerdict');
+            statusEl.className = 'scan-status loading';
+            statusEl.textContent = 'AI is analysing your ticket...';
+            verdictEl.classList.remove('show');
+            try {
+                var dataUrl = await fileToDataURL(file);
+                var b64 = dataUrl.split(',')[1];
+                var res = await fetch('/api/analyze-ticket-photo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ photo: b64 })
+                });
+                var data = await res.json();
+                if (data.error) throw new Error(data.error);
+                var cssMap = { pay: 'verdict-pay', contest: 'verdict-contest', paralegal: 'verdict-paralegal', lawyer: 'verdict-lawyer' };
+                var badgeMap = { pay: '✓ Just Pay It', contest: '⚖️ Contest It Yourself', paralegal: 'Get a Paralegal', lawyer: '⚠️ Get a Lawyer' };
+                verdictEl.className = 'legal-verdict show ' + (cssMap[data.verdict] || 'verdict-contest');
+                document.getElementById('legalVerdictBadge').textContent = badgeMap[data.verdict] || data.verdict;
+                document.getElementById('legalVerdictHeadline').textContent = data.headline || '';
+                var finePill = document.getElementById('legalVerdictFine');
+                if (data.fine) { finePill.textContent = data.fine; finePill.style.display = ''; }
+                else { finePill.style.display = 'none'; }
+                document.getElementById('legalVerdictDetail').textContent = data.detail || '';
+                document.getElementById('legalVerdictCTA').style.display = data.show_firms ? '' : 'none';
+                statusEl.className = 'scan-status done';
+                statusEl.textContent = 'Analysis complete!';
+            } catch (err) {
+                statusEl.className = 'scan-status error';
+                statusEl.textContent = 'Analysis failed. Try a clearer, well-lit photo.';
+            }
+            event.target.value = '';
+        }
+
+        // ---- Chat panel: photo upload --------------------------------
+        var chatPendingPhoto = null;
+
+        async function onChatPhotoSelected(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            var dataUrl = await fileToDataURL(file);
+            chatPendingPhoto = dataUrl.split(',')[1];
+            var wrap = document.getElementById('chatPhotoPreviewWrap');
+            wrap.innerHTML = '';
+            wrap.style.display = 'flex';
+            var thumb = document.createElement('div');
+            thumb.className = 'chat-photo-thumb';
+            var img = document.createElement('img');
+            img.src = dataUrl;
+            var rm = document.createElement('button');
+            rm.className = 'chat-photo-thumb-remove';
+            rm.textContent = '×';
+            rm.onclick = function() {
+                chatPendingPhoto = null;
+                wrap.innerHTML = ''; wrap.style.display = 'none';
+                event.target.value = '';
+            };
+            thumb.appendChild(img); thumb.appendChild(rm);
+            wrap.appendChild(thumb);
+            document.getElementById('chatInput').focus();
+        }
+
+        function sendChatWithPhoto(text, photoB64) {
+            if (chatBusy) return;
+            chatBusy = true;
+            var msgs = document.getElementById('chatMessages');
+            var typingRow = document.getElementById('chatTypingRow');
+            var userMsg = text || 'Please analyse this photo and tell me what to do about this ticket.';
+            var div = document.createElement('div');
+            div.className = 'chat-msg user';
+            div.innerHTML = '<div class="chat-msg-avatar"><i class="fa-solid fa-user"></i></div>'
+                + '<div class="chat-msg-bubble"><img src="data:image/jpeg;base64,' + photoB64 + '" class="chat-msg-photo"><br>' + (text || '[Photo sent]') + '</div>';
+            msgs.insertBefore(div, typingRow);
+            chatHistory.push({ role: 'user', content: userMsg + ' [photo attached]' });
+            typingRow.style.display = 'flex';
+            msgs.scrollTop = msgs.scrollHeight;
+            document.getElementById('chatSendBtn').disabled = true;
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: chatHistory, photo: photoB64 })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                typingRow.style.display = 'none';
+                if (data.reply) {
+                    appendChatMsg('bot', data.reply);
+                    addChatNavChips(data.reply);
+                    chatHistory.push({ role: 'assistant', content: data.reply });
+                } else {
+                    appendChatMsg('bot', data.error || 'Sorry, something went wrong.');
+                }
+            })
+            .catch(function() {
+                typingRow.style.display = 'none';
+                appendChatMsg('bot', 'Connection error. Please try again.');
+            })
+            .finally(function() {
+                chatBusy = false;
+                document.getElementById('chatSendBtn').disabled = false;
+                msgs.scrollTop = msgs.scrollHeight;
+            });
+        }
     </script>
 </body>
 </html>
@@ -5274,6 +5450,54 @@ def dispute_email():
             return jsonify({'error': 'Cloud budget exceeded. Please try again later.'}), 429
         return jsonify({'error': 'AI service unavailable. Please try again.'}), 500
 
+
+@app.route('/api/analyze-ticket-photo', methods=['POST'])
+def analyze_ticket_photo():
+    try:
+        data = request.get_json(force=True) or {}
+        photo_b64 = data.get('photo', '')
+        if not photo_b64:
+            return jsonify({'error': 'No photo provided'}), 400
+        prompt = (
+            'You are a Toronto traffic legal expert. Analyse this parking or traffic ticket photo.\n'
+            'Return ONLY valid JSON (no markdown, no explanation) with these exact fields:\n'
+            '{\n'
+            '  "verdict": "pay" | "contest" | "paralegal" | "lawyer",\n'
+            '  "headline": "short action phrase max 8 words",\n'
+            '  "fine": "amount visible e.g. $150.00 or empty string",\n'
+            '  "detail": "2-3 sentences of advice based on what you see",\n'
+            '  "show_firms": true or false\n'
+            '}\n'
+            'Verdict guide:\n'
+            '- pay: minor parking fine under $100, clear infraction\n'
+            '- contest: unclear signage, procedural error, equipment fault\n'
+            '- paralegal: demerit point offence, fine $150+, camera ticket\n'
+            '- lawyer: stunt driving, DUI, criminal charge, fine $500+\n'
+            'Set show_firms true for paralegal or lawyer verdicts.'
+        )
+        response = _openai_client.chat.completions.create(
+            model='gpt-4o',
+            messages=[{
+                'role': 'user',
+                'content': [
+                    {'type': 'text', 'text': prompt},
+                    {'type': 'image_url', 'image_url': {'url': 'data:image/jpeg;base64,' + photo_b64}}
+                ]
+            }],
+            max_completion_tokens=400
+        )
+        raw = response.choices[0].message.content or '{}'
+        match = re.search(r'\{.*\}', raw, re.DOTALL)
+        if match:
+            parsed = json.loads(match.group())
+            return jsonify(parsed)
+        return jsonify({'error': 'Could not parse AI response'}), 500
+    except Exception as e:
+        err = str(e)
+        if 'FREE_CLOUD_BUDGET_EXCEEDED' in err:
+            return jsonify({'error': 'Budget exceeded'}), 429
+        return jsonify({'error': 'AI service unavailable'}), 500
+
 @app.route('/api/analyze-photo', methods=['POST'])
 def analyze_photo():
     try:
@@ -5324,6 +5548,18 @@ def chat():
             "the user consult a professional. Do not give legal advice for criminal charges. "
             "If a user wants to report a problem with the app or give feedback, tell them to email drivee.canada@gmail.com."
         )
+
+        photo_b64 = data.get('photo', '')
+
+        # If photo provided, replace last user message with vision content
+        if photo_b64 and messages:
+            last = messages[-1]
+            if last.get('role') == 'user':
+                vision_content = [
+                    {'type': 'text', 'text': last.get('content', 'Please analyse this ticket photo.')},
+                    {'type': 'image_url', 'image_url': {'url': 'data:image/jpeg;base64,' + photo_b64}}
+                ]
+                messages = messages[:-1] + [{'role': 'user', 'content': vision_content}]
 
         full_messages = [{"role": "system", "content": system_prompt}] + messages
 
